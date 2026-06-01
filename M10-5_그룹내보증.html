@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M10-5: 그룹 내 보증(Financial Guarantees)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#881337;--purple-light:#fff1f2;--purple-mid:#e11d48;--purple-dark:#4c0519;
+  --green:#0369a1;--green-light:#e0f2fe;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,#4c0519 0%,#881337 60%,#e11d48 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple-dark);line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#fff1f2;border-left:4px solid #fda4af;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple);line-height:1.75}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#fecdd3}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body p{margin-bottom:.65rem}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #fda4af;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p,.col-box ul{font-size:.85rem;color:var(--text2);margin:0;line-height:1.65}
+.col-box ul{padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.blue{border-color:#93c5fd;background:#eff6ff}
+.col-box.blue h4{color:#1d4ed8}
+.col-box.green{border-color:#6ee7b7;background:#ecfdf5}
+.col-box.green h4{color:#065f46}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.gray{border-color:#d1d5db;background:#f9fafb}
+.col-box.gray h4{color:#374151}
+/* 보증 유형 그리드 */
+.guar-type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin:.8rem 0}
+.gt-card{border-radius:12px;padding:1.1rem;border:2px solid}
+.gt-card.explicit{border-color:var(--purple-mid);background:#fff1f2}
+.gt-card.explicit h4{color:var(--purple)}
+.gt-card.comfort{border-color:#93c5fd;background:#eff6ff}
+.gt-card.comfort h4{color:#1d4ed8}
+.gt-card.keepwell{border-color:#6ee7b7;background:#ecfdf5}
+.gt-card.keepwell h4{color:#065f46}
+.gt-card.cross{border-color:#fcd34d;background:#fffbeb}
+.gt-card.cross h4{color:#92400e}
+.gt-card .gt-strength{font-size:.72rem;font-weight:700;letter-spacing:.5px;margin-bottom:.4rem;display:inline-block;padding:2px 8px;border-radius:20px}
+.gt-card.explicit .gt-strength{background:var(--purple);color:#fff}
+.gt-card.comfort .gt-strength{background:#1d4ed8;color:#fff}
+.gt-card.keepwell .gt-strength{background:#065f46;color:#fff}
+.gt-card.cross .gt-strength{background:#92400e;color:#fff}
+.gt-card h4{font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.gt-card p{font-size:.8rem;color:var(--text2);line-height:1.55;margin-bottom:.35rem}
+.gt-card ul{font-size:.78rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.5}
+.gt-card li{margin-bottom:.2rem}
+/* 보증 구조도 */
+.guar-flow{background:#fff1f2;border:2px solid #fda4af;border-radius:14px;padding:1.2rem;margin:.8rem 0}
+.gf-title{font-size:.88rem;font-weight:700;color:var(--purple);text-align:center;margin-bottom:.8rem}
+.gf-diagram{display:flex;align-items:center;justify-content:center;gap:.8rem;flex-wrap:wrap}
+.gf-box{border-radius:10px;padding:.7rem 1rem;text-align:center;font-size:.82rem;font-weight:600;min-width:110px}
+.gf-box.guarantor{background:var(--purple);color:#fff}
+.gf-box.guarantor span{font-size:.68rem;font-weight:400;display:block;opacity:.85}
+.gf-box.borrower{background:#fff;border:2px solid #fda4af;color:var(--purple-dark)}
+.gf-box.borrower span{font-size:.68rem;color:var(--text2);display:block}
+.gf-box.lender{background:#eff6ff;border:2px solid #93c5fd;color:#1d4ed8}
+.gf-box.lender span{font-size:.68rem;color:var(--text2);display:block}
+.gf-arrow{display:flex;flex-direction:column;align-items:center;gap:.1rem}
+.gf-arrow-line{font-size:.9rem;color:var(--purple-mid);font-weight:700}
+.gf-arrow-label{font-size:.68rem;color:var(--text2);text-align:center;white-space:nowrap}
+/* FAR 분석 박스 */
+.far-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+.far-card{border-radius:10px;padding:1rem;border:1.5px solid var(--gray-border);background:#fff}
+.far-card .fc-icon{font-size:1.2rem;margin-bottom:.3rem}
+.far-card h4{font-size:.88rem;font-weight:700;color:var(--purple-dark);margin-bottom:.35rem}
+.far-card ul{font-size:.8rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.55}
+.far-card li{margin-bottom:.25rem}
+/* 보증료 산정 방법 카드 */
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.meth-card{border-radius:12px;padding:1.1rem;border:2px solid}
+.meth-card.cup{border-color:var(--purple-mid);background:#fff1f2}
+.meth-card.cup h4{color:var(--purple)}
+.meth-card.el{border-color:#93c5fd;background:#eff6ff}
+.meth-card.el h4{color:#1d4ed8}
+.meth-card.yield{border-color:#6ee7b7;background:#ecfdf5}
+.meth-card.yield h4{color:#065f46}
+.meth-card.cap{border-color:#fcd34d;background:#fffbeb}
+.meth-card.cap h4{color:#92400e}
+.meth-card .m-badge{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:.4rem;display:inline-block}
+.meth-card.cup .m-badge{background:var(--purple);color:#fff}
+.meth-card.el .m-badge{background:#1d4ed8;color:#fff}
+.meth-card.yield .m-badge{background:#065f46;color:#fff}
+.meth-card.cap .m-badge{background:#92400e;color:#fff}
+.meth-card h4{font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.meth-card p{font-size:.8rem;color:var(--text2);line-height:1.6;margin-bottom:.35rem}
+.meth-card ul{font-size:.78rem;color:var(--text2);padding-left:1.1rem;margin:.3rem 0 0;line-height:1.5}
+.meth-card li{margin-bottom:.2rem}
+.meth-formula{background:rgba(255,255,255,.8);border-radius:6px;padding:.5rem .8rem;margin-top:.5rem;font-size:.82rem;font-weight:600;color:var(--text);text-align:center;border:1px solid rgba(0,0,0,.08)}
+/* 기대손실 계산 박스 */
+.el-calc{background:#eff6ff;border:2px solid #93c5fd;border-radius:12px;padding:1.2rem;margin:.8rem 0}
+.el-title{font-size:.88rem;font-weight:700;color:#1d4ed8;margin-bottom:.8rem}
+.el-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;border-bottom:1px solid #bfdbfe;font-size:.84rem}
+.el-row:last-child{border:none}
+.el-row.total{background:#1d4ed8;color:#fff;border-radius:6px;font-weight:700;padding:.5rem .6rem}
+.el-label{color:var(--text2)}
+.el-row.total .el-label{color:rgba(255,255,255,.85)}
+.el-val{font-weight:600;color:var(--text)}
+.el-row.total .el-val{color:#fff;font-weight:700}
+/* 수익률 접근법 비교 */
+.yield-compare{background:#ecfdf5;border:2px solid #6ee7b7;border-radius:12px;padding:1.2rem;margin:.8rem 0}
+.yc-title{font-size:.88rem;font-weight:700;color:#065f46;margin-bottom:.8rem}
+.yc-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;border-bottom:1px solid #a7f3d0;font-size:.84rem}
+.yc-row:last-child{border:none}
+.yc-row.total{background:#065f46;color:#fff;border-radius:6px;font-weight:700;padding:.5rem .6rem}
+.yc-row.subtotal{background:#d1fae5;font-weight:700;color:#065f46}
+.yc-label{color:var(--text2)}
+.yc-row.total .yc-label,.yc-row.subtotal .yc-label{color:inherit}
+.yc-val{font-weight:600;color:var(--text)}
+.yc-row.total .yc-val,.yc-row.subtotal .yc-val{color:inherit;font-weight:700}
+/* ALP 범위 박스 */
+.alp-band{background:#fff1f2;border:2px solid #fda4af;border-radius:14px;padding:1.3rem;margin:.8rem 0}
+.ab-title{font-size:.9rem;font-weight:700;color:var(--purple);margin-bottom:1rem;text-align:center}
+.ab-zone{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin:.5rem 0}
+.ab-item{border-radius:8px;padding:.7rem .8rem;text-align:center}
+.ab-item.floor{background:#d1fae5;border:1.5px solid #6ee7b7}
+.ab-item.floor strong{color:#065f46}
+.ab-item.alp{background:#fff1f2;border:1.5px solid #fda4af}
+.ab-item.alp strong{color:var(--purple)}
+.ab-item.ceil{background:#fee2e2;border:1.5px solid #fca5a5}
+.ab-item.ceil strong{color:#b91c1c}
+.ab-item h5{font-size:.75rem;font-weight:600;margin-bottom:.25rem;color:var(--text)}
+.ab-item strong{font-size:.88rem;display:block;margin-bottom:.15rem}
+.ab-item p{font-size:.68rem;color:var(--text2);margin:0;line-height:1.4}
+/* 종합 사례 */
+.case-study{background:#fff1f2;border:2px solid var(--purple-mid);border-radius:14px;padding:1.4rem;margin:.8rem 0}
+.cs-title{font-size:.95rem;font-weight:700;color:var(--purple);margin-bottom:.2rem}
+.cs-sub{font-size:.78rem;color:var(--text2);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid #fecdd3}
+.cs-setup{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+.cs-item{background:#fff;border-radius:8px;padding:.7rem .9rem;border:1px solid #fecdd3}
+.cs-item h5{font-size:.78rem;font-weight:700;color:var(--purple);margin-bottom:.3rem}
+.cs-item p{font-size:.78rem;color:var(--text2);margin:0;line-height:1.5}
+.cs-methods{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin:.8rem 0}
+.cs-meth{border-radius:10px;padding:.9rem}
+.cs-meth.m1{background:#fff1f2;border:1.5px solid #fda4af}
+.cs-meth.m1 h5{color:var(--purple)}
+.cs-meth.m2{background:#eff6ff;border:1.5px solid #93c5fd}
+.cs-meth.m2 h5{color:#1d4ed8}
+.cs-meth.m3{background:#ecfdf5;border:1.5px solid #6ee7b7}
+.cs-meth.m3 h5{color:#065f46}
+.cs-meth h5{font-size:.82rem;font-weight:700;margin-bottom:.4rem}
+.cs-meth p{font-size:.8rem;color:var(--text2);line-height:1.55;margin:0}
+.cs-meth .cs-result{font-size:.88rem;font-weight:700;margin-top:.4rem;padding:.3rem .6rem;border-radius:6px;background:rgba(255,255,255,.7);text-align:center}
+.cs-conclusion{margin-top:.8rem;background:#fff;border-radius:8px;padding:.8rem 1rem;font-size:.83rem;color:var(--text2);line-height:1.6;border:1px solid #fecdd3}
+.cs-conclusion strong{color:var(--purple-dark)}
+/* 퀴즈 */
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0f9ff;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+/* 체크리스트 */
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+/* 네비게이션 */
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .guar-type-grid,.method-grid,.two-col,.far-grid,.ab-zone,.cs-setup,.cs-methods{grid-template-columns:1fr}
+  .gf-diagram{flex-direction:column}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter X 금융거래(Financial Transactions) › M10-5 (5/6)</div>
+  <h1>M10-5. 그룹 내 보증(Financial Guarantees)</h1>
+  <div class="sub">보증 유형 분류 &amp; 보증 제공자 FAR 분석 &amp; 보증료 산정 방법론 &amp; ALP 범위 결정&nbsp;|&nbsp;¶10.146 – ¶10.175&nbsp;|&nbsp;예상 학습시간: 60분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('sec1')">1. 보증 유형과 개념 </button>
+      <button class="nav-item" onclick="goTo('sec2')">2. 보증료 산정 방법론 </button>
+      <button class="nav-item" onclick="goTo('sec3')">3. ALP 범위와 실무 이슈 </button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('chk')">☑ 핵심 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습 목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습 목표</h2>
+      <p>M10-5에서는 M10-2에서 간략히 소개한 <strong>명시적 보증(Explicit Guarantee)</strong>을 심층적으로 다룹니다. OECD Chapter X ¶10.146은 그룹 내 금융 보증이 차주의 차입 비용을 실질적으로 낮추고 보증인의 우발 부채를 증가시키므로, 적절한 보증료를 통해 정상가격 원칙을 충족해야 함을 명시합니다.</p>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>명시적 보증·컴포트레터·키프웰 약정·교차 채무 불이행 조항의 차이를 구별하고 각각의 법적·세무적 효과를 설명할 수 있다</span></li>
+        <li><span class="obj-num">2</span><span>보증 제공자(Guarantor)의 기능·위험·자산(FAR)을 분석하고 보증이 제공하는 경제적 편익과 비용을 정량화할 수 있다</span></li>
+        <li><span class="obj-num">3</span><span>CUP방법, 기대손실 접근법, 수익률 접근법, 자본 지원 접근법으로 ALP 보증료를 산정하고 비교·검증할 수 있다</span></li>
+        <li><span class="obj-num">4</span><span>보증의 ALP 범위(보증인의 최저 요구 수익 ~ 차주의 최대 지급 가능 수준)를 설정하고 적정 보증료를 결정할 수 있다</span></li>
+        <li><span class="obj-num">5</span><span>보증이 없다고 가정 시 적용될 독립 신용등급 기반 이자율과 보증 적용 이자율을 비교하여 보증의 경제적 가치를 산정할 수 있다</span></li>
+      </ul>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="card" id="sec1">
+      <h2>§1 보증의 유형과 개념 <span class="tag tag-para">¶10.146–¶10.155</span></h2>
+      <p>그룹 내 금융 보증이란 모회사(또는 관계사)가 자회사의 채무를 담보하는 약속을 채권자에게 제공함으로써 차주의 신용도를 높이는 거래입니다. OECD 지침서 ¶10.146은 보증이 차주에게 직접적·실질적인 경제적 편익(이자 절감)을 제공하므로, 독립 기업 간이라면 반드시 보증료가 지급될 것임을 강조합니다.</p>
+    </div>
+
+    <div class="accordion" id="acc1">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ① 그룹 내 보증의 유형 — 강도에 따른 분류 <span class="para">¶10.146–¶10.150</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>그룹 내 신용 지원 도구는 법적 구속력과 경제적 효과의 강도에 따라 네 가지로 분류됩니다. 강도가 높을수록 채권자에게 더 강한 보호를 제공하므로 차주의 신용등급 상향 효과가 크고, 이에 따라 보증인이 요구하는 보증료도 높아지는 경향이 있습니다.</p>
+
+        <div class="guar-type-grid">
+          <div class="gt-card explicit">
+            <span class="gt-strength">최강 — 법적 의무</span>
+            <h4>① 명시적 보증 (Explicit/Financial Guarantee)</h4>
+            <p>보증인이 채권자와 직접 서면 계약을 체결하여 차주의 채무 불이행 시 <strong>자신이 대신 변제할 법적 의무</strong>를 지는 보증입니다. 가장 강력한 신용 지원 수단입니다.</p>
+            <ul>
+              <li>채권자에 대한 직접적·무조건적 채무</li>
+              <li>차주 파산 시 보증인에게 청구권 발생</li>
+              <li>신용등급 2~3 notch 상향 효과</li>
+              <li>이전가격: ALP 보증료 반드시 필요</li>
+            </ul>
+          </div>
+          <div class="gt-card comfort">
+            <span class="gt-strength">강 — 도덕적 의무</span>
+            <h4>② 컴포트레터 (Letter of Comfort / Support)</h4>
+            <p>모회사가 자회사의 채무 이행을 <strong>"지원할 의사"</strong>를 채권자에게 서면으로 표명하는 문서입니다. 법적 구속력보다는 도덕적 의무에 가깝습니다.</p>
+            <ul>
+              <li>법적 의무 아닌 의사 표명 수준</li>
+              <li>채권자에게 부분적 신뢰 제공</li>
+              <li>신용등급 1~2 notch 상향 효과</li>
+              <li>이전가격: 경우에 따라 보증료 필요</li>
+            </ul>
+          </div>
+          <div class="gt-card keepwell">
+            <span class="gt-strength">중 — 재무 유지 약정</span>
+            <h4>③ 키프웰 약정 (Keep-Well Agreement)</h4>
+            <p>모회사가 자회사의 재무 지표(자본비율, 유동성 등)를 <strong>일정 수준 이상으로 유지</strong>할 것을 약속하는 계약입니다. 간접적 신용 지원입니다.</p>
+            <ul>
+              <li>자회사 재무 건전성 유지 의무</li>
+              <li>파산 방지 목적의 자본 주입 약속</li>
+              <li>신용등급 1~1.5 notch 상향 효과</li>
+              <li>이전가격: 약정 수준에 따라 보증료</li>
+            </ul>
+          </div>
+          <div class="gt-card cross">
+            <span class="gt-strength">약 — 연동 조항</span>
+            <h4>④ 교차 채무 불이행 (Cross-Default Clause)</h4>
+            <p>대출 계약상 그룹 내 한 법인의 채무 불이행이 다른 법인의 채무도 기한의 이익을 상실시키는 조항입니다. 직접적 보증은 아닙니다.</p>
+            <ul>
+              <li>그룹 간 채무 연동 구조</li>
+              <li>직접적 신용 지원 아님</li>
+              <li>신용등급 상향 효과 미미</li>
+              <li>이전가격: 단독으로는 보증료 미발생</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guar-flow">
+          <div class="gf-title">▼ 명시적 보증(Explicit Guarantee) 당사자 구조</div>
+          <div class="gf-diagram">
+            <div class="gf-box guarantor">모회사 A<br>(보증인·Guarantor)<span>보증 제공 → 우발 채무 발생</span></div>
+            <div class="gf-arrow">
+              <div class="gf-arrow-line">⟵ 보증료 수취</div>
+              <div class="gf-arrow-label">ALP 보증료</div>
+              <div class="gf-arrow-line">보증 서한 →</div>
+            </div>
+            <div class="gf-box borrower">자회사 B<br>(차주·Borrower)<span>이자 절감 편익 향유</span></div>
+            <div class="gf-arrow">
+              <div class="gf-arrow-line">← 대출금</div>
+              <div class="gf-arrow-label">낮은 금리로 차입</div>
+              <div class="gf-arrow-line">이자 →</div>
+            </div>
+            <div class="gf-box lender">외부 은행<br>(채권자·Lender)<span>보증으로 신용 위험 감소</span></div>
+          </div>
+          <p style="font-size:.75rem;color:var(--text2);margin-top:.7rem;text-align:center">보증 없을 때 이자율 6.5%(BBB 기준) → 보증 후 이자율 5.2%(A 기준) → 이자 절감 1.3%p = 보증의 경제적 가치</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc2">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ② 보증의 경제적 실질 분석 — 진정한 보증 vs 명목상 지원 <span class="para">¶10.151–¶10.153</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>OECD 지침서 ¶10.151은 명칭이 "보증"이라도 실질적으로 차주에게 경제적 편익을 제공하지 않는 경우 이전가격 분석 대상이 아니라고 명시합니다. 반대로, 명칭이 "컴포트레터"이더라도 법적 구속력이 있는 것으로 시장이 인식한다면 명시적 보증과 동일하게 처리해야 합니다.</p>
+
+        <p><strong>경제적 편익 존재 여부 판단 기준:</strong></p>
+        <ul>
+          <li><strong>이자율 효과:</strong> 보증이 없었다면 자회사가 더 높은 이자율로 차입했을 것인가? 보증으로 인한 실질적 이자 절감이 있어야 경제적 편익이 존재합니다.</li>
+          <li><strong>차입 가능성:</strong> 보증이 없었다면 자회사가 해당 차입 자체가 불가능했을 것인가? 이 경우 보증의 가치는 이자 절감을 넘어 자금 접근성 자체에 있습니다.</li>
+          <li><strong>시장 인식:</strong> 채권자가 보증의 존재를 신용 분석에 실질적으로 반영했는가? 서류상 보증이 있어도 채권자가 독립적으로 차주를 평가했다면 편익이 제한적입니다.</li>
+        </ul>
+
+        <div class="two-col">
+          <div class="col-box">
+            <h4>✅ 보증료 필요 (편익 실재)</h4>
+            <ul>
+              <li>보증 없이 BBB 금리 6.5% → 보증 후 A 금리 5.2%</li>
+              <li>이자 절감 1.3%p × 대출 원금이 연간 편익</li>
+              <li>독립 기업 간이라면 반드시 보증료 지급</li>
+              <li>보증료 미지급 시 이전가격 조정 대상</li>
+            </ul>
+          </div>
+          <div class="col-box orange">
+            <h4>⚠️ 보증료 불필요 검토 (편익 미실재)</h4>
+            <ul>
+              <li>차주가 이미 그룹 없이도 동일 금리로 차입 가능</li>
+              <li>채권자가 보증 무관하게 독립 평가 후 여신</li>
+              <li>보증인의 신용도가 차주보다 낮아 실질 효과 없음</li>
+              <li>암묵적 지원 효과와 구별 필요 (M10-2 참조)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="warn-point">⚠️ 암묵적 지원(Passive Association)과의 구분: 그룹 소속 사실 자체에서 발생하는 소극적 신용 향상(암묵적 지원)은 별도 보증료가 불필요합니다(M10-2 ③ 참조). 그러나 모회사가 서면으로 보증 의무를 지는 명시적 보증은 추가적인 위험을 자발적으로 부담하는 것이므로, 반드시 ALP 보증료가 지급되어야 합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc3">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ③ 보증 제공자의 FAR 분석 <span class="para">¶10.154–¶10.155</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>보증 제공자(Guarantor)는 자신이 직접 차입한 것이 아님에도 불구하고 차주의 채무 불이행 시 대신 변제해야 하는 <strong>우발 채무(Contingent Liability)</strong>를 부담합니다. 이 우발 채무의 경제적 비용이 보증료 산정의 출발점이 됩니다.</p>
+
+        <div class="far-grid">
+          <div class="far-card">
+            <div class="fc-icon">⚙️</div>
+            <h4>기능 (Functions)</h4>
+            <ul>
+              <li>보증서 작성·체결</li>
+              <li>차주 재무 상황 모니터링</li>
+              <li>채권자와의 관계 관리</li>
+              <li>보증 한도·조건 협상</li>
+              <li>내부 승인 및 법무 검토</li>
+            </ul>
+          </div>
+          <div class="far-card">
+            <div class="fc-icon">⚠️</div>
+            <h4>위험 (Risks)</h4>
+            <ul>
+              <li>차주 채무 불이행 위험<br>(대신 변제 의무 발생)</li>
+              <li>보증 실행 시 자금 유출</li>
+              <li>보증인 신용등급 하락 위험</li>
+              <li>보증 한도 초과 시 추가 노출</li>
+              <li>법적 분쟁 위험</li>
+            </ul>
+          </div>
+          <div class="far-card">
+            <div class="fc-icon">🏦</div>
+            <h4>자산 (Assets)</h4>
+            <ul>
+              <li>높은 신용등급 (보증 효과의 원천)</li>
+              <li>재무 여력 (Net Worth)</li>
+              <li>자본시장 접근성</li>
+              <li>차주에 대한 구상권 (Recourse)</li>
+              <li>그룹 내 통제력</li>
+            </ul>
+          </div>
+        </div>
+
+        <p><strong>보증인의 자본 할당 비용:</strong> 금융 보증은 보증인의 재무제표에 우발 부채로 기재됩니다. 규제 자본 요건(은행의 경우 BIS 비율) 또는 내부 경제적 자본 모델에 따르면, 이 우발 부채에 대해 일정 수준의 자본이 할당되어야 하며, 그 자본에 대한 기회비용이 보증료의 하한선이 됩니다.</p>
+
+        <div class="key-point">📌 보증인 관점에서 최소 보증료 = 보증으로 인해 할당된 자본 × 자본 기회비용률 (예: WACC). 이보다 낮은 보증료는 보증인에게 경제적으로 불리한 거래이므로, 독립 기업 간이라면 보증인이 제공하지 않을 것입니다.</div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="card" id="sec2">
+      <h2>§2 보증료 산정 방법론 <span class="tag tag-para">¶10.156–¶10.167</span></h2>
+      <p>OECD 지침서 ¶10.156은 ALP 보증료 산정에 여러 방법론이 활용될 수 있으며, 신뢰성 있는 비교 정보를 제공하는 방법을 우선 적용해야 한다고 명시합니다. 실무에서는 CUP방법, 기대손실 접근법, 수익률 접근법, 자본 지원 접근법이 주로 사용되며, 두 가지 이상의 방법으로 교차 검증하는 것이 권고됩니다.</p>
+    </div>
+
+    <div class="accordion" id="acc4">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ④ 보증료 산정 방법론 개요 — 4가지 접근법 비교 <span class="para">¶10.156–¶10.160</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>보증료 산정의 네 가지 주요 방법론은 각각 다른 관점에서 ALP 보증료를 추정합니다. 이론적으로는 모두 동일한 정상가격을 지향하지만, 가용 데이터와 거래 특성에 따라 적용 가능성이 다릅니다.</p>
+
+        <div class="method-grid">
+          <div class="meth-card cup">
+            <span class="m-badge">1순위</span>
+            <h4>CUP방법 (Comparable Uncontrolled Price)</h4>
+            <p>유사한 신용등급·만기·금액의 외부 보증 거래나 신용부도스왑(CDS) 프리미엄을 비교 기준으로 사용합니다. 시장 데이터를 직접 활용하는 가장 신뢰도 높은 방법입니다.</p>
+            <ul>
+              <li>신용부도스왑(CDS) 프리미엄 활용</li>
+              <li>Bloomberg CDSW 데이터 참고</li>
+              <li>동일 신용등급·만기 CDS 스프레드</li>
+              <li>은행 보증료(Letter of Credit 수수료) 비교</li>
+            </ul>
+            <div class="meth-formula">보증료 ≈ 차주 독립 신용등급 CDS 스프레드</div>
+          </div>
+          <div class="meth-card el">
+            <span class="m-badge">2순위</span>
+            <h4>기대손실 접근법 (Expected Loss)</h4>
+            <p>보증인이 보증 기간 중 실제로 대신 변제해야 할 확률적 손실 기댓값을 보증료의 기준으로 사용합니다. 보험 수리 모델과 유사한 방식입니다.</p>
+            <ul>
+              <li>채무 불이행 확률(PD) 적용</li>
+              <li>신용등급별 PD: Moody's/S&P 통계</li>
+              <li>부도 시 손실률(LGD): 통상 40~60%</li>
+              <li>보증 금액(EAD) 기준</li>
+            </ul>
+            <div class="meth-formula">보증료 = PD × LGD × EAD / EAD = PD × LGD</div>
+          </div>
+          <div class="meth-card yield">
+            <span class="m-badge">3순위</span>
+            <h4>수익률 접근법 (Yield Approach)</h4>
+            <p>보증으로 인한 차주의 이자율 절감액을 보증의 경제적 가치로 보고, 이 절감액의 일부를 보증료로 설정하는 방법입니다. 차주 편익 기준 접근법입니다.</p>
+            <ul>
+              <li>차주 독립 신용등급 금리 (BBB 기준)</li>
+              <li>보증 후 그룹 신용등급 금리 (A 기준)</li>
+              <li>절감액의 일정 비율을 보증료로 설정</li>
+              <li>통상 절감액의 50~80% 범위</li>
+            </ul>
+            <div class="meth-formula">보증료 = (BBB 금리 − A 금리) × 배분 비율</div>
+          </div>
+          <div class="meth-card cap">
+            <span class="m-badge">보완</span>
+            <h4>자본 지원 접근법 (Capital Support)</h4>
+            <p>보증인이 보증 제공으로 자본 요건 상 추가로 할당해야 하는 경제적 자본과 그 기회비용을 보증료의 기준으로 사용합니다.</p>
+            <ul>
+              <li>보증 금액 × 위험 가중치</li>
+              <li>자본 할당액 × WACC(기회비용)</li>
+              <li>주로 은행 지주사 구조에 적용</li>
+              <li>독립형으로보다 교차 검증용 활용</li>
+            </ul>
+            <div class="meth-formula">보증료 = 위험가중자산 × CET1 비율 × WACC</div>
+          </div>
+        </div>
+
+        <div class="note-point">💡 실무 적용: 이전가격 실무에서는 CUP방법(CDS 스프레드 기준)과 수익률 접근법을 동시에 적용하여 교차 검증하는 것이 가장 일반적입니다. 두 방법의 결과가 유사한 범위를 보이면 신뢰도가 높아지고, 크게 다르다면 가정·데이터를 재검토해야 합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc5">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑤ 기대손실 접근법 상세 — PD × LGD 모델 <span class="para">¶10.161–¶10.163</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p><strong>기대손실 접근법(Expected Loss Approach)</strong>은 보증인이 보증을 제공하는 것이 마치 신용 위험을 판매하는 것과 유사하다는 관점에서 출발합니다. 독립 기업 간이라면 이 신용 위험의 기댓값에 해당하는 프리미엄을 보증료로 요구할 것입니다.</p>
+
+        <p><strong>구성 요소 정의:</strong></p>
+        <ul>
+          <li><strong>PD (Probability of Default):</strong> 보증 기간 중 차주가 채무 불이행에 빠질 확률. 차주 독립 신용등급에 따라 결정되며, Moody's·S&P 발표 누적 부도율 통계를 활용합니다.</li>
+          <li><strong>LGD (Loss Given Default):</strong> 채무 불이행 발생 시 보증인이 실제로 손실을 입는 비율. 담보 여부, 구상권 가치 등에 따라 결정됩니다. 통상 무담보 선순위 40~60%, 후순위 60~80% 수준을 적용합니다.</li>
+          <li><strong>EAD (Exposure at Default):</strong> 채무 불이행 시점의 보증 노출 금액. 대출 원금 기준 또는 예상 잔액 기준으로 설정합니다.</li>
+        </ul>
+
+        <div class="el-calc">
+          <div class="el-title">📊 기대손실 접근법 계산 예시 (BBB 등급 차주, 5년 만기 보증)</div>
+          <div class="el-row">
+            <span class="el-label">차주 독립 신용등급</span>
+            <span class="el-val">BBB</span>
+          </div>
+          <div class="el-row">
+            <span class="el-label">5년 누적 PD (S&P BBB 기준)</span>
+            <span class="el-val">1.80%</span>
+          </div>
+          <div class="el-row">
+            <span class="el-label">연평균 PD (5년 누적 ÷ 5)</span>
+            <span class="el-val">0.36% / 년</span>
+          </div>
+          <div class="el-row">
+            <span class="el-label">LGD (무담보 선순위, 구상권 일부 존재)</span>
+            <span class="el-val">45%</span>
+          </div>
+          <div class="el-row">
+            <span class="el-label">기대손실률 = PD × LGD = 0.36% × 45%</span>
+            <span class="el-val">0.162% / 년</span>
+          </div>
+          <div class="el-row">
+            <span class="el-label">위험 조정 마진 (불확실성 가산, 통상 50~100%)</span>
+            <span class="el-val">+ 0.081%</span>
+          </div>
+          <div class="el-row total">
+            <span class="el-label">기대손실 접근법 기준 ALP 보증료</span>
+            <span class="el-val">약 0.24% / 년</span>
+          </div>
+        </div>
+
+        <p><strong>신용등급별 참고 PD 수준 (S&P 1년 평균 부도율, 장기 통계 기준):</strong></p>
+        <table class="compare-table">
+          <thead>
+            <tr><th>신용등급</th><th>1년 평균 PD</th><th>5년 누적 PD</th><th>LGD 45% 적용 시 기대손실률/년</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>AA</td><td>0.01%</td><td>0.06%</td><td>~0.005%</td></tr>
+            <tr><td>A</td><td>0.05%</td><td>0.27%</td><td>~0.023%</td></tr>
+            <tr><td><strong>BBB</strong></td><td><strong>0.18%</strong></td><td><strong>0.90%</strong></td><td><strong>~0.081%</strong></td></tr>
+            <tr><td>BB</td><td>0.72%</td><td>3.50%</td><td>~0.324%</td></tr>
+            <tr><td>B</td><td>2.50%</td><td>11.0%</td><td>~1.125%</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:.78rem;color:var(--text2);margin-top:.3rem">※ 위 수치는 S&P 장기 평균 통계 기반 교육용 참고 수치입니다. 실제 분석 시 거래 시점의 최신 통계를 적용하십시오.</p>
+
+        <div class="key-point">📌 기대손실 접근법의 한계: 이 방법은 보증인의 위험을 순수 기댓값으로만 측정하므로, 꼬리 위험(Tail Risk, 예상치 못한 대규모 손실 가능성)과 보증인의 자본 기회비용을 충분히 반영하지 못할 수 있습니다. 따라서 수익률 접근법과 교차 검증이 필요합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc6">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑥ 수익률 접근법 — 신용등급 상향 효과 기반 보증료 산정 <span class="para">¶10.164–¶10.167</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p><strong>수익률 접근법(Yield Approach)</strong>은 보증으로 인해 차주가 절감하는 이자 비용을 보증의 경제적 가치로 보고, 이 가치 중 적절한 비율을 보증료로 설정하는 방법입니다. OECD 지침서 ¶10.164는 이 접근법이 보증의 편익을 차주와 보증인 간에 공정하게 분배하는 방향성을 제시한다고 설명합니다.</p>
+
+        <div class="yield-compare">
+          <div class="yc-title">📊 수익률 접근법 계산 예시</div>
+          <div class="yc-row">
+            <span class="yc-label">차주(B사) 독립 신용등급</span>
+            <span class="yc-val">BBB</span>
+          </div>
+          <div class="yc-row">
+            <span class="yc-label">보증 없을 때 차입 이자율 (BBB 5년 기준)</span>
+            <span class="yc-val">SOFR + 2.20% = 7.50%</span>
+          </div>
+          <div class="yc-row">
+            <span class="yc-label">보증 후 그룹 신용등급 (A)</span>
+            <span class="yc-val">A</span>
+          </div>
+          <div class="yc-row">
+            <span class="yc-label">보증 후 차입 이자율 (A 5년 기준)</span>
+            <span class="yc-val">SOFR + 1.20% = 6.20%</span>
+          </div>
+          <div class="yc-row subtotal">
+            <span class="yc-label">연간 이자 절감액 (= 보증의 경제적 가치)</span>
+            <span class="yc-val">1.30%p (차입원금 기준)</span>
+          </div>
+          <div class="yc-row">
+            <span class="yc-label">보증료 배분 비율 (통상 50~80% 범위 적용)</span>
+            <span class="yc-val">60% 적용</span>
+          </div>
+          <div class="yc-row total">
+            <span class="yc-label">수익률 접근법 기준 ALP 보증료</span>
+            <span class="yc-val">1.30% × 60% = 0.78% / 년</span>
+          </div>
+        </div>
+
+        <p><strong>배분 비율(50~80%) 결정 요인:</strong> 보증의 경제적 가치 중 얼마를 보증료로 설정할지는 다음 요소를 고려하여 결정합니다.</p>
+        <table class="compare-table">
+          <thead>
+            <tr><th>요인</th><th>높은 배분 비율 (70~80%) 방향</th><th>낮은 배분 비율 (50~60%) 방향</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>보증인 위험</strong></td><td>차주 신용도 낮음, 보증 실행 가능성 높음</td><td>차주 신용도 양호, 실행 가능성 낮음</td></tr>
+            <tr><td><strong>차주 협상력</strong></td><td>차주가 다른 보증 대안 있음</td><td>차주가 보증인 의존도 높음</td></tr>
+            <tr><td><strong>보증 기간</strong></td><td>장기 보증 (위험 누적)</td><td>단기 보증</td></tr>
+            <tr><td><strong>보증 구조</strong></td><td>무조건적·즉시 실행형</td><td>조건부·제한적 보증</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note-point">💡 수익률 접근법 한계: 이 방법은 차주의 편익을 기준으로 하므로, 보증인의 실제 위험 비용(기대손실, 자본 기회비용)이 반영되지 않을 수 있습니다. 신용등급 차이가 크면 이자 절감액이 커지고 보증료도 높아지는데, 이것이 항상 보증인의 실제 위험 부담과 비례하지는 않습니다. 기대손실 접근법과 교차 검증이 필수입니다.</div>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="card" id="sec3">
+      <h2>§3 ALP 범위와 실무 이슈 <span class="tag tag-para">¶10.168–¶10.175</span></h2>
+      <p>여러 방법론으로 산정된 보증료 추정치를 종합하여 ALP 보증료 범위를 설정하고, 최종 보증료를 결정합니다. OECD 지침서 ¶10.168은 이 범위 내에 실제 보증료가 위치해야 정상가격 원칙을 충족한다고 명시합니다.</p>
+    </div>
+
+    <div class="accordion" id="acc7">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑦ 보증료 ALP 범위 설정 — 하한과 상한의 논리 <span class="para">¶10.168–¶10.172</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>ALP 보증료의 범위는 <strong>보증인의 최소 요구 수익(하한)</strong>과 <strong>차주의 최대 지급 가능 수준(상한)</strong>으로 결정됩니다. 이 두 경계 사이에서 실제 보증료가 결정되어야 정상가격 원칙이 충족됩니다.</p>
+
+        <div class="alp-band">
+          <div class="ab-title">📊 보증료 ALP 범위 (Band)</div>
+          <div class="ab-zone">
+            <div class="ab-item floor">
+              <h5>하한 (보증인 관점)</h5>
+              <strong>기대손실 기준</strong>
+              <p>보증인의 최소 보상<br>= PD × LGD<br>예: 0.24% / 년</p>
+              <p style="margin-top:.25rem;font-size:.67rem;color:#065f46">이보다 낮으면 보증인 불이익</p>
+            </div>
+            <div class="ab-item alp">
+              <h5>정상가격 범위</h5>
+              <strong>수익률 접근법</strong>
+              <p>절감액 × 50~80%<br>예: 1.30% × 60%<br>= 0.78% / 년</p>
+              <p style="margin-top:.25rem;font-size:.67rem;color:var(--purple)">두 방법론 교차 검증</p>
+            </div>
+            <div class="ab-item ceil">
+              <h5>상한 (차주 관점)</h5>
+              <strong>이자 절감액 100%</strong>
+              <p>차주의 외부 헷징 비용<br>= BBB − A 금리 차이<br>= 1.30% / 년</p>
+              <p style="margin-top:.25rem;font-size:.67rem;color:#b91c1c">이보다 높으면 차주 불이익</p>
+            </div>
+          </div>
+          <p style="font-size:.78rem;color:var(--text2);text-align:center;margin-top:.5rem">ALP 보증료 범위: <strong style="color:var(--purple)">0.24% ~ 1.30%</strong> / 년 (위 사례 기준) | 교차 검증 결과(0.78%)는 이 범위 내 ✅</p>
+        </div>
+
+        <p><strong>ALP 상한의 논리:</strong> 차주 입장에서 보증료가 이자 절감액(1.30%)을 초과한다면, 보증을 받는 것이 독립 거래보다 더 비싸지므로 합리적인 차주라면 보증을 거부할 것입니다. 따라서 이자 절감액 전체가 보증료의 상한이 됩니다.</p>
+
+        <p><strong>ALP 하한의 논리:</strong> 보증인 입장에서 보증료가 기대손실(0.24%)에도 미치지 못한다면, 평균적으로 보증 제공이 손해가 됩니다. 합리적인 보증인이라면 적어도 기대손실 이상을 요구할 것입니다. 따라서 기대손실이 보증료의 하한이 됩니다.</p>
+
+        <div class="warn-point">⚠️ 실무 위험: 그룹 내 보증료가 0% (무료 보증)이거나 상징적인 수준(예: 0.05%)에 불과한 경우, 국세청은 이를 이전가격 위반으로 조정할 수 있습니다. ALP 범위 내의 보증료를 설정하고, 그 근거(신용등급 분석, CDS 데이터, PD × LGD 계산)를 이전가격 문서화에 명시해야 합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc8">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑧ 종합 사례 연구: B사 그룹 내 보증료 ALP 검토 <span class="para">종합 적용</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>M10-5에서 학습한 모든 방법론을 통합하여, 한국 자회사 B사의 그룹 내 보증에 대한 ALP 보증료를 세 가지 방법으로 산정하고 최종 정상가격 범위를 결정합니다.</p>
+
+        <div class="case-study">
+          <div class="cs-title">📋 종합 사례: B사(한국) ← A사(미국 모회사) 명시적 보증</div>
+          <div class="cs-sub">보증 대상 차입: USD 1,000만 | 만기: 5년 | 분석 기준일: 2024년 1월 1일</div>
+
+          <div class="cs-setup">
+            <div class="cs-item">
+              <h5>🏭 차주 B사(한국)</h5>
+              <p>제조업 자회사<br>독립 신용등급: BBB<br>Net Debt/EBITDA: 2.4배<br>EBIT/이자: 5.2배<br>보증 없을 때 5년 USD 차입금리:<br>SOFR(5.30%) + 2.20% = <strong>7.50%</strong></p>
+            </div>
+            <div class="cs-item">
+              <h5>🏦 보증인 A사(미국)</h5>
+              <p>S&P 신용등급: AA<br>보증 제공 후 B사 인정 등급: A<br>보증 후 5년 USD 차입금리:<br>SOFR(5.30%) + 1.20% = <strong>6.20%</strong><br>이자 절감액: <strong>1.30%p = USD 13만/년</strong></p>
+            </div>
+            <div class="cs-item">
+              <h5>📊 신용 데이터</h5>
+              <p>BBB 5년 누적 PD: 0.90%<br>연평균 PD: 0.18%<br>LGD (구상권 고려): 45%<br>BBB 5년 CDS 스프레드: 약 0.55%<br>(Bloomberg 2024.1 기준)</p>
+            </div>
+            <div class="cs-item">
+              <h5>📋 현행 보증료</h5>
+              <p>그룹 내 설정 보증료: <strong>0.10% / 년</strong><br>= USD 1만 / 년<br>이전가격 리스크: 있음<br>(ALP 범위 검토 필요)</p>
+            </div>
+          </div>
+
+          <div style="font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.6rem">📊 방법론별 ALP 보증료 산정 결과</div>
+          <div class="cs-methods">
+            <div class="cs-meth m1">
+              <h5>① CUP방법 (CDS 스프레드)</h5>
+              <p>BBB 등급 5년 CDS 스프레드를 외부 비교 기준으로 사용합니다.</p>
+              <p style="margin-top:.4rem">CDS 스프레드:<br><strong>0.55% / 년</strong></p>
+              <p style="font-size:.75rem;color:var(--text2);margin-top:.3rem">※ Bloomberg 2024.1 BBB CDS 인덱스</p>
+              <div class="cs-result" style="color:var(--purple)">ALP 기준: ~0.55%</div>
+            </div>
+            <div class="cs-meth m2">
+              <h5>② 기대손실 접근법</h5>
+              <p>PD × LGD + 위험 마진으로 보증인의 최소 보상을 산정합니다.</p>
+              <p style="margin-top:.4rem">0.18% × 45% = 0.081%<br>위험 마진(+100%): +0.081%<br><strong>합계: 0.162% / 년</strong></p>
+              <div class="cs-result" style="color:#1d4ed8">ALP 하한: ~0.16%</div>
+            </div>
+            <div class="cs-meth m3">
+              <h5>③ 수익률 접근법</h5>
+              <p>이자 절감액 1.30%p의 60%를 보증료로 설정합니다.</p>
+              <p style="margin-top:.4rem">1.30% × 60% = 0.78% / 년<br>상한: 1.30%(절감 전액)<br><strong>중간값: 0.78%</strong></p>
+              <div class="cs-result" style="color:#065f46">ALP 중간: ~0.78%</div>
+            </div>
+          </div>
+
+          <div style="margin-top:.8rem;padding:.7rem 1rem;background:#fff1f2;border:2px solid #fda4af;border-radius:10px;font-size:.84rem">
+            <strong style="color:var(--purple)">ALP 범위 종합:</strong> 하한 0.16%(기대손실) ~ 상한 1.30%(이자 절감 전액) | 교차 검증 중앙값: <strong>0.55~0.78%</strong><br>
+            현행 보증료 0.10%는 하한(0.16%)에도 미달 → <strong style="color:#b91c1c">이전가격 조정 대상</strong>
+          </div>
+
+          <div class="cs-conclusion" style="margin-top:.8rem">
+            <strong>결론 및 권고:</strong> B사에 설정된 보증료(0.10%/년 = USD 1만)는 세 가지 방법론이 제시하는 ALP 범위(0.16%~1.30%)의 하한에도 미달합니다. 연간 조정 가능 보증료 차이는 최소 USD 6천(= 0.16%−0.10% × USD 1,000만)에서 최대 USD 6.8만(= 0.78%−0.10% × USD 1,000만)입니다. <strong>권고 조치:</strong> ① 보증료를 CUP방법·수익률 접근법 교차 검증 결과인 <strong>0.55~0.65%/년(= USD 5.5만~6.5만/년)</strong> 수준으로 상향 조정하고, ② 신용등급 변화 시 보증료를 재산정하는 조항을 보증 계약에 포함하며, ③ 이전가격 문서화에 세 가지 방법론 산정 내역과 ALP 범위 명시.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>✏️ 확인 퀴즈</h2>
+      <div class="q-block">
+        <div class="q-text">① 다음 중 법적 구속력이 가장 강한 그룹 내 신용 지원 도구는?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a">㉠ 컴포트레터(Letter of Comfort)</label>
+          <label><input type="radio" name="q1" value="b">㉡ 명시적 금융 보증(Explicit Financial Guarantee)</label>
+          <label><input type="radio" name="q1" value="c">㉢ 키프웰 약정(Keep-Well Agreement)</label>
+          <label><input type="radio" name="q1" value="d">㉣ 교차 채무 불이행 조항(Cross-Default Clause)</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">② 그룹 내 보증에서 차주가 보증인에게 지급해야 하는 ALP 보증료의 상한선은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a">㉠ 보증인의 기대손실(PD × LGD) 금액</label>
+          <label><input type="radio" name="q2" value="b">㉡ 차주의 독립 신용등급과 보증 후 신용등급 간 이자율 차이(이자 절감액)</label>
+          <label><input type="radio" name="q2" value="c">㉢ 보증인의 WACC × 보증 금액</label>
+          <label><input type="radio" name="q2" value="d">㉣ 외부 은행의 보증 서비스 수수료</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">③ 기대손실 접근법에서 보증료를 계산하는 공식은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a">㉠ 이자 절감액 × 배분 비율</label>
+          <label><input type="radio" name="q3" value="b">㉡ PD × LGD (+ 위험 마진)</label>
+          <label><input type="radio" name="q3" value="c">㉢ 위험가중자산 × CET1 비율 × WACC</label>
+          <label><input type="radio" name="q3" value="d">㉣ CDS 스프레드 × 만기</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">④ 암묵적 지원(Passive Association)과 명시적 보증(Explicit Guarantee)의 차이로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a">㉠ 암묵적 지원은 항상 명시적 보증보다 신용 향상 효과가 크다</label>
+          <label><input type="radio" name="q4" value="b">㉡ 명시적 보증은 서면 계약과 법적 의무가 있으므로 ALP 보증료 지급이 필요하지만, 암묵적 지원은 별도 보증료가 불필요하다</label>
+          <label><input type="radio" name="q4" value="c">㉢ 두 지원 모두 동일한 수준의 보증료가 요구된다</label>
+          <label><input type="radio" name="q4" value="d">㉣ 암묵적 지원이 법적 구속력이 더 강하여 이전가격상 더 엄격하게 취급된다</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">⑤ 수익률 접근법에서 BBB(금리 7.50%)→A(금리 6.00%) 보증 시 이자 절감액의 60%를 보증료로 설정하면, 대출 원금 USD 1,000만에 대한 연간 보증료는?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a">㉠ USD 3만</label>
+          <label><input type="radio" name="q5" value="b">㉡ USD 9만</label>
+          <label><input type="radio" name="q5" value="c">㉢ USD 15만</label>
+          <label><input type="radio" name="q5" value="d">㉣ USD 6만</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+      <button class="quiz-btn" id="gradeBtn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 핵심 체크리스트 -->
+    <div class="card" id="chk">
+      <h2>✅ 핵심 개념 체크리스트</h2>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1"><label for="c1">그룹 내 신용 지원은 강도에 따라 명시적 보증 → 컴포트레터 → 키프웰 약정 → 교차 채무 불이행 순으로 구분된다</label></li>
+        <li><input type="checkbox" id="c2"><label for="c2">명시적 보증은 보증인에게 법적 의무(우발 채무)를 부과하므로 ALP 보증료가 반드시 필요하다 (암묵적 지원과의 핵심 차이)</label></li>
+        <li><input type="checkbox" id="c3"><label for="c3">보증의 경제적 편익 = 보증 없을 때 이자율(독립 신용등급 기준) − 보증 후 이자율(그룹 신용등급 기준)</label></li>
+        <li><input type="checkbox" id="c4"><label for="c4">보증료 산정 방법: CUP방법(CDS 스프레드), 기대손실법(PD×LGD), 수익률 접근법(절감액×배분비율), 자본지원법 — 교차 검증 권고</label></li>
+        <li><input type="checkbox" id="c5"><label for="c5">ALP 보증료 하한 = 보증인의 기대손실(PD × LGD), 상한 = 차주의 이자 절감액 전체</label></li>
+        <li><input type="checkbox" id="c6"><label for="c6">보증료 0% 또는 지나치게 낮은 수준(하한 미달)은 이전가격 조정 대상이며, 신용등급 변화에 따른 재산정 조항을 계약에 포함해야 한다</label></li>
+        <li><input type="checkbox" id="c7"><label for="c7">보증인의 FAR 분석: 기능(모니터링·협상), 위험(우발채무·자본기회비용), 자산(높은 신용등급·구상권)을 기반으로 보상 수준 결정</label></li>
+        <li><input type="checkbox" id="c8"><label for="c8">이전가격 문서화에 보증 서면 계약서, 신용등급 분석, 세 가지 방법론 산정 내역, ALP 범위 근거를 포함해야 한다</label></li>
+      </ul>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="nav-bottom">
+      <a href="M10-4_헷징.html" class="btn-nav secondary">← M10-4 헷징</a>
+      <a href="../index.html" class="btn-nav secondary">📋목차</a>
+      <a href="M10-6_캡티브보험.html" class="btn-nav">M10-6 캡티브보험 →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const allAcc=document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent=allAcc.length;
+function toggleAcc(btn){
+  const body=btn.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  if(!btn.classList.contains('viewed')){btn.classList.add('viewed');updatePct();}
+}
+let quizCorrect=0;
+function updatePct(){
+  const viewed=document.querySelectorAll('.acc-header.viewed').length;
+  const total=allAcc.length;
+  const pct=Math.round(((total>0?viewed/total:0)*0.6+(quizCorrect/5)*0.4)*100);
+  document.getElementById('pctDisp').textContent=pct+'%';
+  document.getElementById('topBar').style.width=pct+'%';
+  document.getElementById('accDone').textContent=viewed;
+  document.getElementById('quizDone').textContent=quizCorrect;
+}
+const answers={q1:'b',q2:'b',q3:'b',q4:'b',q5:'b'};
+const msgs=[
+  '아직 개념이 더 필요해요. §1~§3을 다시 복습해 보세요.',
+  '기초는 잡혔습니다. 보증료 산정 방법론을 한 번 더 검토해 보세요.',
+  '절반 이상 이해했습니다. ALP 범위 설정과 종합 사례를 보완하세요.',
+  '잘 이해했습니다! 종합 사례(⑧)를 다시 확인하면 완벽합니다.',
+  '훌륭합니다! M10-5 내용을 완전히 습득했습니다. 마지막 M10-6(캡티브보험)으로 진행하세요!'
+];
+function gradeQuiz(){
+  quizCorrect=0;
+  for(let i=1;i<=5;i++){
+    const sel=document.querySelector('input[name="q'+i+'"]:checked');
+    const fb=document.getElementById('f'+i);
+    if(!sel){fb.style.display='none';continue;}
+    if(sel.value===answers['q'+i]){
+      quizCorrect++;
+      fb.className='q-feedback correct';
+      const exps={
+        f1:'✅ 정답! 명시적 금융 보증(Explicit Financial Guarantee)은 보증인이 채권자와 직접 서면 계약을 체결하여 차주 채무 불이행 시 대신 변제할 법적 의무를 지는 가장 강력한 신용 지원 도구입니다.',
+        f2:'✅ 정답! ALP 보증료의 상한은 차주의 이자 절감액 전체입니다. 보증료가 이자 절감액을 초과한다면 차주는 보증을 받는 것이 손해이므로, 합리적인 차주라면 보증을 거부할 것입니다.',
+        f3:'✅ 정답! 기대손실 접근법의 핵심 공식은 PD × LGD입니다. 채무 불이행 확률(PD)과 부도 시 손실률(LGD)의 곱으로 보증인의 기댓값 손실을 산출하고, 이에 위험 마진을 가산하여 최소 보증료를 결정합니다.',
+        f4:'✅ 정답! 명시적 보증은 서면 계약과 법적 변제 의무가 있으므로 ALP 보증료 지급이 필요합니다. 반면 암묵적 지원(Passive Association)은 그룹 소속 사실 자체에서 발생하는 소극적 편익으로, 별도 계약이나 보증료가 필요 없습니다.',
+        f5:'✅ 정답! 이자 절감액 = 7.50% − 6.00% = 1.50%p × USD 1,000만 = USD 15만/년. 이 중 60%를 보증료로 설정: USD 15만 × 60% = <strong>USD 9만/년</strong>입니다.'
+      };
+      fb.textContent=exps['f'+i];
+    } else {
+      fb.className='q-feedback wrong';
+      const wrgs={
+        f1:'❌ 오답. 컴포트레터은 도덕적 의무, 키프웰 약정은 재무 유지 약정, 교차 채무 불이행은 연동 조항입니다. 법적 구속력이 가장 강한 것은 명시적 금융 보증입니다.',
+        f2:'❌ 오답. ALP 보증료의 상한은 차주의 이자 절감액 전체입니다. 이자 절감액 이상의 보증료는 차주에게 불리하므로, 합리적 차주라면 독립 거래에서 지불하지 않을 것입니다.',
+        f3:'❌ 오답. ㉠은 수익률 접근법, ㉢은 자본지원 접근법, ㉣은 CUP방법의 기준입니다. 기대손실 접근법의 공식은 PD × LGD입니다.',
+        f4:'❌ 오답. 암묵적 지원이 더 강하다거나 동일한 보증료가 필요한 것은 아닙니다. 핵심 차이는 명시적 보증에는 서면 계약·법적 의무가 있어 ALP 보증료가 필요하고, 암묵적 지원은 그룹 소속에서 자연 발생하여 별도 보증료가 불필요하다는 점입니다.',
+        f5:'❌ 오답. 이자 절감액 = 7.50% − 6.00% = 1.50%p × USD 1,000만 = USD 15만/년. 보증료 = USD 15만 × 60% = USD 9만/년입니다. USD 6만은 절감액의 40%에 해당하는 오답입니다.'
+      };
+      fb.textContent=wrgs['f'+i];
+    }
+    fb.style.display='block';
+    document.querySelectorAll('input[name="q'+i+'"]').forEach(r=>r.disabled=true);
+  }
+  document.getElementById('gradeBtn').disabled=true;
+  const sb=document.getElementById('scoreBox');
+  const score=quizCorrect*20;
+  document.getElementById('scoreNum').textContent=score+'점';
+  document.getElementById('scoreMsg').textContent=score>=80
+    ?`🎉 통과! ${quizCorrect}문항 정답. 다음 모듈로 진행하세요.`
+    :`${quizCorrect}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  updatePct();
+}
+function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+const sections=['obj','sec1','sec2','sec3','quiz','chk'];
+const navBtns=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY+150>=el.offsetTop)cur=id;});
+  navBtns.forEach(btn=>{
+    const fn=btn.getAttribute('onclick');
+    if(fn&&fn.includes(`'${cur}'`))btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+updatePct();
+</script>
+</body>
+</html>

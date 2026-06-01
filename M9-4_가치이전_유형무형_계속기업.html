@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M9-4: 가치이전 — 유형·무형자산·계속기업</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#0c4a6e;--purple-light:#e0f2fe;--purple-mid:#0ea5e9;--purple-dark:#082f49;
+  --green:#0369a1;--green-light:#e0f2fe;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,var(--purple-mid) 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple-dark);line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#f0f9ff;border-left:4px solid #38bdf8;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#0c4a6e;line-height:1.75}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#bae6fd}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0;table-layout:fixed}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #7dd3fc;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p,.col-box ul{font-size:.85rem;color:var(--text2);margin:0;line-height:1.65}
+.col-box ul{padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.red{border-color:#fca5a5;background:#fef2f2}
+.col-box.red h4{color:var(--red)}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+.pillar-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid var(--purple-mid);background:var(--purple-light)}
+.pillar-card .pl-num{display:inline-block;background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;text-align:center;line-height:26px;font-size:.78rem;font-weight:800;margin-bottom:.4rem}
+.pillar-card h4{font-size:.92rem;font-weight:700;color:var(--purple-dark);margin-bottom:.35rem}
+.pillar-card p{font-size:.82rem;color:var(--text2);margin:0;line-height:1.6}
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0f9ff;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+/* asset transfer comparison */
+.asset-compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.asset-card{border-radius:10px;padding:1.1rem 1.2rem;border:1.5px solid var(--gray-border)}
+.asset-card .ac-badge{font-size:.75rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;display:inline-block;margin-bottom:.6rem}
+.asset-card.tangible .ac-badge{background:#fef3c7;color:#92400e}
+.asset-card.intangible .ac-badge{background:var(--purple-light);color:var(--purple)}
+.asset-card.going .ac-badge{background:#fce7f3;color:#831843}
+.asset-card h4{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:.5rem}
+.asset-card ul{font-size:.83rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.6}
+.asset-card li{margin-bottom:.25rem}
+/* going concern breakdown */
+.gc-box{background:#f0f9ff;border:2px solid #7dd3fc;border-radius:12px;padding:1.4rem;margin:.8rem 0}
+.gc-box .gc-title{font-weight:700;font-size:.92rem;color:var(--purple);margin-bottom:.9rem}
+.gc-table{width:100%;border-collapse:collapse;font-size:.87rem}
+.gc-table th{background:var(--purple);color:#fff;padding:.5rem .8rem;font-weight:600}
+.gc-table td{padding:.48rem .8rem;border-bottom:1px solid #bae6fd;color:var(--text2)}
+.gc-table td:last-child{text-align:right;font-weight:600}
+.gc-table tr.section td{background:var(--gray-light);font-weight:700;color:var(--text);font-size:.82rem}
+.gc-table tr.subtotal td{background:#e0f2fe;font-weight:700;color:var(--purple-dark)}
+.gc-table tr.total td{background:var(--purple);color:#fff;font-weight:800}
+.gc-table tr.premium td{background:#fff7ed;color:#92400e;font-weight:700}
+/* transfer type indicators */
+.indicator-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.ind-card{border-radius:10px;padding:1.1rem;border:2px solid var(--gray-border)}
+.ind-card.yes{border-color:#7dd3fc;background:var(--purple-light)}
+.ind-card.no{border-color:#fdba74;background:#fff7ed}
+.ind-card h4{font-size:.88rem;font-weight:700;margin-bottom:.5rem}
+.ind-card.yes h4{color:var(--purple)}
+.ind-card.no h4{color:var(--orange)}
+.ind-card ul{font-size:.82rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.6}
+.ind-card li{margin-bottom:.25rem}
+/* IP transfer vs license */
+.ip-flow{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:center;margin:.8rem 0}
+.ip-box{border-radius:10px;padding:1rem;text-align:center;border:2px solid var(--purple-mid);background:var(--purple-light)}
+.ip-box h4{font-size:.88rem;font-weight:700;color:var(--purple-dark);margin-bottom:.4rem}
+.ip-box p{font-size:.8rem;color:var(--text2);line-height:1.5;margin:0}
+.ip-vs{font-size:1.3rem;font-weight:900;color:var(--purple-mid);text-align:center}
+.ip-box.license{border-color:#fdba74;background:#fff7ed}
+.ip-box.license h4{color:var(--orange)}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .two-col,.three-col,.asset-compare,.indicator-grid,.ip-flow{grid-template-columns:1fr}
+  .ip-vs{transform:rotate(90deg);padding:.3rem 0}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter IX 사업구조조정(Business Restructurings) › M9-4 (4/6)</div>
+  <h1>M9-4. 가치이전 — 유형·무형자산·계속기업</h1>
+  <div class="sub">유형자산 이전 &amp; 무형자산·사용권 이전 &amp; 계속기업 가치·활동 이전&nbsp;|&nbsp;¶9.48 – ¶9.74&nbsp;|&nbsp;예상 학습시간: 50분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('s1')">1. 유형자산 이전 (¶9.48–9.53)</button>
+      <button class="nav-item" onclick="goTo('s2')">2. 무형자산·사용권 이전 (¶9.54–9.62)</button>
+      <button class="nav-item" onclick="goTo('s3')">3. 계속기업 가치·활동 이전 (¶9.63–9.74)</button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('check')">☑ 실무 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습목표</h2>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>사업구조조정에서 유형자산 이전의 ALP 기준(FMV)과 자산 유형별 이전가격 이슈를 이해한다</span></li>
+        <li><span class="obj-num">2</span><span>무형자산의 소유권 이전과 사용권 부여(라이선스)의 차이를 구별하고 각각의 ALP 산정 방법을 파악한다</span></li>
+        <li><span class="obj-num">3</span><span>계속기업(Going Concern) 가치의 개념과 개별 자산 합산 초과분의 구성 요소를 설명할 수 있다</span></li>
+        <li><span class="obj-num">4</span><span>계속기업 가치를 DCF 및 자산 접근법으로 측정하는 방법을 적용할 수 있다</span></li>
+        <li><span class="obj-num">5</span><span>"활동의 이전(Transfer of Activity)"과 단순 자산 이전의 차이를 구별하는 판단 지표를 적용할 수 있다</span></li>
+      </ul>
+
+      <div style="margin-top:1rem">
+        <p style="font-size:.88rem;color:var(--gray);margin-bottom:.6rem"><strong>이 모듈에서 다루는 이전 가치 유형:</strong></p>
+        <div class="three-col">
+          <div class="pillar-card">
+            <div class="pl-num">🏭</div>
+            <h4>유형자산</h4>
+            <p>설비·기계·재고·부동산 등 물리적 자산의 이전. FMV 기준 산정</p>
+          </div>
+          <div class="pillar-card">
+            <div class="pl-num">💡</div>
+            <h4>무형자산·사용권</h4>
+            <p>IP·특허·브랜드·고객목록 등의 소유권 이전 또는 사용권 부여. Chapter VI 연계</p>
+          </div>
+          <div class="pillar-card">
+            <div class="pl-num">🏢</div>
+            <h4>계속기업 가치</h4>
+            <p>개별 자산 합산 초과분: 조직된 인력·고객 관계·운영 노하우 등 복합 가치</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 1: 유형자산 이전 -->
+    <div class="card" id="s1">
+      <h2>1. 유형자산 이전 <span class="tag tag-para">¶9.48–9.53</span></h2>
+      <p>사업구조조정에서 기계·설비·재고·부동산 등의 <strong>유형자산</strong>이 이전되는 경우가 많습니다. 이때 이전가격은 독립기업 간에 거래되었을 공정시장가치(FMV)를 기준으로 결정해야 합니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          유형자산 이전의 ALP 기준과 유형별 이슈 <span class="para">¶9.48–9.50</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>유형자산 이전의 정상가격은 <strong>이전 시점의 공정시장가치(FMV)</strong>입니다. 장부가액이나 역사적 취득원가는 ALP 기준이 되지 않습니다.</p>
+          <table class="compare-table">
+            <thead><tr><th>유형자산 종류</th><th>ALP 산정 기준</th><th>주요 이슈</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>기계·설비·장비</strong></td>
+                <td>감정평가사 FMV 평가 또는 시장 비교가</td>
+                <td>잔존수명, 기술적 진부화, 유지보수 이력 반영 필요</td>
+              </tr>
+              <tr>
+                <td><strong>재고자산</strong></td>
+                <td>이전 시점 시장 가격 (CUP법)</td>
+                <td>진부화된 재고, 진행 중인 재공품의 단계별 평가</td>
+              </tr>
+              <tr>
+                <td><strong>부동산</strong></td>
+                <td>감정평가 FMV</td>
+                <td>국가별 부동산 가격 규제, 지역 시장 비교</td>
+              </tr>
+              <tr>
+                <td><strong>특수 목적 자산</strong></td>
+                <td>대체비용(Replacement Cost) 또는 수익 접근법</td>
+                <td>외부 시장 거래 없는 자산의 FMV 산정 어려움</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="key-point">
+            <strong>핵심 원칙 (¶9.48):</strong><br>
+            독립기업 간 유형자산 거래에서 적용되는 가격 결정 원칙이 그대로 적용됩니다. 관계사 간이라는 이유로 할인 또는 할증 거래를 정당화할 수 없습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          유형자산 이전 방식 — 양도 vs 리스와 사업 내 자산 이전 <span class="para">¶9.51–9.53</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>유형자산 이전은 소유권의 완전 이전(양도)일 수도 있고, 계속적 사용권 이전(리스)일 수도 있습니다. 이 구분이 ALP 산정 방법에 영향을 미칩니다.</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>📦 소유권 완전 양도</h4>
+              <ul>
+                <li>이전 시점 FMV 일시불 지급</li>
+                <li>자산 위험·유지보수 책임도 이전</li>
+                <li>독립기업 간 유사 거래 가격이 기준</li>
+                <li>세무처리: 양수인에게 자산 취득원가로 자본화</li>
+              </ul>
+            </div>
+            <div class="col-box orange">
+              <h4>🔄 리스·사용 허가</h4>
+              <ul>
+                <li>사용기간 분할 리스료 지급</li>
+                <li>소유권은 원래 법인에 유지</li>
+                <li>독립기업 간 유사 리스 조건 기준</li>
+                <li>세무처리: 리스료 당기비용 or 금융리스 처리</li>
+              </ul>
+            </div>
+          </div>
+          <div class="warn-point">
+            <strong>⚠ 사업 내 자산 이전의 특수성 (¶9.52–9.53):</strong> 유형자산이 독립적으로 이전되는 것이 아닌, 사업 활동의 일부로서 이전되는 경우(예: 공장과 함께 근로자·고객 계약·IP가 동시에 이전) 단순 유형자산 이전이 아닌 <em>계속기업 가치 이전</em>으로 처리될 수 있습니다. 이때는 훨씬 높은 보상이 필요합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 2: 무형자산·사용권 이전 -->
+    <div class="card" id="s2">
+      <h2>2. 무형자산 및 사용권 이전 <span class="tag tag-para">¶9.54–9.62</span></h2>
+      <p>사업구조조정에서 <strong>무형자산(IP, 브랜드, 고객 목록, 영업 노하우 등)</strong>의 이전 또는 사용권 부여는 가장 복잡하고 세무 리스크가 높은 영역입니다. Chapter VI의 무형자산 원칙이 함께 적용됩니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          무형자산 소유권 이전 vs 사용권 부여(라이선스) — 핵심 구별 <span class="para">¶9.54–9.56</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>무형자산 관련 거래에서 가장 먼저 결정해야 할 것은 <strong>소유권 자체가 이전되는지, 아니면 단순히 사용권만 부여되는지</strong>입니다. 이 구분이 보상의 성격과 규모, 세무처리를 결정합니다.</p>
+
+          <div class="ip-flow">
+            <div class="ip-box">
+              <h4>🔑 소유권 이전(IP 양도)</h4>
+              <p>IP의 법적 소유권 자체가 이전됨. 양수인이 이후 모든 권리 행사, 라이선스 수여, 처분 가능. 일시불 또는 분할 대가 지급.</p>
+            </div>
+            <div class="ip-vs">⟷</div>
+            <div class="ip-box license">
+              <h4>📋 사용권 부여(라이선스)</h4>
+              <p>IP 소유권은 원법인이 보유. 일정 조건(지역, 기간, 용도)으로 사용만 허가. 계속적 로열티 지급.</p>
+            </div>
+          </div>
+
+          <table class="compare-table">
+            <thead><tr><th>구분</th><th>소유권 이전</th><th>라이선스(사용권)</th></tr></thead>
+            <tbody>
+              <tr><td>보상 성격</td><td>일시불 양도 대가 (자본 거래)</td><td>계속적 로열티 (경상 거래)</td></tr>
+              <tr><td>ALP 산정</td><td>FMV 기반 (Chapter VI 평가 방법)</td><td>정상 로열티율 (CUT법, TNMM 등)</td></tr>
+              <tr><td>세무처리(양도인)</td><td>처분이익 과세 (양도세)</td><td>로열티 수입 과세 (경상소득)</td></tr>
+              <tr><td>세무처리(양수인)</td><td>취득원가 자본화 후 감가상각</td><td>로열티 당기비용 처리</td></tr>
+              <tr><td>원천세</td><td>통상 없음(양도소득)</td><td>적용 가능(로열티 원천세)</td></tr>
+            </tbody>
+          </table>
+          <div class="warn-point">
+            <strong>⚠ 실질 우선:</strong> 계약서에 "라이선스"라고 명시되어 있어도 실질이 양도(경제적 수명 전체에 대한 독점적 사용권 부여, 모든 위험 이전 등)이면 소유권 이전으로 재분류될 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          무형자산 이전의 ALP 산정 — Chapter VI 연계 <span class="para">¶9.57–9.60</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>무형자산 이전의 ALP 산정에는 Chapter VI(무형자산)의 원칙과 방법이 그대로 적용됩니다. 독립기업 간 비교 가능한 IP 거래가 있다면 이를 우선 활용합니다.</p>
+          <div class="three-col">
+            <div class="pillar-card">
+              <div class="pl-num">①</div>
+              <h4>CUT법(비교 가능 비통제 거래)</h4>
+              <p>유사한 IP에 대해 독립기업 간 실제 합의된 양도 가격 또는 로열티율을 직접 비교. 가장 선호되는 방법</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pl-num">②</div>
+              <h4>수익 기반법(DCF)</h4>
+              <p>해당 IP로부터 미래에 창출될 현금흐름의 현재가치를 산정. 비교 가능 거래가 없을 때 주로 사용</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pl-num">③</div>
+              <h4>잔여이익법</h4>
+              <p>관련 사업 전체의 이익에서 일상적 기능에 귀속되는 이익을 제외한 잔여분을 IP 가치로 산정</p>
+            </div>
+          </div>
+          <div class="note-point">
+            <strong>HTVI(고도수익 무형자산) 적용:</strong> IP의 가치를 사전에 측정하기 극히 어려운 경우(HTVI), 과세관청은 Chapter VI의 HTVI 규정을 적용하여 사후 결과를 참고한 사전 평가 재검토를 할 수 있습니다. 이때 가격 조정 조항(Price Adjustment Clause) 포함이 중요합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          기존 계약 종료·재협상과 보상 의무 <span class="para">¶9.61–9.62</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>사업구조조정 과정에서 기존에 체결된 유통 계약, 제조 계약, 서비스 계약 등이 조기 종료되거나 재협상되는 경우가 많습니다. 이때 계약 조기 종료에 대한 보상이 필요할 수 있습니다.</p>
+          <div class="key-point">
+            <strong>계약 조기 종료 보상의 원칙 (¶9.61):</strong><br>
+            독립기업 간에도 유효한 계약을 일방적으로 조기 종료하면 손해배상 책임이 발생합니다. 따라서 관계사 간 구조조정으로 기존 계약이 조기 종료되는 경우, 계약 잔여 기간 동안의 기대이익에 상당하는 보상이 이루어져야 합니다.
+          </div>
+          <ul>
+            <li><strong>잔여 기대이익 보상:</strong> 계약 잔여 기간 동안 피구조조정법인이 얻었을 이익의 현재가치</li>
+            <li><strong>합리적 통지 기간 보상:</strong> 독립기업 간이라면 최소 통지 기간이 필요. 이 기간의 이익 손실을 보상</li>
+            <li><strong>매몰비용 보상:</strong> 해당 계약 이행을 위해 투자한 비용 중 회수 불가능한 부분</li>
+          </ul>
+          <div class="warn-point">
+            <strong>⚠ 계약 종료 보상 누락은 일반적 이전가격 오류:</strong> 기업들이 구조조정 시 가장 자주 놓치는 항목입니다. "계약 종료는 별도 보상이 불필요하다"는 주장은 ALP 관점에서 수용되기 어렵습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 3: 계속기업 가치와 활동 이전 -->
+    <div class="card" id="s3">
+      <h2>3. 계속기업 가치·활동 이전 <span class="tag tag-para">¶9.63–9.74</span></h2>
+      <p>여러 자산·기능·위험·인력이 <em>함께</em> 이전될 때, 그 복합체의 가치는 개별 요소를 단순 합산한 것보다 클 수 있습니다. 이 초과분이 <strong>계속기업 가치(Going Concern Value)</strong>이며, 이것이 이전되면 더 높은 보상이 요구됩니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          계속기업 가치의 개념과 구성 요소 <span class="para">¶9.63–9.66</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p><strong>계속기업(Going Concern)</strong>이란 개별 자산·기능의 단순 집합이 아닌, 이미 가동 중인 사업 단위로서 시장에서 인식되는 추가적 가치입니다. 이 가치는 사업을 새로 구축하려면 상당한 시간과 비용이 소요된다는 점에서 발생합니다.</p>
+
+          <div class="gc-box">
+            <div class="gc-title">📊 계속기업 가치 산출 예시 — A사 제조 활동 이전</div>
+            <table class="gc-table">
+              <tr><th colspan="2">구분</th><th>평가액</th></tr>
+              <tr class="section"><td colspan="3">【개별 자산 합산】</td></tr>
+              <tr><td></td><td>기계·설비 (감가상각 반영 FMV)</td><td>500억 원</td></tr>
+              <tr><td></td><td>재고자산 (현재가)</td><td>100억 원</td></tr>
+              <tr><td></td><td>특허·IP (Chapter VI 평가)</td><td>300억 원</td></tr>
+              <tr class="subtotal"><td colspan="2">개별 자산 합계</td><td>900억 원</td></tr>
+              <tr class="section"><td colspan="3">【계속기업 가치 구성요소】</td></tr>
+              <tr><td></td><td>조직된 인력 (재구축비용: 채용+교육+정착)</td><td>100억 원</td></tr>
+              <tr><td></td><td>고객 관계 (고객 생애가치 현재가치)</td><td>80억 원</td></tr>
+              <tr><td></td><td>공급자 관계·구매 협상력</td><td>70억 원</td></tr>
+              <tr><td></td><td>운영 노하우·프로세스</td><td>50억 원</td></tr>
+              <tr class="subtotal"><td colspan="2">계속기업 프리미엄 소계</td><td>300억 원</td></tr>
+              <tr class="total"><td colspan="2">총 계속기업 가치(Enterprise Value)</td><td>1,200억 원</td></tr>
+              <tr class="premium"><td colspan="2">⚠ 단순 자산 이전 시 누락되는 금액</td><td>300억 원</td></tr>
+            </table>
+          </div>
+
+          <div class="warn-point">
+            <strong>⚠ 실무 함정:</strong> 기업들은 유형자산과 IP만을 이전 대상으로 식별하고 900억 기준으로 보상을 산정하는 경우가 많습니다. 그러나 계속기업 프리미엄 300억이 실질적으로 이전되었다면 총 1,200억이 보상 기준이 되어야 합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          계속기업 가치 측정 방법 — 복제비용과 수익 접근 <span class="para">¶9.67–9.70</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>계속기업 가치는 두 가지 접근법으로 측정할 수 있습니다: <strong>복제비용 접근(Cost Approach)</strong>과 <strong>수익 접근(Income Approach)</strong>입니다.</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>🔧 복제비용 접근법 (Cost Approach)</h4>
+              <p><strong>핵심 질문:</strong> 수취인이 이 사업을 처음부터 구축하려면 얼마가 드는가?</p>
+              <ul>
+                <li>조직된 인력 구축비: 채용+교육+생산성 도달까지 기간</li>
+                <li>고객 관계 구축비: 마케팅+영업 투자+신뢰 형성 기간</li>
+                <li>공급자 네트워크 구축비: 협상+계약+검증 비용</li>
+                <li>장점: 직관적. 단점: 복제 불가능한 가치 반영 어려움</li>
+              </ul>
+            </div>
+            <div class="col-box">
+              <h4>💰 수익 접근법 (Income Approach)</h4>
+              <p><strong>핵심 질문:</strong> 계속기업 전체의 현금흐름 현재가치는 얼마인가?</p>
+              <ul>
+                <li>사업 전체의 DCF 산정</li>
+                <li>개별 자산 DCF 합계와의 차이가 계속기업 프리미엄</li>
+                <li>또는 유사 사업의 M&A 거래 배수(EV/EBITDA 등) 활용</li>
+                <li>장점: 전체 가치 반영. 단점: 가정의 불확실성</li>
+              </ul>
+            </div>
+          </div>
+          <div class="note-point">
+            두 접근법의 결과가 크게 다를 경우, 그 차이의 원인을 분석하고 합리적인 가중 평균을 산정하거나 추가 검증이 필요합니다. 실무에서는 두 방법을 상호 검증(cross-check)하는 것이 권고됩니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          활동의 이전(Transfer of Activity) — 판단 기준과 세무 이슈 <span class="para">¶9.71–9.74</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>여러 자산·기능·위험·인력이 패키지로 함께 이전될 때 이를 <strong>"활동의 이전(Transfer of Activity)"</strong>이라 합니다. 이는 단순 자산 이전보다 훨씬 광범위한 이전가격 이슈를 수반합니다.</p>
+
+          <div class="indicator-grid">
+            <div class="ind-card yes">
+              <h4>✅ 활동의 이전으로 판단되는 지표</h4>
+              <ul>
+                <li>핵심 인력이 함께 이전됨(Know-how 포함)</li>
+                <li>주요 고객 계약이 이전됨</li>
+                <li>공급자·하청업체 관계가 이전됨</li>
+                <li>영업 프로세스·시스템이 이전됨</li>
+                <li>이전 후 원래 법인이 해당 사업 더 이상 영위 불가</li>
+              </ul>
+            </div>
+            <div class="ind-card no">
+              <h4>⚠ 단순 자산 이전으로 판단되는 지표</h4>
+              <ul>
+                <li>특정 기계·설비만 이전됨</li>
+                <li>인력·고객 관계는 원법인이 유지</li>
+                <li>이전 자산이 대체 가능한 범용 자산</li>
+                <li>이전 후 원법인이 동일 사업 계속 영위 가능</li>
+                <li>사업의 연속성 단절 없음</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="key-point">
+            <strong>활동의 이전 = 사업 매각에 준하는 대우 (¶9.73–9.74):</strong><br>
+            활동의 이전이 인정되면, 이는 경제적으로 <em>사업 단위 전체의 매각</em>에 준하는 거래로 처리됩니다. 이전 보상은 개별 자산 합산이 아닌 계속기업 가치(Enterprise Value) 기준으로 산정해야 하며, 이 차이는 수백억 원에 달할 수 있습니다.
+          </div>
+
+          <table class="compare-table">
+            <thead><tr><th>구분</th><th>단순 자산 이전</th><th>활동의 이전</th></tr></thead>
+            <tbody>
+              <tr><td><strong>보상 기준</strong></td><td>개별 자산 FMV 합산</td><td>계속기업 가치(Enterprise Value)</td></tr>
+              <tr><td><strong>프리미엄</strong></td><td>없음</td><td>계속기업 프리미엄 별도 보상 필요</td></tr>
+              <tr><td><strong>국내세법 처리</strong></td><td>자산 양도</td><td>사업 양도(일부 국가: Exit Tax 적용)</td></tr>
+              <tr><td><strong>VAT/거래세</strong></td><td>적용 가능</td><td>일부 국가 면제(사업 양도 특례)</td></tr>
+              <tr><td><strong>이전가격 리스크</strong></td><td>보통</td><td>매우 높음 (계속기업 프리미엄 누락 위험)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 확인 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>📝 확인 퀴즈</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1.2rem">5문제 · 문제당 1점 · 즉시 피드백 제공</p>
+
+      <div class="q-block">
+        <div class="q-text">Q1. 사업구조조정에서 유형자산 이전의 ALP 산정 기준으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a"> ① 자산의 역사적 취득원가</label>
+          <label><input type="radio" name="q1" value="b"> ② 자산의 세무상 장부가액(감가상각 후)</label>
+          <label><input type="radio" name="q1" value="c"> ③ 이전 시점의 공정시장가치(FMV)</label>
+          <label><input type="radio" name="q1" value="d"> ④ 자산의 대체비용(신품 구입 가격)</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q2. 무형자산의 "소유권 이전"과 "라이선스(사용권 부여)"의 차이에 대한 설명으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a"> ① 두 경우 모두 원천세가 적용되지 않는다</label>
+          <label><input type="radio" name="q2" value="b"> ② 소유권 이전은 일시불 양도 대가(자본 거래)이고, 라이선스는 계속적 로열티(경상 거래)로 처리된다</label>
+          <label><input type="radio" name="q2" value="c"> ③ 두 경우 모두 양수인에게 자본화 처리가 요구된다</label>
+          <label><input type="radio" name="q2" value="d"> ④ 라이선스 형태이면 세무처리와 원천세가 소유권 이전과 동일하다</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q3. A사 제조 활동 이전에서 개별 자산(설비 500억 + 재고 100억 + 특허 300억) 합계는 900억이나, 사업 전체의 기업가치(Enterprise Value)는 1,200억으로 평가되었다. "계속기업 프리미엄"은 얼마인가?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a"> ① 900억 원 (개별 자산 합계)</label>
+          <label><input type="radio" name="q3" value="b"> ② 1,200억 원 (기업 전체 가치)</label>
+          <label><input type="radio" name="q3" value="c"> ③ 300억 원 (기업가치 1,200억 − 개별 자산 합계 900억)</label>
+          <label><input type="radio" name="q3" value="d"> ④ 0원 (계속기업 프리미엄은 이전가격 분석 대상이 아님)</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q4. "활동의 이전(Transfer of Activity)"으로 판단되는 지표로 가장 적절한 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a"> ① 특정 기계 한 대만 이전되고 인력·고객 관계는 원법인이 유지</label>
+          <label><input type="radio" name="q4" value="b"> ② 핵심 인력, 주요 고객 계약, 공급자 관계, 운영 프로세스가 함께 이전되어 원법인이 해당 사업을 더 이상 영위할 수 없게 됨</label>
+          <label><input type="radio" name="q4" value="c"> ③ 원법인이 이전 후에도 동일한 사업을 그대로 영위할 수 있음</label>
+          <label><input type="radio" name="q4" value="d"> ④ 이전 자산이 시장에서 쉽게 구매 가능한 범용 자산임</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q5. 사업구조조정에서 기존 유통 계약이 조기 종료되는 경우, OECD 지침서에 따른 보상 원칙으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a"> ① 관계사 간 계약 종료는 보상이 필요 없다</label>
+          <label><input type="radio" name="q5" value="b"> ② 계약 잔여 기간 동안의 기대이익 현재가치에 상당하는 보상이 필요하다</label>
+          <label><input type="radio" name="q5" value="c"> ③ 계약 종료 통보 후 즉시 효력이 발생하므로 보상이 불필요하다</label>
+          <label><input type="radio" name="q5" value="d"> ④ 보상은 계약서에 명시된 경우에만 발생한다</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+
+      <button class="quiz-btn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 체크리스트 -->
+    <div class="card" id="check">
+      <h2>☑ 실무 체크리스트</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">유형·무형자산 이전·계속기업 가치 검토 사항 (¶9.48–9.74)</p>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c1">
+          <label for="c1">이전되는 유형자산 목록을 파악하고, <strong>이전 시점 FMV</strong>를 독립적 감정평가를 통해 산정하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c2">
+          <label for="c2">유형자산 이전이 소유권 완전 양도인지, 리스·사용 허가인지 명확히 구별하고 각각에 맞는 ALP를 산정하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c3">
+          <label for="c3">무형자산 이전이 <strong>소유권 이전인지 라이선스인지</strong> 경제적 실질에 따라 구별하고, 그에 맞는 보상 방식(일시불 vs 로열티)을 적용하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c4">
+          <label for="c4">무형자산 이전의 ALP 산정에 <strong>Chapter VI 원칙</strong>(CUT법·DCF법·잔여이익법)을 적용하고 HTVI 해당 여부를 검토하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c5">
+          <label for="c5">구조조정으로 기존 계약이 조기 종료되는 경우, <strong>잔여 기대이익의 현재가치에 상당하는 보상</strong>을 검토하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c6">
+          <label for="c6">구조조정에서 이전되는 가치가 개별 자산 합산을 초과하는지 파악하기 위해 <strong>계속기업 가치(Enterprise Value)</strong>를 별도로 평가하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c7">
+          <label for="c7">인력·고객 관계·공급자 관계·운영 노하우 등의 이전 여부를 확인하여 <strong>"활동의 이전(Transfer of Activity)"</strong> 해당 여부를 판단하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c8">
+          <label for="c8">활동의 이전이 인정되는 경우, <strong>계속기업 프리미엄</strong>을 포함한 Enterprise Value 기준으로 보상을 산정하고, Exit Tax 등 국내세법 이슈를 검토하였습니까?</label>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-bottom">
+      <a class="btn-nav secondary" href="M9-3_거래인식_이익잠재력_재배분.html">← 이전 모듈</a>
+      <span class="btn-nav secondary" onclick="alert('목차 페이지로 이동합니다.')">📋 목차로</span>
+      <a class="btn-nav" href="M9-5_기존약정_종료_보상_비용부담.html">다음 모듈 →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const allAcc=document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent=allAcc.length;
+function toggleAcc(btn){
+  const body=btn.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  if(!btn.classList.contains('viewed')){btn.classList.add('viewed');updatePct();}
+}
+let quizCorrect=0;
+function updatePct(){
+  const viewed=document.querySelectorAll('.acc-header.viewed').length;
+  const total=allAcc.length;
+  const pct=Math.round(((total>0?viewed/total:0)*0.6+(quizCorrect/5)*0.4)*100);
+  document.getElementById('pctDisp').textContent=pct+'%';
+  document.getElementById('topBar').style.width=pct+'%';
+  document.getElementById('accDone').textContent=viewed;
+  document.getElementById('quizDone').textContent=quizCorrect;
+}
+const answers={q1:'c',q2:'b',q3:'c',q4:'b',q5:'b'};
+const feedbacks={
+  q1:{
+    a:'오답: 역사적 취득원가는 ALP 기준이 아닙니다. 시간이 지남에 따라 자산 가치는 취득원가와 크게 달라질 수 있습니다.',
+    b:'오답: 세무상 장부가액(감가상각 후)도 ALP 기준이 아닙니다. 세무상 감가상각과 실제 경제적 가치 감소는 다릅니다.',
+    c:'정답! ¶9.48에 따르면 유형자산 이전의 ALP는 이전 시점의 공정시장가치(FMV)를 기준으로 합니다. 독립기업 간 거래에서 합의될 시장 가격이 ALP의 기준입니다.',
+    d:'오답: 신품 대체비용은 사용 이력이 없는 자산에 적용될 수 있으나, 일반적으로 FMV(시장 가치)가 우선 적용됩니다.'
+  },
+  q2:{
+    a:'오답: 라이선스(로열티)는 일반적으로 원천세 과세 대상입니다. 소유권 이전은 양도소득으로 처리되어 원천세가 없는 경우가 많습니다.',
+    b:'정답! ¶9.54–9.56에 따르면 소유권 이전은 일시불 양도 대가(자본 거래, 양도세 과세)이고 양수인은 취득원가로 자본화합니다. 라이선스는 계속적 로열티(경상 거래, 원천세 적용 가능)이고 양수인은 당기비용으로 처리합니다.',
+    c:'오답: 라이선스의 경우 양수인은 로열티를 당기비용으로 처리하는 것이 원칙입니다. 자본화는 소유권 이전 시 적용됩니다.',
+    d:'오답: 라이선스와 소유권 이전의 세무처리와 원천세는 크게 다릅니다. 라이선스는 로열티로 경상소득 처리·원천세 적용 가능, 소유권 이전은 양도소득 처리·원천세 없음이 일반적입니다.'
+  },
+  q3:{
+    a:'오답: 900억은 개별 자산의 합계이며, 계속기업 프리미엄이 아닙니다.',
+    b:'오답: 1,200억은 계속기업 가치(Enterprise Value) 전체이며, 프리미엄만을 의미하지 않습니다.',
+    c:'정답! 계속기업 프리미엄 = 기업가치(1,200억) - 개별 자산 합계(900억) = 300억 원입니다. 이 300억은 조직된 인력, 고객 관계, 공급자 네트워크, 운영 노하우 등의 복합 가치로 구성됩니다. 단순 자산 이전 시 이 금액이 누락될 위험이 있습니다.',
+    d:'오답: 계속기업 프리미엄은 이전가격 분석의 핵심 대상입니다. 활동의 이전이 인정되면 반드시 보상에 포함되어야 합니다.'
+  },
+  q4:{
+    a:'오답: 기계 한 대만 이전되고 인력·고객 관계가 원법인에 남는 경우는 단순 유형자산 이전에 해당합니다.',
+    b:'정답! ¶9.71–9.72에 따르면 핵심 인력, 고객 계약, 공급자 관계, 운영 프로세스가 패키지로 함께 이전되어 원법인이 해당 사업을 더 이상 영위할 수 없게 되는 것이 "활동의 이전"의 핵심 지표입니다.',
+    c:'오답: 이전 후 원법인이 동일 사업을 계속 영위할 수 있다면 활동의 이전이 아닌 단순 자산 이전에 가깝습니다.',
+    d:'오답: 범용 자산의 이전은 계속기업 가치 이전 없이 단순 자산 이전에 해당합니다. 활동의 이전은 이전 후 사업 연속성 단절이 핵심 특징입니다.'
+  },
+  q5:{
+    a:'오답: 관계사 간이라도 유효한 계약의 조기 종료에는 독립기업 기준에 상응하는 보상이 필요합니다.',
+    b:'정답! ¶9.61에 따르면 독립기업 간에도 유효한 계약을 조기 종료하면 손해배상 책임이 발생합니다. 따라서 관계사 간 구조조정으로 기존 계약이 조기 종료될 때, 계약 잔여 기간 동안의 기대이익에 상당하는 보상(+ 합리적 통지 기간 보상 + 매몰비용)이 이루어져야 합니다.',
+    c:'오답: 통보와 동시에 보상 의무가 소멸되지 않습니다. 잔여 기간 기대이익에 대한 보상은 별도로 필요합니다.',
+    d:'오답: ALP 원칙에 따라 독립기업 간이라면 지급되었을 보상이 기준입니다. 계약서 명시 여부와 무관하게 경제적 실질에 따른 보상이 필요합니다.'
+  }
+};
+let graded=false;
+function gradeQuiz(){
+  if(graded)return;
+  let correct=0;
+  ['q1','q2','q3','q4','q5'].forEach(function(q,i){
+    const sel=document.querySelector('input[name="'+q+'"]:checked');
+    const fb=document.getElementById('f'+(i+1));
+    fb.style.display='block';
+    if(sel && sel.value===answers[q]){
+      correct++;
+      fb.className='q-feedback correct';
+      fb.textContent='✅ '+feedbacks[q][sel.value];
+    } else {
+      fb.className='q-feedback wrong';
+      const chosen=sel?sel.value:null;
+      fb.textContent='❌ '+(chosen?feedbacks[q][chosen]:'선택하지 않았습니다. 정답: '+answers[q].toUpperCase()+'번');
+    }
+    document.querySelectorAll('input[name="'+q+'"]').forEach(function(r){r.disabled=true;});
+  });
+  quizCorrect=correct;
+  const sb=document.getElementById('scoreBox');
+  const score=correct*20;
+  document.getElementById('scoreNum').textContent=score+'점';
+  document.getElementById('scoreMsg').textContent=score>=80
+    ?`🎉 통과! ${correct}문항 정답. 다음 모듈로 진행하세요.`
+    :`${correct}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.querySelector('.quiz-btn').disabled=true;
+  graded=true;
+  updatePct();
+}
+function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+const sections=['obj','s1','s2','s3','quiz','check'];
+const navBtns=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY+150>=el.offsetTop)cur=id;});
+  navBtns.forEach(btn=>{
+    const fn=btn.getAttribute('onclick');
+    if(fn&&fn.includes(`'${cur}'`))btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+updatePct();
+</script>
+</body>
+</html>

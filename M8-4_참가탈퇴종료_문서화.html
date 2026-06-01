@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M8-4: CCA 참가·탈퇴·종료 및 문서화</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#065f46;--purple-light:#ecfdf5;--purple-mid:#059669;--purple-dark:#022c22;
+  --green:#1a7a4a;--green-light:#e6f5ee;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,var(--purple-mid) 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#022c22;line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#f0fdf4;border-left:4px solid #22c55e;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#14532d;line-height:1.75}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#d1fae5}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #6ee7b7;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p,.col-box ul{font-size:.85rem;color:var(--text2);margin:0;line-height:1.65}
+.col-box ul{padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.red{border-color:#fca5a5;background:#fef2f2}
+.col-box.red h4{color:var(--red)}
+.col-box.blue{border-color:#93c5fd;background:#eff6ff}
+.col-box.blue h4{color:#1d4ed8}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+.pillar-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid var(--purple);background:var(--purple-light)}
+.pillar-card .pl-num{display:inline-block;background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;text-align:center;line-height:26px;font-size:.78rem;font-weight:800;margin-bottom:.4rem}
+.pillar-card h4{font-size:.92rem;font-weight:700;color:var(--purple-dark);margin-bottom:.35rem}
+.pillar-card p{font-size:.82rem;color:var(--text2);margin:0;line-height:1.6}
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0fdf4;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+.calc-box{background:#f0fdf4;border:2px solid var(--purple-mid);border-radius:12px;padding:1.4rem;margin:.8rem 0}
+.calc-box .calc-title{font-weight:700;font-size:.9rem;color:var(--purple);margin-bottom:.8rem}
+.calc-box table{width:100%;border-collapse:collapse;font-size:.88rem}
+.calc-box th{background:var(--purple);color:#fff;padding:.5rem .8rem;text-align:center;font-weight:600}
+.calc-box td{padding:.5rem .8rem;border-bottom:1px solid #a7f3d0;text-align:right;color:var(--text2)}
+.calc-box td:first-child{text-align:left}
+.calc-box tr.total td{font-weight:700;background:#ecfdf5;color:var(--purple-dark);border-top:2px solid var(--purple)}
+.calc-box tr.highlight td{background:#fefce8;color:#92400e;font-weight:600}
+.flow-box{display:flex;flex-direction:column;gap:.4rem;margin:.8rem 0}
+.flow-step{display:flex;align-items:center;gap:.8rem;background:var(--purple-light);border-radius:8px;padding:.6rem 1rem;font-size:.9rem}
+.flow-step .step-icon{background:var(--purple);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0}
+.flow-arrow-v{text-align:center;font-size:1.1rem;color:var(--purple-mid)}
+.chapter-complete{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 100%);color:#fff;border-radius:12px;padding:1.5rem 2rem;text-align:center;margin-top:2.5rem}
+.chapter-complete h3{font-size:1.2rem;margin-bottom:.5rem}
+.chapter-complete p{font-size:.9rem;opacity:1;color:#f0e6ff;line-height:1.65}
+.chapter-complete p strong{color:#ffe066}
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.doc-card{border-radius:10px;padding:1.1rem 1.2rem;border:1.5px solid var(--gray-border);background:#fafafa}
+.doc-card .dc-label{font-size:.78rem;font-weight:700;color:var(--purple);background:var(--purple-light);padding:.25rem .6rem;border-radius:6px;display:inline-block;margin-bottom:.6rem}
+.doc-card ul{font-size:.84rem;color:var(--text2);padding-left:1.2rem;margin:0;line-height:1.65}
+.doc-card li{margin-bottom:.3rem}
+.timeline{display:flex;flex-direction:column;gap:0;margin:.8rem 0}
+.tl-item{display:flex;gap:1rem;position:relative;padding-bottom:1.2rem}
+.tl-item:last-child{padding-bottom:0}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0}
+.tl-dot{width:32px;height:32px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0}
+.tl-line{width:2px;background:#a7f3d0;flex:1;margin-top:4px}
+.tl-item:last-child .tl-line{display:none}
+.tl-content{flex:1;padding-top:.2rem}
+.tl-content h4{font-size:.92rem;font-weight:700;color:var(--purple-dark);margin-bottom:.25rem}
+.tl-content p{font-size:.85rem;color:var(--text2);margin:0;line-height:1.6}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .two-col,.three-col,.doc-grid{grid-template-columns:1fr}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter VIII 원가분담약정(CCA) › M8-4 (4/4)</div>
+  <h1>M8-4. CCA 참가·탈퇴·종료 및 문서화 권고사항</h1>
+  <div class="sub">D. Entry/Withdrawal/Termination &amp; E. Recommendations for Documenting CCAs&nbsp;|&nbsp;¶8.44 – ¶8.53&nbsp;|&nbsp;예상 학습시간: 40분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('s1')">1. CCA 참가 - Buy-in </button>
+      <button class="nav-item" onclick="goTo('s2')">2. 탈퇴·종료 - Buy-out </button>
+      <button class="nav-item" onclick="goTo('s3')">3. 문서화 권고사항 </button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('check')">☑ 실무 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습목표</h2>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>Buy-in Payment의 개념과 산정 방법(공정가치 기준)을 설명할 수 있다</span></li>
+        <li><span class="obj-num">2</span><span>CCA 탈퇴 시 Buy-out Payment의 산정 원칙과 기존 참여자의 지분 인수 방식을 이해한다</span></li>
+        <li><span class="obj-num">3</span><span>CCA 종료 시 각 참여자의 권리 처리와 보상 구조를 파악한다</span></li>
+        <li><span class="obj-num">4</span><span>Buy-in/Buy-out Payment의 세무처리(자본화 vs 손금, 원천세 이슈)를 구분하여 설명할 수 있다</span></li>
+        <li><span class="obj-num">5</span><span>OECD 지침서(¶8.50–8.53)가 권고하는 CCA 문서화 요건의 핵심 내용을 열거할 수 있다</span></li>
+      </ul>
+    </div>
+
+    <!-- 섹션 1: D. CCA 참가 - Buy-in Payment -->
+    <div class="card" id="s1">
+      <h2>1. CCA 참가 — Buy-in Payment <span class="tag tag-para">¶8.44–8.45</span></h2>
+      <p>기존 CCA에 신규 참여자가 합류할 때, 해당 신규 참여자는 기존 참여자들이 이미 창출해 놓은 CCA 성과물(무형자산, 개발 결과물 등)에 대한 지분을 취득하게 됩니다. 이 대가로 지급하는 금액이 <strong>Buy-in Payment(참가대가)</strong>입니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          Buy-in Payment의 의미와 발생 근거 <span class="para">¶8.44</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>기존 CCA 참여자들은 과거 기여를 통해 이미 일정한 가치의 자산 또는 성과를 축적해 두었습니다. 신규 참여자가 이러한 기존 성과물로부터 혜택을 받게 된다면, 정상가격 원칙(ALP)에 따라 그 지분에 상응하는 대가를 지급해야 합니다.</p>
+          <div class="key-point">
+            <strong>Buy-in이 필요한 이유:</strong><br>
+            독립기업이라면 타 기업이 이미 개발해 놓은 자산의 지분을 무상으로 취득하지 않을 것입니다. 신규 참여자는 <em>기존 성과물의 공정시장가치(FMV)에 자신의 기대이익 지분율을 곱한 금액</em>을 기존 참여자들에게 지급해야만 정상가격 원칙을 충족합니다.
+          </div>
+          <p>이는 단순한 입회비가 아니라, 기존 CCA 자산에 대한 비례적 지분 취득의 대가입니다. 따라서 Buy-in 없이 기존 CCA에 편입되는 것은 이전가격 문제를 야기합니다.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          Buy-in Payment 산정 방법 — FMV 기준 <span class="para">¶8.45</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>Buy-in Payment는 참가 <strong>시점 기준</strong>의 기존 CCA 성과물의 공정시장가치(FMV)에 신규 참여자의 기대이익 지분율을 곱하여 산정합니다.</p>
+          <div class="key-point">
+            <strong>Buy-in Payment 공식:</strong><br>
+            Buy-in = 기존 CCA 성과물의 FMV × 신규 참여자의 기대이익 지분율<br><br>
+            <em>※ 역사적 원가(Book Value)나 과거 기여 비용 기준이 아닌, 참가 시점의 시장가치 기준</em>
+          </div>
+          <ul>
+            <li>CCA 성과물에 무형자산이 포함된 경우, Chapter VI의 무형자산 평가 원칙을 적용</li>
+            <li>평가가 어려운 무형자산(HTVI)의 경우 Chapter VI ¶6.181 등 특수 규정 준용</li>
+            <li>참가 시점 이후 신규 참여자는 정상적인 CCA 참여자로서 이후 기여에도 참가</li>
+          </ul>
+          <div class="warn-point">
+            <strong>⚠ 주의:</strong> Buy-in을 역사적 원가나 장부가액으로 산정하면 ALP 위반. 반드시 시점 기준 FMV로 산정해야 합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          Buy-in Payment의 기존 참여자 배분 방식
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>신규 참여자가 지급한 Buy-in Payment는 기존 참여자들에게 그들의 <strong>기존 지분 비율</strong>에 따라 배분됩니다.</p>
+
+          <div class="calc-box">
+            <div class="calc-title">📊 Buy-in Payment 계산 예시</div>
+            <table>
+              <tr>
+                <th>항목</th>
+                <th>A사</th>
+                <th>B사</th>
+                <th>C사(신규)</th>
+              </tr>
+              <tr>
+                <td>참가 전 기대이익 비율</td>
+                <td>70%</td>
+                <td>30%</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>참가 후 기대이익 비율</td>
+                <td>56%</td>
+                <td>24%</td>
+                <td>20%</td>
+              </tr>
+              <tr class="highlight">
+                <td>기존 CCA 성과물 FMV</td>
+                <td colspan="3" style="text-align:center">1,000억 원</td>
+              </tr>
+              <tr class="total">
+                <td>C사 Buy-in Payment</td>
+                <td colspan="3" style="text-align:center">1,000억 × 20% = <strong>200억 원</strong></td>
+              </tr>
+              <tr>
+                <td>A사 수취액</td>
+                <td>200억 × 70% = <strong>140억 원</strong></td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>B사 수취액</td>
+                <td>—</td>
+                <td>200억 × 30% = <strong>60억 원</strong></td>
+                <td>—</td>
+              </tr>
+            </table>
+          </div>
+          <div class="note-point">
+            C사 참가 후 전체 지분이 재조정됩니다(70%→56%, 30%→24%, 신규 20%). C사는 200억 원의 Buy-in을 지급하고 기존 참여자들이 그들의 기존 지분 비율대로 수취합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 2: D. 탈퇴·종료 및 세무처리 -->
+    <div class="card" id="s2">
+      <h2>2. CCA 탈퇴·종료 — Buy-out Payment 및 세무처리 <span class="tag tag-para">¶8.46–8.49</span></h2>
+      <p>CCA 참여자가 탈퇴하거나 CCA 자체가 종료되는 경우에도 정상가격 원칙이 적용됩니다. 탈퇴자는 자신의 지분에 상응하는 <strong>Buy-out Payment(탈퇴대가)</strong>를 수취하거나, CCA가 종료되면 각자의 권리를 보유하게 됩니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          CCA 탈퇴와 Buy-out Payment <span class="para">¶8.46–8.47</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA 참여자가 탈퇴할 경우, 탈퇴자의 지분을 기존 잔류 참여자들이 인수하게 됩니다. 이때 기존 참여자들이 탈퇴자에게 지급하는 금액이 <strong>Buy-out Payment</strong>입니다.</p>
+          <div class="key-point">
+            <strong>Buy-out Payment 공식:</strong><br>
+            Buy-out = 탈퇴 시점 기준 CCA 성과물의 FMV × 탈퇴자의 기대이익 지분율<br><br>
+            <em>※ Buy-in과 동일하게 탈퇴 시점의 FMV를 기준으로 산정</em>
+          </div>
+          <ul>
+            <li>탈퇴자의 과거 기여 비용 합계와는 무관하게 탈퇴 시점 시장가치로 결정</li>
+            <li>잔류 참여자들은 탈퇴자의 지분을 그들의 지분 비율에 따라 인수</li>
+            <li>탈퇴 후 잔류 참여자들의 기대이익 비율은 탈퇴자 지분이 제외된 비율로 재산정</li>
+          </ul>
+          <div class="two-col" style="margin-top:.8rem">
+            <div class="col-box">
+              <h4>✅ 정상 탈퇴 시나리오</h4>
+              <ul>
+                <li>사업 전략 변경으로 특정 IP 개발 포기</li>
+                <li>자금 사정 악화로 기여 불가</li>
+                <li>기대이익 범위 축소(일부 시장 철수)</li>
+              </ul>
+            </div>
+            <div class="col-box orange">
+              <h4>⚠ 실무 주의사항</h4>
+              <ul>
+                <li>탈퇴 시점이 IP 가치 하락 시점이면 낮은 Buy-out 가능</li>
+                <li>과세관청은 탈퇴 타이밍의 경제적 합리성을 검토</li>
+                <li>관계사 간 탈퇴는 조세회피 의도 의심 가능</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          CCA 종료 처리 <span class="para">¶8.48</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA는 참여자 전원의 합의나 CCA 목적 달성 등으로 종료될 수 있습니다. 종료 시 CCA 성과물에 대한 각 참여자의 권리 처리가 핵심입니다.</p>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-left">
+                <div class="tl-dot">①</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-content">
+                <h4>각 참여자 권리 확인</h4>
+                <p>CCA 종료 시 각 참여자는 기여 비율에 따른 성과물에 대한 권리를 보유합니다. 개발 CCA라면 IP에 대한 공유 또는 분할 소유권이 확정됩니다.</p>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-left">
+                <div class="tl-dot">②</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-content">
+                <h4>지분 유지 vs 이전</h4>
+                <p>각 참여자가 자신의 지분을 그대로 보유하는 경우에는 별도 보상이 없습니다. 다만 한 참여자가 타 참여자의 지분을 인수하는 경우, ALP에 따른 대가 지급이 필요합니다.</p>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-left">
+                <div class="tl-dot">③</div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-content">
+                <h4>청산 처리</h4>
+                <p>CCA 청산 시 잔여 자산은 기여 비율에 따라 배분. 이 과정에서 발생하는 손익도 각국 세법에 따라 처리되며, 이전가격 문서화 의무가 유지됩니다.</p>
+              </div>
+            </div>
+          </div>
+          <div class="note-point">
+            종료 시 핵심 원칙: <strong>각 참여자의 경제적 실질에 따른 권리</strong>가 반드시 반영되어야 하며, 형식적인 계약 종료만으로 이전가격 문제가 해결되지 않습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          Buy-in / Buy-out Payment 세무처리 <span class="para">¶8.49</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>Buy-in과 Buy-out Payment의 세무처리는 그 경제적 실질이 <strong>IP 지분의 취득·처분</strong>에 해당한다는 점에서 일반적인 무형자산 거래와 유사하게 다루어집니다.</p>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>구분</th>
+                <th>지급 법인</th>
+                <th>수취 법인</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Buy-in Payment</strong><br><span style="font-size:.8rem;color:var(--gray)">(신규 참여자 → 기존 참여자)</span></td>
+                <td>취득한 CCA 지분의 <strong>취득원가 자본화</strong><br>(IP 취득 원가로 처리)</td>
+                <td>보유 CCA 지분 일부의 <strong>처분이익으로 인식</strong><br>(양도소득 또는 사업소득)</td>
+              </tr>
+              <tr>
+                <td><strong>Buy-out Payment</strong><br><span style="font-size:.8rem;color:var(--gray)">(잔류 참여자 → 탈퇴 참여자)</span></td>
+                <td>인수한 탈퇴자 지분의 <strong>취득원가 자본화</strong></td>
+                <td>탈퇴자 CCA 지분의 <strong>처분이익으로 인식</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="key-point">
+            <strong>원천세(WHT) 이슈:</strong><br>
+            Buy-in / Buy-out은 <em>로열티</em>가 아닌 <em>자산(IP 지분) 양도 대가</em>로 분류되는 것이 일반적이므로, 조세조약상 양도소득 또는 사업소득 조항이 적용되어 원천세가 부과되지 않는 경우가 많습니다. 그러나 거래의 경제적 실질, 각국 국내법, 적용 조약 조항에 따라 다를 수 있으므로 사전 검토가 필요합니다.
+          </div>
+          <div class="warn-point">
+            <strong>⚠ 실무 포인트:</strong> 일부 과세관청은 Buy-in Payment를 실질적 로열티로 재분류하여 원천세를 부과하려 할 수 있습니다. 계약의 법적 성격과 경제적 실질을 명확히 정의하고 문서화해야 합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 3: E. 문서화 권고사항 -->
+    <div class="card" id="s3">
+      <h2>3. CCA 구조화·문서화 권고사항 <span class="tag tag-para">¶8.50–8.53</span></h2>
+      <p>OECD 이전가격 지침서는 CCA가 정상가격 원칙을 충족하는 적법한 약정으로 인정받기 위해 갖추어야 할 구체적인 조건과 문서화 요건을 권고합니다. 이는 과세 불확실성을 최소화하는 핵심 실무 지침입니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          CCA 적격 요건 — 일반 조건 <span class="para">¶8.50</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA가 이전가격 목적상 정상가격 약정으로 인정되기 위해서는 다음 일반 조건을 충족해야 합니다.</p>
+          <div class="three-col">
+            <div class="pillar-card">
+              <div class="pl-num">①</div>
+              <h4>참여자 요건</h4>
+              <p>CCA로부터 합리적으로 예상되는 이익을 보유하는 기업만이 참여자가 될 수 있습니다. 단순 서비스 제공자나 하청업자는 참여자가 아닙니다.</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pl-num">②</div>
+              <h4>기여 적정성</h4>
+              <p>각 참여자의 기여액은 독립기업 간 거래에서 합의했을 금액, 즉 ALP를 반영해야 합니다. 기여 비율은 기대이익 비율에 부합해야 합니다.</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pl-num">③</div>
+              <h4>조정 의무 이행</h4>
+              <p>대차지급액(Balancing Payment), Buy-in/Buy-out Payment 등 조정 의무가 적시에 이행되어야 합니다. 미이행은 ALP 위반입니다.</p>
+            </div>
+          </div>
+          <div class="note-point">
+            위 조건 중 하나라도 미충족 시, 과세관청은 해당 CCA를 이전가격 목적상 적법한 CCA로 인정하지 않을 수 있으며, 전체 기여액을 재산정하거나 관련 거래를 재분류할 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          최초 계약서 및 초기 문서화 요건 <span class="para">¶8.51</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA 체결 시 작성되는 계약서(CCA Agreement)는 세무 목적상 최소한 다음 내용을 포함해야 합니다.</p>
+          <div class="doc-grid">
+            <div class="doc-card">
+              <div class="dc-label">🏢 참여자 관련</div>
+              <ul>
+                <li>모든 CCA 참여자 명단</li>
+                <li>각 참여자의 역할 및 법적 위치</li>
+                <li>참여 시작일 및 예상 기간</li>
+                <li>신규 참여자 편입 조건</li>
+              </ul>
+            </div>
+            <div class="doc-card">
+              <div class="dc-label">🔬 활동 관련</div>
+              <ul>
+                <li>CCA 대상 활동의 성격과 범위</li>
+                <li>수행 지역 및 담당 기업</li>
+                <li>외부 용역 활용 시 그 범위</li>
+                <li>CCA 성과물의 정의</li>
+              </ul>
+            </div>
+            <div class="doc-card">
+              <div class="dc-label">💰 재무 관련</div>
+              <ul>
+                <li>기여액 산정 방법 및 배분 기준</li>
+                <li>기대이익 비율 결정 방식</li>
+                <li>대차지급액 산정·지급 절차</li>
+                <li>기여 가치 평가 방법론</li>
+              </ul>
+            </div>
+            <div class="doc-card">
+              <div class="dc-label">🚪 변동 관련</div>
+              <ul>
+                <li>참여자 변경·탈퇴 조건</li>
+                <li>Buy-in/Buy-out 산정 방식</li>
+                <li>CCA 종료 조건 및 절차</li>
+                <li>분쟁 해결 절차</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          연간 기록 유지 및 보존 의무 <span class="para">¶8.52–8.53</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA 체결 후에도 매년 다음 정보를 기록하고 유지해야 합니다. 이는 과세관청의 사후 검증에 대응하기 위한 핵심 문서입니다.</p>
+
+          <div class="flow-box">
+            <div class="flow-step">
+              <div class="step-icon">📋</div>
+              <div><strong>연간 기여 실적 기록:</strong> 각 참여자의 실제 기여 금액·종류 및 배분 방식의 변동사항</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-icon">⚖️</div>
+              <div><strong>기대이익 비율 업데이트:</strong> 기대이익 기준(매출, 영업이익, 판매량 등) 및 비율 변동 이유</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-icon">💸</div>
+              <div><strong>대차지급액 내역:</strong> 발생 금액, 지급·수취 법인, 지급 시기 및 근거</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-icon">🔄</div>
+              <div><strong>참여자 변동 기록:</strong> 신규 참가(Buy-in 내역), 탈퇴(Buy-out 내역), 지분 재조정 내역</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-icon">📁</div>
+              <div><strong>계약 변경 기록:</strong> 조건 변경 일자, 내용, 변경 이유 및 승인 절차</div>
+            </div>
+          </div>
+
+          <div class="key-point" style="margin-top:1rem">
+            <strong>문서 보존 기간 (¶8.53):</strong><br>
+            CCA 관련 문서는 <em>CCA 전체 기간 + 각국 세법상 부과제척기간(통상 5~10년)</em> 동안 보존해야 합니다. 무형자산 개발 CCA의 경우 상업화 단계까지 포함하면 장기 보존이 필요합니다. 문서 요청 시 즉시 제출 가능한 상태로 유지해야 합니다.
+          </div>
+
+          <div class="warn-point">
+            <strong>⚠ Master File / Local File 연계:</strong> CCA는 Master File의 무형자산 및 관계사 내부거래 섹션에 반드시 기술되어야 합니다. Local File에서는 CCA 거래의 구체적 조건, 기여액, 정상가격 분석 결과를 상세히 기재해야 합니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter VIII 완료 박스 -->
+      <div class="chapter-complete">
+        <h3>🎓 Chapter VIII 학습 완료</h3>
+        <p>원가분담약정(CCA)의 개념부터 참가·탈퇴·종료 및 문서화 요건까지 4개 모듈을 완주했습니다.<br>
+        다음은 <strong>Chapter IX — 사업구조조정(Business Restructurings)</strong>으로 이어집니다.</p>
+      </div>
+    </div>
+
+    <!-- 확인 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>📝 확인 퀴즈</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1.2rem">5문제 · 문제당 1점 · 즉시 피드백 제공</p>
+
+      <div class="q-block">
+        <div class="q-text">Q1. A사(기여율 70%)·B사(기여율 30%)가 CCA를 통해 공동 개발한 기존 IP의 현재 FMV가 1,000억 원이다. C사가 20%의 기대이익 지분으로 CCA에 신규 참가할 경우, C사가 지급해야 할 Buy-in Payment는?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a"> ① 1,000억 × 30% = 300억 원</label>
+          <label><input type="radio" name="q1" value="b"> ② 1,000억 × 20% = 200억 원</label>
+          <label><input type="radio" name="q1" value="c"> ③ 1,000억 × (70%+30%) / 2 = 500억 원</label>
+          <label><input type="radio" name="q1" value="d"> ④ Buy-in 의무 없음 (미래 기여만으로 충분)</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q2. OECD 이전가격 지침서에 따른 Buy-in Payment 산정 시 적용하는 가액 기준은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a"> ① 기존 참여자들의 과거 기여 비용 합계(역사적 원가)</label>
+          <label><input type="radio" name="q2" value="b"> ② 기존 참여자들의 과거 기여 비용에 적정 이자를 가산한 금액</label>
+          <label><input type="radio" name="q2" value="c"> ③ 참가 시점 기준 기존 CCA 성과물의 공정시장가치(FMV)</label>
+          <label><input type="radio" name="q2" value="d"> ④ 신규 참여자의 향후 기대이익 현재가치</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q3. CCA 참여자가 탈퇴할 때 수취하는 Buy-out Payment에 대한 설명으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a"> ① Buy-out는 탈퇴자의 미래 기여 손실에 대한 영업손해 보상액이다</label>
+          <label><input type="radio" name="q3" value="b"> ② Buy-out는 탈퇴 시점 기준 탈퇴자 CCA 지분의 공정시장가치로 산정한다</label>
+          <label><input type="radio" name="q3" value="c"> ③ Buy-out는 탈퇴자의 과거 기여 비용 총액과 반드시 일치해야 한다</label>
+          <label><input type="radio" name="q3" value="d"> ④ Buy-out Payment는 CCA 종료 시에만 발생하며, 중도 탈퇴에는 해당되지 않는다</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q4. OECD 이전가격 지침서(¶8.51)가 CCA 최초 계약서에 포함되어야 한다고 권고하지 않는 항목은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a"> ① 모든 참여자의 명단 및 역할</label>
+          <label><input type="radio" name="q4" value="b"> ② CCA 대상 활동의 성격과 범위</label>
+          <label><input type="radio" name="q4" value="c"> ③ 기여액 및 기대이익 배분 방식</label>
+          <label><input type="radio" name="q4" value="d"> ④ 각 참여자 국가의 세율 및 최종 세무신고 방법</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q5. Buy-in Payment의 세무처리에 대한 설명으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a"> ① 지급 법인은 취득한 CCA 지분의 취득원가로 자본화하고, 수취 법인은 보유 지분 처분이익으로 인식한다</label>
+          <label><input type="radio" name="q5" value="b"> ② 지급 법인과 수취 법인 모두 당기 손금(비용)으로 처리한다</label>
+          <label><input type="radio" name="q5" value="c"> ③ Buy-in Payment는 로열티로 분류되므로 원천세가 반드시 부과된다</label>
+          <label><input type="radio" name="q5" value="d"> ④ 수취 법인은 자본 납입 처리로 과세에서 제외된다</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+
+      <button class="quiz-btn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 체크리스트 -->
+    <div class="card" id="check">
+      <h2>☑ 실무 체크리스트</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">CCA 참가·탈퇴·종료 및 문서화 검토 사항 (¶8.44–8.53)</p>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c1">
+          <label for="c1">CCA 신규 참가 시 <strong>참가 시점 기준 FMV 평가 보고서</strong>를 구비하고, Buy-in Payment 산정 근거를 문서화하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c2">
+          <label for="c2">Buy-in Payment 산정 시 <strong>역사적 원가가 아닌 FMV 기준</strong>을 적용하였으며, 무형자산의 경우 Chapter VI 평가 원칙을 준수하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c3">
+          <label for="c3">Buy-in Payment의 기존 참여자 배분 비율(기존 지분 비율 기준)이 계약에 명확히 규정되어 있고 실제 지급과 일치합니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c4">
+          <label for="c4">CCA 탈퇴 발생 시 <strong>탈퇴 시점 FMV 평가 절차</strong>가 마련되어 있으며, Buy-out Payment 산정 내역이 문서화되어 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c5">
+          <label for="c5">CCA 계약서에 참가·탈퇴·종료 관련 조항(Buy-in/Buy-out 조건, 절차, 가격 결정 방법)이 포함되어 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c6">
+          <label for="c6">CCA 개시 시 ¶8.51 문서화 요건(참여자 목록, 활동 범위, 기여·이익 배분 방식, 변동 조건 등)을 충족하는 계약서를 체결하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c7">
+          <label for="c7">CCA 진행 중 연간 기여 실적, 대차지급액 내역, 기대이익 비율 변동, 참여자 변동 사항을 <strong>체계적으로 기록·보관</strong>하고 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c8">
+          <label for="c8">CCA 종료 후에도 법정 보존 기간(CCA 기간 + 부과제척기간) 동안 관련 문서를 유지하며, 과세당국 요청 시 즉시 제출 가능한 상태로 관리하고 있습니까?</label>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-bottom">
+      <a class="btn-nav secondary" href="M8-3_대차지급액_세무처리.html">← 이전 모듈</a>
+      <span class="btn-nav secondary" onclick="alert('목차 페이지로 이동합니다.')">📋 목차로</span>
+      <a class="btn-nav" href="../고급과정_Chapter_IX/M9-1_서론_범위_이론적틀.html">다음 Chapter →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const allAcc=document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent=allAcc.length;
+function toggleAcc(btn){
+  const body=btn.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  if(!btn.classList.contains('viewed')){btn.classList.add('viewed');updatePct();}
+}
+let quizCorrect=0;
+function updatePct(){
+  const viewed=document.querySelectorAll('.acc-header.viewed').length;
+  const total=allAcc.length;
+  const pct=Math.round(((total>0?viewed/total:0)*0.6+(quizCorrect/5)*0.4)*100);
+  document.getElementById('pctDisp').textContent=pct+'%';
+  document.getElementById('topBar').style.width=pct+'%';
+  document.getElementById('accDone').textContent=viewed;
+  document.getElementById('quizDone').textContent=quizCorrect;
+}
+const answers={q1:'b',q2:'c',q3:'b',q4:'d',q5:'a'};
+const feedbacks={
+  q1:{
+    a:'오답: B사의 기여율 30%를 적용한 오류입니다. Buy-in은 신규 참여자(C사)의 기대이익 지분율(20%)에 기존 성과물 FMV를 곱하여 산정합니다.',
+    b:'정답! C사 Buy-in = 1,000억 × 20% = 200억 원. 신규 참여자는 기존 CCA 성과물의 FMV 중 자신의 기대이익 지분율(20%)에 해당하는 금액을 Buy-in으로 지급해야 합니다(¶8.44–8.45).',
+    c:'오답: A·B사 비율의 평균을 적용하는 방법은 OECD 지침서에서 인정하지 않습니다. Buy-in은 신규 참여자 지분율(20%)을 기준으로 합니다.',
+    d:'오답: 기존 CCA 성과물이 존재하는 경우 신규 참여자는 반드시 Buy-in Payment를 지급해야 합니다. 미래 기여만으로는 기존 성과 지분 취득의 대가를 갈음할 수 없습니다.'
+  },
+  q2:{
+    a:'오답: 과거 역사적 원가는 ALP를 반영하지 않습니다. FMV는 시간이 지남에 따라 역사적 원가와 크게 달라질 수 있습니다.',
+    b:'오답: 과거 비용에 이자를 가산하는 방식도 FMV를 정확히 반영하지 못합니다.',
+    c:'정답! ¶8.45에 따르면 Buy-in Payment는 참가 시점 기준의 기존 CCA 성과물의 공정시장가치(FMV)에 신규 참여자의 기대이익 지분율을 곱하여 산정합니다. 역사적 원가가 아닌 FMV 기준이 핵심입니다.',
+    d:'오답: 신규 참여자의 향후 기대이익 현재가치는 Buy-in의 산정 기준이 아닙니다. 기존 성과물의 가치를 기준으로 해야 합니다.'
+  },
+  q3:{
+    a:'오답: Buy-out는 영업 손해 보상이 아니라 탈퇴자의 CCA 지분(자산 가치)에 대한 대가입니다.',
+    b:'정답! ¶8.46–8.47에 따르면 Buy-out Payment는 탈퇴 시점 기준 탈퇴자 CCA 지분의 공정시장가치로 산정합니다. 과거 기여 비용이 아닌, 탈퇴 시점 시장가치 기준이 적용됩니다.',
+    c:'오답: Buy-out는 과거 기여 비용 합계와 반드시 일치하지 않습니다. 탈퇴 시점의 시장가치에 따라 결정되므로 시장 상황에 따라 과거 비용보다 크거나 작을 수 있습니다.',
+    d:'오답: Buy-out는 CCA 진행 중 참여자 중도 탈퇴 시에도 발생합니다. 종료 시에만 국한되지 않습니다.'
+  },
+  q4:{
+    a:'오답: 참여자 명단과 역할은 ¶8.51의 필수 기재 사항입니다.',
+    b:'오답: CCA 활동의 성격과 범위는 ¶8.51의 필수 기재 사항입니다.',
+    c:'오답: 기여액 및 기대이익 배분 방식은 ¶8.51의 필수 기재 사항입니다.',
+    d:'정답! 각 참여자 국가의 세율이나 구체적인 세무신고 방법은 ¶8.51의 CCA 계약서 필수 기재 사항에 포함되지 않습니다. CCA 계약서는 CCA 활동·기여·이익의 구조를 다루며, 각국의 세무신고는 별도로 이루어집니다.'
+  },
+  q5:{
+    a:'정답! ¶8.49에 따르면 Buy-in Payment 지급 법인은 취득한 CCA 지분을 IP 취득원가로 자본화하고, 수취 법인은 보유 CCA 지분의 일부 처분이익(자산 양도소득)으로 인식합니다. 이는 로열티가 아닌 자산 거래 성격으로 처리되는 것이 원칙입니다.',
+    b:'오답: 개발 CCA의 Buy-in은 미래 IP 권리 취득의 대가이므로 지급 법인은 자본화 처리가 원칙입니다. 당기 손금 처리가 아닙니다.',
+    c:'오답: Buy-in Payment는 일반적으로 IP 지분 양도 대가(자산 거래)로 분류되어 로열티 원천세의 적용을 받지 않는 경우가 많습니다. 단, 거래 성격에 따라 다를 수 있으므로 사전 검토가 필요합니다.',
+    d:'오답: 수취 법인은 IP 지분 처분이익으로 인식하여 과세 대상이 됩니다. 자본 납입으로 처리되지 않습니다.'
+  }
+};
+function gradeQuiz(){
+  let correct=0;
+  ['q1','q2','q3','q4','q5'].forEach(q=>{
+    const sel=document.querySelector(`input[name=${q}]:checked`);
+    const fb=document.getElementById('f'+q.slice(1));
+    if(!sel){fb.style.display='none';return;}
+    const val=sel.value;
+    const ok=val===answers[q];
+    if(ok)correct++;
+    fb.textContent=(ok?'✅ ':'❌ ')+feedbacks[q][val];
+    fb.className='q-feedback '+(ok?'correct':'wrong');
+    fb.style.display='block';
+  });
+  quizCorrect=correct;
+  updatePct();
+  const sb=document.getElementById('scoreBox');
+  const score=correct*20;
+  document.getElementById('scoreNum').textContent=score+'점';
+  document.getElementById('scoreMsg').textContent=score>=80
+    ?`🎉 통과! ${correct}문항 정답. 다음 모듈로 진행하세요.`
+    :`${correct}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.querySelector('.quiz-btn').disabled=true;
+}
+function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+const sections=['obj','s1','s2','s3','quiz','check'];
+const navBtns=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY+150>=el.offsetTop)cur=id;});
+  navBtns.forEach(btn=>{
+    const fn=btn.getAttribute('onclick');
+    if(fn&&fn.includes(`'${cur}'`))btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+updatePct();
+</script>
+</body>
+</html>

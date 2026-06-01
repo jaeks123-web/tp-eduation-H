@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M8-2: 정상가격원칙 적용 — 참여자·기대이익·기여도</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#065f46;--purple-light:#ecfdf5;--purple-mid:#059669;--purple-dark:#022c22;
+  --green:#1a7a4a;--green-light:#e6f5ee;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,var(--purple-mid) 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#022c22;line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#f0fdf4;border-left:4px solid #22c55e;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#14532d;line-height:1.75}
+.practice-note{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:.9rem 1.1rem;margin:.8rem 0}
+.practice-note .pn-label{font-weight:700;font-size:.78rem;color:#92400e;margin-bottom:.35rem}
+.practice-note p{font-size:.88rem;color:#78350f;margin-bottom:.35rem}
+.practice-note p:last-child{margin-bottom:0}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#d1fae5}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #6ee7b7;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p{font-size:.85rem;margin:0;color:var(--text2);line-height:1.65}
+.col-box ul{font-size:.84rem;color:var(--text2);padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.red{border-color:#fca5a5;background:#fef2f2}
+.col-box.red h4{color:var(--red)}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+.pillar-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid var(--purple);background:var(--purple-light)}
+.pillar-card .pl-num{display:inline-block;background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;text-align:center;line-height:26px;font-size:.78rem;font-weight:800;margin-bottom:.4rem}
+.pillar-card h4{font-size:.92rem;font-weight:700;color:var(--purple-dark);margin-bottom:.35rem}
+.pillar-card p{font-size:.82rem;color:var(--text2);margin:0;line-height:1.6}
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0fdf4;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+.def-box{background:#f8fffe;border:2px solid var(--purple-mid);border-radius:10px;padding:1.1rem 1.3rem;margin:.8rem 0}
+.def-box .def-label{font-size:.78rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.def-box p{font-size:.93rem;color:var(--text2);margin:0;line-height:1.8}
+.case-box{background:#f8fffe;border:1.5px solid var(--purple-mid);border-radius:10px;padding:1.2rem 1.4rem;margin:.8rem 0}
+.case-box .case-label{font-size:.78rem;font-weight:700;color:var(--purple-mid);letter-spacing:.05em;margin-bottom:.6rem}
+.case-box table{width:100%;border-collapse:collapse;font-size:.86rem}
+.case-box th{background:var(--purple);color:#fff;padding:.5rem .8rem;text-align:center;font-weight:600}
+.case-box td{padding:.5rem .8rem;border-bottom:1px solid #a7f3d0;text-align:center;color:var(--text2)}
+.case-box tr:last-child td{border:none;font-weight:700;background:#ecfdf5;color:var(--purple-dark)}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700}
+.badge-g{background:#dcfce7;color:#166534}
+.badge-o{background:#ffedd5;color:#9a3412}
+.badge-b{background:#dbeafe;color:#1e40af}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .two-col,.three-col{grid-template-columns:1fr}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter VIII 원가분담약정(CCA) › M8-2 (2/4)</div>
+  <h1>M8-2. 정상가격원칙 적용 — 참여자·기대이익·기여도</h1>
+  <div class="sub">C.1 In general & C.2 Determining Participants & C.3 Expected Benefits & C.4 Value of Contributions&nbsp;|&nbsp;¶8.12 – ¶8.33&nbsp;|&nbsp;예상 학습시간: 55분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('s1')">1. 정상가격원칙 적용 개관 </button>
+      <button class="nav-item" onclick="goTo('s2')">2. 참여자 결정 </button>
+      <button class="nav-item" onclick="goTo('s3')">3. CCA 기대이익 분석 </button>
+      <button class="nav-item" onclick="goTo('s4')">4. 참여자 기여도 가치 측정 </button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('check')">☑ 실무 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습목표</h2>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>CCA에 정상가격원칙이 적용되는 방식(미래 공동·비례적 이익 기준)을 설명할 수 있다</span></li>
+        <li><span class="obj-num">2</span><span>CCA 참여자 요건과 비참여자(외주 서비스 제공자)를 구분하고 각각에 적용되는 분석 방식을 이해한다</span></li>
+        <li><span class="obj-num">3</span><span>기대이익(expected benefits) 측정 기준과 기대이익 vs 실제이익의 관계를 파악한다</span></li>
+        <li><span class="obj-num">4</span><span>참여자 기여도의 가치 측정 방법(원가 vs 공정시장가치)과 적용 기준을 이해한다</span></li>
+        <li><span class="obj-num">5</span><span>기존 자산 기여, 기여 시기, 예산-실제 비용 차이 처리 등 실무 이슈를 설명할 수 있다</span></li>
+      </ul>
+    </div>
+
+    <!-- 섹션 1: C.1 -->
+    <div class="card" id="s1">
+      <h2>1. 정상가격원칙 적용 개관 <span class="tag tag-para">¶8.12–8.13</span></h2>
+      <p>CCA에 대한 정상가격 분석의 핵심 질문은 "<strong>독립기업이라면 이 조건으로 CCA에 참여하였을 것인가?</strong>"입니다. 이를 위해 각 참여자의 기여가 기대이익에 비례하는지를 검토합니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          CCA에서 정상가격원칙의 적용 방식 <span class="para">¶8.12</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA의 정상가격 여부 판단은 두 가지 질문으로 귀결됩니다.</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>① 기여도 비율의 정상가격 여부</h4>
+              <p>각 참여자가 분담하는 비용·위험의 비율이 기대이익 비율에 부합하는가?</p>
+              <p>→ 비용 분담 비율 ≠ 기대이익 비율이면 <strong>대차지급액(Balancing Payment)</strong>으로 조정 필요</p>
+            </div>
+            <div class="col-box orange">
+              <h4>② 기여의 가치 측정 적정성</h4>
+              <p>각 참여자 기여(현금·자산·서비스)의 가치가 정상가격으로 평가되었는가?</p>
+              <p>→ 기존 자산 기여 시 공정시장가치(FMV) 기준 적용</p>
+            </div>
+          </div>
+          <div class="key-point">
+            <strong>핵심 공식:</strong> 정상가격 CCA = <em>참여자 i의 기여 가치 / 총 기여 가치 ≈ 참여자 i의 기대이익 / 총 기대이익</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          미래 공동 및 비례적 이익 (Future Mutual and Proportionate Benefits) <span class="para">¶8.13</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>OECD 지침은 CCA의 정상가격 분석에서 <strong>"미래의 공동 및 비례적 이익"</strong>이라는 개념을 핵심 기준으로 제시합니다.</p>
+          <ul>
+            <li><strong>미래(Future)</strong>: 이익은 CCA 약정 시점 이후에 발생하며, 사후적으로 실현된 이익이 아닌 합리적 기대이익을 기준으로 판단</li>
+            <li><strong>공동(Mutual)</strong>: 각 참여자가 CCA 결과물로부터 실질적인 이익을 기대해야 하며, 일부만 이익을 보는 구조는 CCA 요건 미충족</li>
+            <li><strong>비례적(Proportionate)</strong>: 기여 비율과 기대이익 비율이 균형을 이루어야 함</li>
+          </ul>
+          <div class="warn-point">
+            <strong>실무 주의:</strong> 사후적(ex post)으로 실제 이익이 기대와 달라도, 약정 체결 시점(ex ante)의 합리적 기대를 기준으로 정상가격 여부를 판단합니다. 단, 예측 방법론 자체의 합리성은 검증됩니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 2: C.2 -->
+    <div class="card" id="s2">
+      <h2>2. CCA 참여자 결정 <span class="tag tag-para">¶8.14–8.18</span></h2>
+      <p>CCA의 <strong>참여자(Participant)</strong>와 단순히 서비스를 제공하는 <strong>비참여자(Non-participant)</strong>를 구분하는 것이 중요합니다. 참여자 여부에 따라 적용되는 이전가격 분석 방식이 달라집니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          참여자 구분 기준 <span class="para">¶8.14</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA 참여자는 다음 세 가지 요건을 모두 충족해야 합니다.</p>
+          <div class="three-col">
+            <div class="pillar-card">
+              <div class="pl-num">①</div>
+              <h4>기대이익 보유</h4>
+              <p>CCA 활동의 결과물로부터 직접적 이익을 기대하고 있어야 함</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pl-num">②</div>
+              <h4>위험 부담</h4>
+              <p>CCA 활동의 성패에 따른 위험을 실질적으로 부담해야 함 (Chapter I D.1.2.1 기준)</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pl-num">③</div>
+              <h4>통제 기능</h4>
+              <p>외주 서비스 포함, 수행 활동에 대한 통제 및 위험관리 기능을 실제 수행</p>
+            </div>
+          </div>
+          <div class="key-point">
+            CCA 결과물을 단순히 사용하거나 서비스를 제공하는 주체는 참여자가 아닙니다. 참여자로 인정되려면 <strong>결과물에 대한 직접 권리 취득 + 위험 부담 + 통제 기능</strong>이 모두 필요합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          위험의 통제 — Chapter I D.1.2.1 적용 <span class="para">¶8.15</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA 참여자가 위험을 실질적으로 부담하는지 여부는 Chapter I D.1.2.1의 위험 분석 6단계를 따릅니다.</p>
+          <ol>
+            <li>계약상 위험 배분 확인</li>
+            <li>실제 거래의 정확한 분석(accurate delineation)</li>
+            <li>위험 통제 기능을 수행하는 주체 파악 (의사결정 권한)</li>
+            <li>재무적 위험 부담 능력 확인</li>
+            <li>위험 배분의 일관성 검토</li>
+            <li>최종 위험 귀속 주체 결정</li>
+          </ol>
+          <div class="note-point">
+            <strong>실무 시사점:</strong> 일부 다국적기업은 저세율국 자회사를 CCA 참여자로 형식적으로 등록하지만, 실제 R&D 의사결정은 모회사가 수행합니다. 이 경우 자회사의 참여자 지위가 부인될 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          기여도 측정 방법 — 참여자 vs 비참여자 <span class="para">¶8.16</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <table class="compare-table">
+            <tr>
+              <th>구분</th>
+              <th>참여자(Participant)</th>
+              <th>비참여자(Non-participant)</th>
+            </tr>
+            <tr>
+              <td><strong>역할</strong></td>
+              <td>CCA 결과물의 권리 취득자</td>
+              <td>단순 서비스 제공자</td>
+            </tr>
+            <tr>
+              <td><strong>위험</strong></td>
+              <td>CCA 위험 부담 (실패 시 손실 가능)</td>
+              <td>위험 부담 없음 (용역 대가만 수령)</td>
+            </tr>
+            <tr>
+              <td><strong>대가 기준</strong></td>
+              <td>기여도 가치 (¶8.23~8.33)</td>
+              <td>Chapter VII 서비스 정상가격 원칙 적용</td>
+            </tr>
+            <tr>
+              <td><strong>분석 방법</strong></td>
+              <td>기대이익 비례 기여도 분석</td>
+              <td>독립기업 서비스 거래 분석 (TNMM 등)</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          외주 서비스 통제 및 대가 산정 <span class="para">¶8.17–8.18</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA 참여자가 일부 활동을 외부(제3자 또는 비참여 관계회사)에 외주할 수 있습니다.</p>
+          <ul>
+            <li>외주한 활동에 대해서도 참여자는 <strong>통제 기능</strong>을 유지해야 참여자 지위가 인정됨</li>
+            <li>통제 기능 없이 외주만 하면, 해당 참여자는 사실상 단순 대리인(agent)에 불과할 수 있음</li>
+            <li>외주 서비스에 대한 대가는 <strong>제3자 거래 기준(Chapter VII 원칙)</strong>으로 결정되며, CCA 기여도와 별도로 처리</li>
+          </ul>
+          <div class="warn-point">
+            <strong>중요 구분:</strong> 외주 비용을 CCA 총 비용 풀에 포함시킬 수는 있지만, 외주 서비스 제공자에게 지급하는 대가 자체는 CCA 기여가 아닌 독립 서비스 거래로 분석합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 3: C.3 -->
+    <div class="card" id="s3">
+      <h2>3. CCA 기대이익 분석 <span class="tag tag-para">¶8.19–8.22</span></h2>
+      <p>CCA의 비용 분담 비율을 결정하는 핵심은 <strong>각 참여자의 기대이익(expected benefits)</strong>을 어떻게 측정하느냐입니다. 기대이익은 CCA 결과물로부터 향후 창출할 것으로 합리적으로 예상되는 경제적 가치입니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          기대이익 배분 방법 <span class="para">¶8.19</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>기대이익은 다음 방법 중 사안에 가장 적합한 것으로 측정합니다.</p>
+          <table class="compare-table">
+            <tr><th>측정 기준</th><th>설명</th><th>적용 예시</th></tr>
+            <tr>
+              <td><strong>매출</strong></td>
+              <td>각 참여자의 예상 매출 비율</td>
+              <td>마케팅 CCA, 판매망 공동구축</td>
+            </tr>
+            <tr>
+              <td><strong>사용량·생산량</strong></td>
+              <td>IP 사용 예상 횟수, 생산 예상 단위</td>
+              <td>제조 공정 개선 CCA</td>
+            </tr>
+            <tr>
+              <td><strong>직원 수 / 시설 규모</strong></td>
+              <td>서비스 이용 예상 규모</td>
+              <td>IT 시스템, HR 서비스 CCA</td>
+            </tr>
+            <tr>
+              <td><strong>예상 이익</strong></td>
+              <td>DCF 등 현금흐름 할인 모델 기반 기대이익</td>
+              <td>고가치 무형자산 개발 CCA</td>
+            </tr>
+          </table>
+          <div class="key-point">
+            <strong>원칙:</strong> 기대이익 측정 기준은 CCA 결과물로부터 창출되는 이익의 성격을 가장 잘 반영하는 방법을 선택해야 합니다. 다양한 기준을 혼용할 수도 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          기대이익 vs 실제이익 — 사후 조정 이슈 <span class="para">¶8.20</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA는 <strong>사전에(ex ante)</strong> 기대이익을 추정하여 비용을 분담하므로, 사후에 실제 이익이 달라질 수 있습니다.</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>✅ 정상적 상황 (조정 불필요)</h4>
+              <ul>
+                <li>예상치 못한 시장 변화, 경쟁 심화 등 사업 위험이 현실화된 경우</li>
+                <li>합리적 예측 방법론을 사용했으나 결과가 달라진 경우</li>
+                <li>→ 사후적 결과 차이만으로 CCA를 재분류하지 않음</li>
+              </ul>
+            </div>
+            <div class="col-box red">
+              <h4>⚠️ 조정이 필요한 상황</h4>
+              <ul>
+                <li>기대이익 예측 방법론 자체가 비합리적이었던 경우</li>
+                <li>처음부터 특정 참여자에게 이익이 없음이 명백했던 경우</li>
+                <li>→ 과세관청이 원래 비용 분담 비율을 조정할 수 있음</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          다층 개발활동 및 조정 필요성 <span class="para">¶8.21–8.22</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p><strong>다층 개발활동(Multi-tiered development)</strong>이란 CCA 내에서 하나의 개발 결과물이 여러 하위 개발 단계를 거치는 구조를 말합니다.</p>
+          <ul>
+            <li>예: 기초 플랫폼 개발(Layer 1) → 제품별 특화 기능 개발(Layer 2) → 시장별 현지화(Layer 3)</li>
+            <li>각 레이어마다 참여자와 기대이익 비율이 달라질 수 있음</li>
+            <li>기대이익 비율의 변화(예: 시장 진입, 철수)가 있을 경우 비용 분담 비율의 <strong>정기적 재검토 및 조정</strong>이 필요</li>
+          </ul>
+          <div class="note-point">
+            <strong>¶8.22 조정 필요성:</strong> 기대이익 비율이 크게 변화할 때에는 CCA를 재협상하거나 대차지급액으로 조정해야 합니다. 조정 없이 비율을 고정하면 한쪽에 과도한 부담 또는 이익이 발생하여 정상가격 원칙에 위반될 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 4: C.4 -->
+    <div class="card" id="s4">
+      <h2>4. 참여자 기여도 가치 측정 <span class="tag tag-para">¶8.23–8.33</span></h2>
+      <p>기여도 가치 측정은 CCA 분석에서 가장 복잡하고 논쟁적인 영역입니다. 각 참여자가 CCA에 투입하는 기여(현금, 자산, 서비스, IP)의 가치를 어떻게 평가하느냐에 따라 비용 분담 결과가 달라집니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          기여도 측정의 기본 원칙 <span class="para">¶8.23–8.24</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>각 참여자의 기여는 다음 두 가지 방식으로 이루어질 수 있습니다.</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>① 자원·위험 기여 (Resource/Risk Contributions)</h4>
+              <ul>
+                <li>현금 지급</li>
+                <li>기존 자산(IP, 설비 등) 제공</li>
+                <li>서비스 제공 (R&D 인력, 시설 등)</li>
+                <li>위험 부담</li>
+              </ul>
+            </div>
+            <div class="col-box orange">
+              <h4>② 대차지급액 (Balancing Payments)</h4>
+              <ul>
+                <li>기여 가치와 기대이익 비율이 불일치할 때 조정하는 지급액</li>
+                <li>초과 기여 참여자 → 받는 측</li>
+                <li>미달 기여 참여자 → 지급하는 측</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          기여가치 측정 시기 <span class="para">¶8.25</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>기여의 가치는 <strong>기여가 이루어지는 시점</strong>을 기준으로 측정합니다.</p>
+          <ul>
+            <li>연간 또는 정기적으로 기여가 발생하는 경우 → 각 기여 시점마다 가치를 측정</li>
+            <li>기존 자산을 최초 CCA 참여 시 기여하는 경우 → CCA 참여 시점의 공정시장가치(FMV) 기준</li>
+            <li>가치 측정 시기를 임의로 조작하여 특정 참여자에게 유리하게 하는 행위는 정상가격 원칙에 위반</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          기존 자산 가치 기여 — 핵심 쟁점 <span class="para">¶8.26–8.27</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA에 기존에 개발·보유한 무형자산(특허, 노하우 등)을 기여하는 경우 가치 측정이 특히 중요합니다.</p>
+          <div class="def-box">
+            <div class="def-label">핵심 원칙 (¶8.26)</div>
+            <p>기존 자산의 기여 가치는 <strong>장부가액(book value)이 아닌 공정시장가치(Fair Market Value, FMV)</strong>를 기준으로 측정합니다. 자산이 완전히 상각되어 장부가가 0이더라도 경제적 가치가 있으면 FMV로 평가해야 합니다.</p>
+          </div>
+          <ul>
+            <li>FMV 측정에는 Chapter VI(무형자산)의 가치평가 방법론 적용 (소득접근법, 시장접근법 등)</li>
+            <li>HTVI(고도수익 무형자산)인 경우 Chapter VI ¶6.181 이후의 특별 지침 참조</li>
+          </ul>
+          <div class="warn-point">
+            <strong>조세 회피 주의:</strong> 자산의 FMV를 과소평가하여 기여가치를 낮추면, 해당 참여자는 더 적은 대가로 더 많은 CCA 결과물을 취득하게 됩니다. 이는 사실상 무형자산의 저가 이전과 동일한 효과를 낳습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          가치 및 비용 측정 — 원가 vs FMV <span class="para">¶8.28–8.30</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>기여의 가치 측정 방식은 기여의 성격에 따라 달라집니다.</p>
+          <table class="compare-table">
+            <tr>
+              <th>기여 유형</th>
+              <th>적용 측정 기준</th>
+              <th>근거</th>
+            </tr>
+            <tr>
+              <td><strong>신규 현금 기여</strong></td>
+              <td>기여 금액 그대로</td>
+              <td>논란 없음</td>
+            </tr>
+            <tr>
+              <td><strong>신규 서비스 기여</strong></td>
+              <td>원가(cost) 또는 공정시장가치<br><span class="badge badge-o">상황에 따라 선택</span></td>
+              <td>독립기업 서비스 거래 가격 참조</td>
+            </tr>
+            <tr>
+              <td><strong>기존 자산 기여</strong></td>
+              <td>공정시장가치(FMV) <span class="badge badge-g">필수</span></td>
+              <td>¶8.26 — 장부가 사용 불가</td>
+            </tr>
+            <tr>
+              <td><strong>기존 IP 사용권 기여</strong></td>
+              <td>정상가격 로열티 상당액</td>
+              <td>Chapter VI 무형자산 분석</td>
+            </tr>
+          </table>
+          <div class="note-point">
+            <strong>¶8.29 예산 vs 실제 비용:</strong> CCA에서는 실제 발생한 비용(actual costs)을 기준으로 배분하는 것이 원칙입니다. 단, 행정적 이유로 예산(budgeted costs)을 사용할 수도 있으나 연간 조정이 필요합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          통제 vs 관리 기능 — 기여도 인정 범위 <span class="para">¶8.31–8.32</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA에서 참여자가 수행하는 기능 중 어디까지를 기여도로 인정할 것인가가 중요합니다.</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>✅ 기여도로 인정 (통제 기능)</h4>
+              <ul>
+                <li>R&D 방향 결정 및 전략적 의사결정</li>
+                <li>외주 R&D의 발주·감독·평가</li>
+                <li>위험 감수 및 자금 조달</li>
+                <li>핵심 인적자원 배분</li>
+              </ul>
+            </div>
+            <div class="col-box orange">
+              <h4>⚠️ 기여도로 인정 불가 (관리 기능)</h4>
+              <ul>
+                <li>단순 행정·회계 처리</li>
+                <li>의사결정 없는 보고·취합 업무</li>
+                <li>법적 형식만의 계약 당사자 역할</li>
+              </ul>
+            </div>
+          </div>
+          <div class="key-point">
+            <strong>¶8.32 원칙:</strong> CCA의 기여도는 단순히 비용 부담에 그치지 않고, 실질적인 <em>경제적 활동(economic activity)</em>의 수행을 전제로 합니다. 비용만 부담하고 기능이 없는 참여자는 위험 배분이 재결정될 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          사례: 기업 A vs 기업 B 기여도 비교 (¶8.33)
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p><strong>상황:</strong> 기업 A(모회사)와 기업 B(자회사)가 신기술 R&D CCA 체결. 각각의 기여를 비교합니다.</p>
+
+          <div class="case-box">
+            <div class="case-label">📊 기여도 분석표</div>
+            <table>
+              <tr>
+                <th>항목</th>
+                <th>기업 A (모회사)</th>
+                <th>기업 B (자회사)</th>
+              </tr>
+              <tr>
+                <td>기존 특허 기여</td>
+                <td>FMV 500억 원</td>
+                <td>해당 없음</td>
+              </tr>
+              <tr>
+                <td>연간 R&D 인력·설비</td>
+                <td>200억 원 (FMV)</td>
+                <td>100억 원 (FMV)</td>
+              </tr>
+              <tr>
+                <td>연간 현금 기여</td>
+                <td>해당 없음</td>
+                <td>300억 원</td>
+              </tr>
+              <tr>
+                <td><strong>총 기여 가치</strong></td>
+                <td><strong>700억 원</strong></td>
+                <td><strong>400억 원</strong></td>
+              </tr>
+              <tr>
+                <td>기여 비율</td>
+                <td>63.6%</td>
+                <td>36.4%</td>
+              </tr>
+              <tr>
+                <td>기대이익 비율</td>
+                <td>60%</td>
+                <td>40%</td>
+              </tr>
+              <tr>
+                <td><strong>대차지급액 필요?</strong></td>
+                <td colspan="2"><strong>B → A 방향 소액 조정 필요 (기여 63.6% > 이익 60%인 A에게)</strong></td>
+              </tr>
+            </table>
+          </div>
+          <div class="note-point">
+            기업 A가 기존 특허를 FMV로 평가하지 않고 장부가(예: 0원)로 기여한다면, A의 총 기여 가치는 200억 원으로 줄어 기여 비율이 역전되고, 결국 A는 과소 기여·과다 이익 수혜 구조가 됩니다. 이것이 기존 자산 FMV 평가가 중요한 이유입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>📝 확인 퀴즈</h2>
+      <p style="font-size:.9rem;color:var(--gray);margin-bottom:1rem">5문항 | 80점(4문항) 이상 통과</p>
+
+      <div class="q-block">
+        <div class="q-text">Q1. CCA 참여자(Participant)와 단순 서비스 제공자(비참여자)의 핵심 차이점은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a"> ① 참여자는 반드시 관계회사여야 하지만 비참여자는 제3자도 가능하다</label>
+          <label><input type="radio" name="q1" value="b"> ② 참여자는 CCA 결과물로부터 직접 이익을 기대하고 위험을 부담하지만, 비참여자는 서비스 대가만 수취한다</label>
+          <label><input type="radio" name="q1" value="c"> ③ 참여자는 대규모 기여를 해야 하고 비참여자는 소규모 기여만 한다</label>
+          <label><input type="radio" name="q1" value="d"> ④ 참여자와 비참여자에게 동일한 이전가격 방법이 적용된다</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q2. CCA에서 기존 무형자산(특허)을 기여할 때 올바른 가치 측정 기준은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a"> ① 재무제표상 장부가액(book value)</label>
+          <label><input type="radio" name="q2" value="b"> ② 원가(historical cost)</label>
+          <label><input type="radio" name="q2" value="c"> ③ 공정시장가치(Fair Market Value, FMV)</label>
+          <label><input type="radio" name="q2" value="d"> ④ 세무상 감가상각 잔존가액</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q3. 다음 중 기대이익(expected benefits) 측정 기준으로 <u>사용할 수 없는</u> 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a"> ① 각 참여자의 예상 매출 비율</label>
+          <label><input type="radio" name="q3" value="b"> ② IP 예상 사용 횟수 또는 생산 단위 수</label>
+          <label><input type="radio" name="q3" value="c"> ③ DCF 기반 예상 이익</label>
+          <label><input type="radio" name="q3" value="d"> ④ 각 참여자의 납부 세금 금액</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q4. CCA의 비용 분담 비율(기여 비율)과 기대이익 비율이 불일치할 때 이를 해소하는 메커니즘은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a"> ① 자동 조정되므로 별도 조치 불필요</label>
+          <label><input type="radio" name="q4" value="b"> ② 대차지급액(Balancing Payment)을 통해 조정한다</label>
+          <label><input type="radio" name="q4" value="c"> ③ CCA를 해지하고 새로 체결해야 한다</label>
+          <label><input type="radio" name="q4" value="d"> ④ 과세관청이 직접 비율을 결정한다</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q5. CCA에서 예산 비용(budgeted costs)을 실제 비용(actual costs) 대신 사용하는 경우에 대한 설명으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a"> ① 예산 비용 사용은 어떠한 경우에도 허용되지 않는다</label>
+          <label><input type="radio" name="q5" value="b"> ② 예산 비용 사용 후 연간 사후 조정(true-up)이 필요하다</label>
+          <label><input type="radio" name="q5" value="c"> ③ 예산 비용을 사용하면 실제 비용과 차이가 있어도 조정 없이 확정된다</label>
+          <label><input type="radio" name="q5" value="d"> ④ 예산 비용은 CCA 체결 이후 3년간 고정 적용된다</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+
+      <button class="quiz-btn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 체크리스트 -->
+    <div class="card" id="check">
+      <h2>☑ 실무 체크리스트</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">CCA 정상가격 분석 — 참여자·기대이익·기여도 검토 사항 (¶8.12–8.33)</p>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c1">
+          <label for="c1">각 CCA 참여자가 결과물로부터 <strong>직접 이익</strong>을 기대하고 있음을 입증할 수 있습니까? (단순 서비스 수혜자와 구분)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c2">
+          <label for="c2">각 참여자가 CCA 활동에 대한 <strong>실질적 통제 기능과 위험 부담</strong>을 수행하는지 Chapter I D.1.2.1 기준으로 검토하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c3">
+          <label for="c3">기대이익 측정 기준(매출, 사용량, 이익 등)이 CCA 결과물의 성격에 부합하도록 선정되었습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c4">
+          <label for="c4">기대이익 비율과 비용 분담 비율이 일치하는지 확인하고, 불일치 시 <strong>대차지급액 조정</strong>이 이루어졌습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c5">
+          <label for="c5">기존 보유 자산(IP 포함)을 CCA에 기여할 경우 <strong>공정시장가치(FMV)</strong>로 평가하였습니까? (장부가 사용 금지)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c6">
+          <label for="c6">예산 비용을 기준으로 분담할 경우, 연간 실제 비용과의 차이에 대한 <strong>사후 조정(true-up) 프로세스</strong>가 설계되어 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c7">
+          <label for="c7">참여자의 기대이익 비율 변화(시장 진입·철수 등)가 있을 경우, CCA 비용 분담 비율을 <strong>정기 재검토</strong>하는 프로세스가 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c8">
+          <label for="c8">외주 서비스에 대한 통제 기능(발주·감독·평가)을 CCA 참여자가 실질적으로 수행함을 확인하고 문서화하였습니까?</label>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-bottom">
+      <a class="btn-nav secondary" href="M8-1_CCA개요_개념.html">← 이전 모듈</a>
+      <span class="btn-nav secondary" onclick="alert('목차 페이지로 이동합니다.')">📋 목차로</span>
+      <a class="btn-nav" href="M8-3_대차지급액_세무처리.html">다음 모듈 →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const allAcc = document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent = allAcc.length;
+
+function toggleAcc(btn){
+  const body = btn.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  if(!btn.classList.contains('viewed')){btn.classList.add('viewed');updatePct();}
+}
+
+let quizCorrect = 0;
+function updatePct(){
+  const viewed = document.querySelectorAll('.acc-header.viewed').length;
+  const total = allAcc.length;
+  const pct = Math.round(((total>0?viewed/total:0)*0.6+(quizCorrect/5)*0.4)*100);
+  document.getElementById('pctDisp').textContent=pct+'%';
+  document.getElementById('topBar').style.width=pct+'%';
+  document.getElementById('accDone').textContent=viewed;
+  document.getElementById('quizDone').textContent=quizCorrect;
+}
+
+const answers={q1:'b',q2:'c',q3:'d',q4:'b',q5:'b'};
+const feedbacks={
+  q1:{
+    a:'오답: 참여자/비참여자의 구분은 관계회사 여부가 아닌 이익 기대 여부와 위험 부담 여부입니다.',
+    b:'정답! 참여자는 CCA 결과물로부터 직접 이익을 기대하고 위험을 부담합니다. 비참여자(단순 서비스 제공자)는 성과와 무관하게 서비스 대가만 수취하며 Chapter VII 원칙에 따라 거래가 분석됩니다.',
+    c:'오답: 기여 규모는 참여자 여부의 기준이 아닙니다.',
+    d:'오답: 참여자는 CCA 기여도 분석, 비참여자는 독립 서비스 거래 분석을 각각 적용합니다.'
+  },
+  q2:{
+    a:'오답: ¶8.26은 장부가액이 아닌 공정시장가치를 기준으로 할 것을 명시합니다. 완전 상각된 자산도 경제적 가치가 있으면 FMV로 평가해야 합니다.',
+    b:'오답: 역사적 원가는 현재의 공정가치와 다를 수 있어 기준으로 부적합합니다.',
+    c:'정답! ¶8.26에 따라 기존 자산을 CCA에 기여할 때는 공정시장가치(FMV)를 기준으로 측정해야 합니다. 장부가가 0이라도 실질적 경제 가치가 있으면 FMV로 평가합니다.',
+    d:'오답: 세무상 잔존가액은 세무 목적의 수치로, CCA 기여 가치 측정의 기준이 아닙니다.'
+  },
+  q3:{
+    a:'오답: 예상 매출 비율은 기대이익 측정의 대표적 기준 중 하나입니다.',
+    b:'오답: 사용량·생산 단위는 제조 공정 CCA 등에서 활용되는 적합한 기준입니다.',
+    c:'오답: DCF 기반 예상 이익은 특히 고가치 무형자산 개발 CCA에서 유용한 기대이익 측정 방법입니다.',
+    d:'정답! 납부 세금 금액은 조세 부담을 나타낼 뿐, CCA 결과물로부터의 경제적 이익을 반영하지 않습니다. OECD 지침은 납세액을 기대이익 배분 기준으로 제시하지 않습니다.'
+  },
+  q4:{
+    a:'오답: CCA 비율 불일치는 자동으로 해소되지 않습니다. 명시적인 조정이 필요합니다.',
+    b:'정답! 대차지급액(Balancing Payment)은 CCA 참여자 간 기여 비율과 기대이익 비율의 불일치를 해소하기 위한 추가 지급액입니다. 초과 기여한 참여자가 미달 기여한 참여자로부터 대차지급액을 받게 됩니다.',
+    c:'오답: 불일치 해소를 위해 CCA를 해지할 필요는 없으며, 대차지급액으로 조정하는 것이 원칙입니다.',
+    d:'오답: 과세관청은 정상가격 원칙에 부합하지 않을 때 조정할 수 있지만, 일차적 조정 의무는 납세자에게 있습니다.'
+  },
+  q5:{
+    a:'오답: 예산 비용 사용이 전면 금지되지는 않습니다. 행정적 편의를 위해 예산 기준을 사용할 수 있습니다.',
+    b:'정답! ¶8.29에 따르면, 예산 비용을 사용하는 경우에도 기간 종료 후 실제 발생 비용과 비교하여 차이를 조정(true-up)해야 합니다. 예산과 실제의 차이를 방치하면 왜곡된 비용 배분이 고착됩니다.',
+    c:'오답: 예산-실제 차이는 반드시 조정이 필요합니다.',
+    d:'오답: 3년 고정 적용에 대한 규정은 없으며, 연간 조정이 원칙입니다.'
+  }
+};
+
+function gradeQuiz(){
+  let correct=0;
+  ['q1','q2','q3','q4','q5'].forEach(q=>{
+    const sel=document.querySelector(`input[name=${q}]:checked`);
+    const fb=document.getElementById('f'+q.slice(1));
+    if(!sel){fb.style.display='none';return;}
+    const val=sel.value;
+    const ok=val===answers[q];
+    if(ok)correct++;
+    fb.textContent=(ok?'✅ ':'❌ ')+feedbacks[q][val];
+    fb.className='q-feedback '+(ok?'correct':'wrong');
+    fb.style.display='block';
+  });
+  quizCorrect=correct;
+  updatePct();
+  const sb=document.getElementById('scoreBox');
+  const score=correct*20;
+  document.getElementById('scoreNum').textContent=score+'점';
+  document.getElementById('scoreMsg').textContent=score>=80
+    ?`🎉 통과! ${correct}문항 정답. 다음 모듈로 진행하세요.`
+    :`${correct}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.querySelector('.quiz-btn').disabled=true;
+}
+
+function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+
+const sections=['obj','s1','s2','s3','s4','quiz','check'];
+const navBtns=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY+150>=el.offsetTop)cur=id;});
+  navBtns.forEach(btn=>{
+    const fn=btn.getAttribute('onclick');
+    if(fn&&fn.includes(`'${cur}'`))btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+updatePct();
+</script>
+</body>
+</html>

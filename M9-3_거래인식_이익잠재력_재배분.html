@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M9-3: 거래인식·이익잠재력 재배분</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#0c4a6e;--purple-light:#e0f2fe;--purple-mid:#0ea5e9;--purple-dark:#082f49;
+  --green:#0369a1;--green-light:#e0f2fe;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,var(--purple-mid) 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple-dark);line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#f0f9ff;border-left:4px solid #38bdf8;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#0c4a6e;line-height:1.75}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#bae6fd}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #7dd3fc;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p,.col-box ul{font-size:.85rem;color:var(--text2);margin:0;line-height:1.65}
+.col-box ul{padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.red{border-color:#fca5a5;background:#fef2f2}
+.col-box.red h4{color:var(--red)}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+.pillar-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid var(--purple-mid);background:var(--purple-light)}
+.pillar-card .pl-num{display:inline-block;background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;text-align:center;line-height:26px;font-size:.78rem;font-weight:800;margin-bottom:.4rem}
+.pillar-card h4{font-size:.92rem;font-weight:700;color:var(--purple-dark);margin-bottom:.35rem}
+.pillar-card p{font-size:.82rem;color:var(--text2);margin:0;line-height:1.6}
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0f9ff;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+/* non-recognition conditions */
+.nr-box{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.nr-card{border-radius:10px;padding:1.1rem 1.2rem;border:2px solid var(--purple-mid);background:var(--purple-light)}
+.nr-card .nr-num{font-size:1.8rem;font-weight:900;color:var(--purple);line-height:1;margin-bottom:.4rem}
+.nr-card h4{font-size:.9rem;font-weight:700;color:var(--purple-dark);margin-bottom:.5rem}
+.nr-card p{font-size:.83rem;color:var(--text2);line-height:1.6;margin:0}
+/* NPV calc */
+.npv-box{background:#f0f9ff;border:2px solid #7dd3fc;border-radius:12px;padding:1.4rem;margin:.8rem 0}
+.npv-box .npv-title{font-weight:700;font-size:.92rem;color:var(--purple);margin-bottom:.9rem}
+.npv-table{width:100%;border-collapse:collapse;font-size:.87rem}
+.npv-table th{background:var(--purple);color:#fff;padding:.5rem .8rem;text-align:center;font-weight:600}
+.npv-table td{padding:.48rem .8rem;border-bottom:1px solid #bae6fd;text-align:right;color:var(--text2)}
+.npv-table td:first-child{text-align:left}
+.npv-table tr.subtotal td{font-weight:600;background:#e0f2fe;color:var(--purple-dark)}
+.npv-table tr.total td{font-weight:800;background:var(--purple);color:#fff;border-top:2px solid var(--purple-dark)}
+.npv-table tr.highlight td{background:#fff7ed;color:#92400e;font-weight:600}
+/* profit potential types */
+.pp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+.pp-card{border-radius:10px;padding:1rem;border:1.5px solid var(--gray-border);background:#fafafa;text-align:center}
+.pp-card .pp-icon{font-size:1.8rem;margin-bottom:.4rem}
+.pp-card h4{font-size:.88rem;font-weight:700;color:var(--purple-dark);margin-bottom:.35rem}
+.pp-card p{font-size:.8rem;color:var(--text2);line-height:1.5;margin:0}
+/* ex ante vs ex post */
+.timeline-row{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:center;margin:.8rem 0}
+.tl-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid #7dd3fc;background:var(--purple-light)}
+.tl-card h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.tl-card ul{font-size:.82rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.6}
+.tl-card li{margin-bottom:.2rem}
+.tl-sep{text-align:center;font-size:1.5rem;color:var(--purple-mid);font-weight:700}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .two-col,.three-col,.nr-box,.pp-grid,.timeline-row{grid-template-columns:1fr}
+  .tl-sep{transform:rotate(90deg)}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter IX 사업구조조정(Business Restructurings) › M9-3 (3/6)</div>
+  <h1>M9-3. 거래 인식·이익잠재력 재배분</h1>
+  <div class="sub">실제거래 인식·재분류 조건 &amp; 이익잠재력 개념·측정·보상 산정&nbsp;|&nbsp;¶9.34 – ¶9.47&nbsp;|&nbsp;예상 학습시간: 50분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('s1')">1. 실제거래 인식과 재분류 원칙 (¶9.34–9.39)</button>
+      <button class="nav-item" onclick="goTo('s2')">2. 이익잠재력 — 개념과 측정 (¶9.40–9.43)</button>
+      <button class="nav-item" onclick="goTo('s3')">3. 구조조정 보상 ALP 산정 (¶9.44–9.47)</button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('check')">☑ 실무 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습목표</h2>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>사업구조조정 거래의 인식 원칙과 예외적 재분류(non-recognition)의 두 가지 조건을 설명할 수 있다</span></li>
+        <li><span class="obj-num">2</span><span>이익잠재력(Profit Potential)의 개념과 현재이익과의 차이를 이해한다</span></li>
+        <li><span class="obj-num">3</span><span>이익잠재력을 DCF(현금흐름할인법)로 측정하는 방법을 적용할 수 있다</span></li>
+        <li><span class="obj-num">4</span><span>구조조정 보상(Exit Charge)의 ALP 산정 방법과 수치 계산을 수행할 수 있다</span></li>
+        <li><span class="obj-num">5</span><span>사전(ex ante) 관점이 구조조정 보상 산정의 원칙임을 이해하고 사후(ex post) 결과와의 충돌 시 처리 방법을 파악한다</span></li>
+      </ul>
+    </div>
+
+    <!-- 섹션 1: 실제거래 인식과 재분류 -->
+    <div class="card" id="s1">
+      <h2>1. 실제거래 인식과 재분류(Non-recognition) 원칙 <span class="tag tag-para">¶9.34–9.39</span></h2>
+      <p>사업구조조정 이전가격 분석의 출발점은 납세자가 설계한 구조조정 거래를 <strong>있는 그대로 인식</strong>하는 것입니다. 그러나 예외적으로 거래 자체가 재분류(non-recognition)될 수 있으며, 이는 매우 엄격한 조건 하에서만 허용됩니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          사업구조조정 거래 인식의 기본 원칙 <span class="para">¶9.34–9.35</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>OECD 지침서는 원칙적으로 납세자가 설계한 구조조정 거래의 형식과 실질을 <strong>그대로 인식</strong>하도록 규정합니다. 과세관청은 납세자의 사업 판단을 존중해야 하며, 단순히 세금이 줄어든다는 이유만으로 거래를 재분류할 수 없습니다.</p>
+          <div class="key-point">
+            <strong>인식 우선 원칙 (¶9.34):</strong><br>
+            사업구조조정의 분석은 <em>납세자가 실제로 수행한 거래를 정확히 파악(delineation)</em>하는 것에서 시작합니다. 계약 형식과 경제적 실질이 일치한다면 그 거래는 원칙적으로 인정됩니다.
+          </div>
+          <p>인식의 원칙이 적용되면 과세관청의 역할은:</p>
+          <ol>
+            <li>인식된 거래에 대해 ALP에 따른 보상이 이루어졌는지 검토</li>
+            <li>구조조정 후 새로운 관계사 거래 조건의 ALP 적합성 확인</li>
+            <li>필요 시 이전가격 조정(보상 금액 재산정)을 실시</li>
+          </ol>
+          <div class="note-point">
+            거래 인식과 이전가격 조정은 다른 개념입니다. 거래가 인식되더라도 보상 금액이 ALP를 벗어나면 이전가격 조정이 이루어집니다. 재분류(non-recognition)는 거래 자체를 부인하는 더 극단적인 조치입니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          예외적 재분류(Non-recognition)의 두 가지 조건 <span class="para">¶9.36–9.38</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>극히 예외적인 경우에만 사업구조조정 거래 자체를 재분류(non-recognition)할 수 있습니다. OECD 지침서는 두 가지 독립적 조건을 제시하며, 어느 하나라도 충족되면 재분류가 가능합니다.</p>
+
+          <div class="nr-box">
+            <div class="nr-card">
+              <div class="nr-num">①</div>
+              <h4>경제적 실질과 법적 형식의 괴리</h4>
+              <p>거래의 경제적 실질이 법적 형식과 다른 경우입니다. 예를 들어, "로열티 계약"으로 포장되었지만 실질은 IP의 완전 양도인 경우, 또는 "대여금"이지만 실질은 자본 투자인 경우가 해당합니다.</p>
+            </div>
+            <div class="nr-card">
+              <div class="nr-num">②</div>
+              <h4>상업적으로 비합리적인 약정</h4>
+              <p>해당 구조조정이 독립기업 사이에서라면 절대 합의되지 않을 만큼 비합리적인 경우입니다. 경제적 논리나 사업 목적 없이 순전히 세금 이점만을 위해 설계된 거래가 대표적입니다.</p>
+            </div>
+          </div>
+
+          <div class="warn-point">
+            <strong>⚠ 재분류의 엄격한 제한 (¶9.37):</strong><br>
+            재분류는 세무 당국의 강력한 조치인 만큼, 그 적용은 극히 제한적이어야 합니다. 단순히 세금을 줄이는 구조라는 이유만으로, 또는 과세관청이 더 나은 구조를 생각할 수 있다는 이유만으로 거래를 재분류할 수 없습니다.
+          </div>
+
+          <table class="compare-table">
+            <thead><tr><th>구분</th><th>재분류 가능 여부</th><th>판단 근거</th></tr></thead>
+            <tbody>
+              <tr><td>IP 양도를 로열티 계약으로 위장</td><td>✅ 가능</td><td>경제적 실질(양도)이 법적 형식(라이선스)과 괴리</td></tr>
+              <tr><td>세금 절감 목적의 LRD 전환</td><td>❌ 불가</td><td>상업적 이유도 존재; 단순 절세 동기만으로 재분류 불가</td></tr>
+              <tr><td>독립기업이라면 절대 동의 못할 완전 무상 기능 이전</td><td>✅ 가능</td><td>상업적으로 비합리적 — 조건 ② 충족</td></tr>
+              <tr><td>시장 상황을 고려한 제조 기능 이전</td><td>❌ 불가</td><td>상업적 합리성 인정 가능 (비교 가능 사례 존재)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          재분류의 실무 적용과 과세관청 접근 <span class="para">¶9.39</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>실무에서 재분류보다 이전가격 조정이 훨씬 빈번합니다. 과세관청은 대부분의 경우 거래 자체를 부인하기보다 <strong>보상 금액을 ALP 수준으로 조정</strong>하는 방식을 택합니다.</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>📋 과세관청의 일반적 접근: 이전가격 조정</h4>
+              <ul>
+                <li>거래 자체는 인정</li>
+                <li>보상 금액만 ALP 수준으로 상향 조정</li>
+                <li>예: LRD 전환 인정, 단 Exit Charge 미지급분 추가</li>
+                <li>예: 로열티율이 낮으면 정상 로열티율로 조정</li>
+              </ul>
+            </div>
+            <div class="col-box orange">
+              <h4>⚠ 과세관청의 예외적 접근: 재분류</h4>
+              <ul>
+                <li>거래 자체를 부인하거나 재성격화</li>
+                <li>"로열티"를 "IP 양도"로 재분류 → 세율 변경</li>
+                <li>"대여금"을 "자본"으로 재분류 → 이자 손금 불인정</li>
+                <li>완전 무상 기능 이전을 유상 기능 양도로 재성격화</li>
+              </ul>
+            </div>
+          </div>
+          <div class="note-point">
+            재분류는 그 자체로 이중과세 위험을 내포합니다. 한 국가에서 거래를 재분류하면 상대방 국가에서 이에 맞는 조정이 이루어지지 않으면 이중과세가 발생합니다. 따라서 납세자는 APA나 상호합의절차(MAP)를 통해 사전·사후 분쟁을 해결하는 것이 중요합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 2: 이익잠재력 -->
+    <div class="card" id="s2">
+      <h2>2. 이익잠재력(Profit Potential) — 개념과 측정 <span class="tag tag-para">¶9.40–9.43</span></h2>
+      <p>사업구조조정 보상의 핵심은 구조조정을 통해 <strong>이익잠재력(Profit Potential)</strong>이 이전되었는지, 그리고 그 규모는 얼마인지를 정확히 파악하는 것입니다. 이익잠재력은 구조조정 보상 금액 산정의 직접적 기초가 됩니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          이익잠재력의 개념과 현재이익과의 차이 <span class="para">¶9.40–9.42</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p><strong>이익잠재력(Profit Potential)</strong>이란 특정 기능·자산·위험을 보유·수행하는 법인이 미래에 창출할 것으로 <em>기대되는</em> 이익의 현재가치입니다. 현재 실현되고 있는 이익과 구별되는 개념입니다.</p>
+
+          <div class="key-point">
+            <strong>이익잠재력 = 미래 기대이익의 현재가치(NPV)</strong><br>
+            단, 이는 과거·현재 실적이 아닌 구조조정 시점의 <em>합리적 기대치</em>를 기준으로 합니다.
+          </div>
+
+          <div class="pp-grid">
+            <div class="pp-card">
+              <div class="pp-icon">🔄</div>
+              <h4>현재 사업 이익잠재력</h4>
+              <p>구축된 고객 관계, 유통망, 브랜드에서 발생하는 예측 가능한 미래 이익. 상대적으로 측정 용이</p>
+            </div>
+            <div class="pp-card">
+              <div class="pp-icon">🔬</div>
+              <h4>미래 사업 이익잠재력</h4>
+              <p>진행 중인 R&amp;D, 개발 중인 IP에서 미래에 발생할 것으로 기대되는 이익. 불확실성이 높음</p>
+            </div>
+            <div class="pp-card">
+              <div class="pp-icon">⚡</div>
+              <h4>예상치 못한 이익(Windfall)</h4>
+              <p>구조조정 시점에 예측 불가능했던 외부 요인(시장 붐, 기술 혁신)으로 인한 이익. 구조조정 보상 산정에 원칙적으로 포함 안 됨</p>
+            </div>
+          </div>
+
+          <p><strong>이익잠재력 이전 여부 판단 기준:</strong></p>
+          <ul>
+            <li>구조조정 전 A사가 누리던 이익이 구조조정 후 B(HQ)로 이전되었는가?</li>
+            <li>A사가 보유했던 고객 관계, 시장 지위, 유통망이 실질적으로 HQ로 귀속되었는가?</li>
+            <li>구조조정 후 A사의 기대이익이 구조조정 전 대비 현저히 감소하였는가?</li>
+          </ul>
+          <div class="warn-point">
+            <strong>⚠ 실무 함정:</strong> 기업들은 "단순한 기능 변경"이라고 주장하지만, 과세관청은 이익잠재력이 실질적으로 이전되었는지를 구체적인 수치로 분석합니다. 구조조정 전·후 수익성 비교가 핵심 증거가 됩니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          이익잠재력 측정 방법 — DCF와 비교 가능 거래 <span class="para">¶9.43</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>이익잠재력 측정에는 주로 <strong>DCF(현금흐름할인법)</strong>가 사용됩니다. 미래의 기대 현금흐름을 적절한 할인율로 현재가치화하는 방법입니다.</p>
+
+          <div class="npv-box">
+            <div class="npv-title">📊 이익잠재력 DCF 측정 예시 — A사(완전판매법인 → LRD 전환)</div>
+            <table class="npv-table">
+              <tr>
+                <th>항목</th>
+                <th>1년차</th>
+                <th>2년차</th>
+                <th>3년차</th>
+                <th>4년차</th>
+                <th>5년차</th>
+              </tr>
+              <tr>
+                <td>전환 전 기대 영업이익</td>
+                <td>100억</td>
+                <td>105억</td>
+                <td>110억</td>
+                <td>115억</td>
+                <td>120억</td>
+              </tr>
+              <tr>
+                <td>전환 후 LRD 수수료</td>
+                <td>20억</td>
+                <td>21억</td>
+                <td>22억</td>
+                <td>23억</td>
+                <td>24억</td>
+              </tr>
+              <tr class="highlight">
+                <td>포기한 이익잠재력</td>
+                <td>80억</td>
+                <td>84억</td>
+                <td>88억</td>
+                <td>92억</td>
+                <td>96억</td>
+              </tr>
+              <tr>
+                <td>할인율 10% 적용 PV</td>
+                <td>72.7억</td>
+                <td>69.4억</td>
+                <td>66.1억</td>
+                <td>62.8억</td>
+                <td>59.6억</td>
+              </tr>
+              <tr class="total">
+                <td><strong>이익잠재력 NPV (Exit Charge)</strong></td>
+                <td colspan="5" style="text-align:center"><strong>≈ 330.6억 원</strong></td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="key-point">
+            A사는 LRD로 전환되면서 5년간 약 330억 원 규모의 이익잠재력을 HQ에 이전하게 됩니다. 독립기업이라면 이에 상응하는 Exit Charge(이익잠재력 이전 대가)를 HQ로부터 수취해야 합니다.
+          </div>
+
+          <p><strong>기타 이익잠재력 측정 방법:</strong></p>
+          <ul>
+            <li><strong>시장 배수(Market Multiples)법:</strong> 유사 사업의 M&amp;A 거래에서 관찰되는 EBITDA 배수 등을 적용</li>
+            <li><strong>비교 가능 거래(CUT)법:</strong> 유사한 기능·자산·위험 이전에 대해 독립기업 간 지급된 가격을 기준으로 산정</li>
+            <li><strong>잔여이익법:</strong> 구조조정 후 각 법인에 귀속되어야 할 일상적 이익을 제외한 잔여 이익의 현재가치 산정</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 3: 구조조정 보상 ALP 산정 -->
+    <div class="card" id="s3">
+      <h2>3. 구조조정 보상 ALP 산정과 Ex Ante 원칙 <span class="tag tag-para">¶9.44–9.47</span></h2>
+      <p>이익잠재력을 측정했다면, 이를 기반으로 구조조정 보상(Exit Charge 등)의 ALP를 산정합니다. 이때 핵심 원칙은 구조조정 <strong>결정 시점의 기대(ex ante)</strong>를 기준으로 한다는 것입니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          구조조정 보상(Exit Charge)의 ALP 산정 방법 <span class="para">¶9.44–9.46</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>구조조정 보상은 구조조정을 통해 이전된 <strong>가치 전체</strong>를 반영해야 합니다. 단순히 자산 장부가액이나 기여비용만이 아닌, 이전된 이익잠재력·무형자산·계약상 권리의 공정가치를 기준으로 합니다.</p>
+
+          <table class="compare-table">
+            <thead><tr><th>이전 항목</th><th>ALP 보상 기준</th><th>주요 적용 방법</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>이익잠재력</strong></td>
+                <td>DCF 또는 시장 배수로 산정한 NPV</td>
+                <td>DCF법, 비교 가능 M&amp;A 배수</td>
+              </tr>
+              <tr>
+                <td><strong>무형자산</strong></td>
+                <td>Chapter VI 기준 FMV</td>
+                <td>CUT법, 잔여이익법, 실물옵션법</td>
+              </tr>
+              <tr>
+                <td><strong>고객 관계·유통망</strong></td>
+                <td>관계 재구축 비용 또는 수익 기여 현재가치</td>
+                <td>원가법, DCF법</td>
+              </tr>
+              <tr>
+                <td><strong>계속기업 가치</strong></td>
+                <td>개별 자산 합산 초과분의 공정가치</td>
+                <td>시장 접근법, 수익 접근법</td>
+              </tr>
+              <tr>
+                <td><strong>위험 이전</strong></td>
+                <td>위험 인수의 독립기업 대가(보험료 상당)</td>
+                <td>보험계리적 방법, CUP법</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="key-point">
+            <strong>Exit Charge 산정의 핵심 원칙:</strong><br>
+            피구조조정법인은 구조조정 이후 상황(LRD, 계약제조업체 등)에서 얻는 수익과, 구조조정이 없었다면 얻었을 수익의 차이를 <em>현재가치로 환산</em>하여 보상받아야 합니다. 이 차이가 바로 Exit Charge의 이론적 하한선입니다.
+          </div>
+
+          <p><strong>비교 가능 거래 활용:</strong> 독립기업 간에 유사한 기능 전환(예: 완전판매법인 → LRD) 거래가 존재한다면, 해당 거래에서 지급된 Exit Charge를 벤치마크로 사용할 수 있습니다. 이 방법이 가장 신뢰성이 높습니다.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          Ex Ante(사전) 원칙과 Ex Post(사후) 결과의 충돌 <span class="para">¶9.47</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>구조조정 보상의 ALP 산정은 원칙적으로 구조조정 <strong>결정 당시의 합리적 기대(ex ante)</strong>를 기준으로 합니다. 그러나 실제 결과(ex post)가 기대와 크게 다를 때 어떻게 처리할지가 중요한 쟁점입니다.</p>
+
+          <div class="timeline-row">
+            <div class="tl-card">
+              <h4>⏮ Ex Ante (사전 관점)</h4>
+              <ul>
+                <li>구조조정 결정 시점의 기대이익 기준</li>
+                <li>독립기업도 미래를 알 수 없으므로 당시 합리적 예측 기준</li>
+                <li>사전에 설정한 가격 조건 원칙 존중</li>
+                <li>일반 원칙: ex ante 관점이 우선</li>
+              </ul>
+            </div>
+            <div class="tl-sep">⟷</div>
+            <div class="tl-card">
+              <h4>⏭ Ex Post (사후 관점)</h4>
+              <ul>
+                <li>구조조정 이후 실제 실현된 이익 기준</li>
+                <li>실제 결과가 예측과 현저히 다를 경우 참고</li>
+                <li>HTVI 유사 상황: 사후 결과로 사전 평가 검증</li>
+                <li>예외적 적용: 사전 예측이 근본적으로 잘못된 경우</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="key-point">
+            <strong>핵심 원칙 (¶9.47):</strong><br>
+            사업구조조정 보상 산정은 <em>ex ante 관점이 원칙</em>입니다. 독립기업도 계약 시점에 미래를 완전히 예측할 수 없으므로, 당시의 합리적 기대에 기반한 가격 설정을 존중합니다. 다만 <em>사후 결과가 사전 예측과 현저히 괴리</em>되고, 이것이 사전 평가 오류를 시사하는 경우 과세관청은 ex post 결과를 증거로 활용할 수 있습니다.
+          </div>
+
+          <p><strong>실무 시나리오 비교:</strong></p>
+          <table class="compare-table">
+            <thead><tr><th>시나리오</th><th>사전 기대</th><th>사후 결과</th><th>처리 방향</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>정상 케이스</td>
+                <td>연 100억 이익잠재력</td>
+                <td>연 95억 실현</td>
+                <td>ex ante 산정 보상 금액 유지 (허용 범위 내 차이)</td>
+              </tr>
+              <tr>
+                <td>예상치 못한 시장 붐</td>
+                <td>연 100억 기대</td>
+                <td>연 500억 실현</td>
+                <td>원칙적으로 ex ante 유지. 단, HTVI 유사 상황이면 재검토</td>
+              </tr>
+              <tr>
+                <td>근본적 평가 오류</td>
+                <td>연 100억 기대</td>
+                <td>연 10억 미만 (정보 은닉 등)</td>
+                <td>과세관청, ex post 결과를 증거로 ex ante 평가 재검토</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="warn-point">
+            <strong>⚠ HTVI 규정의 준용:</strong> Chapter VI의 HTVI(고도수익 무형자산) 규정과 유사하게, 구조조정에서 이전된 이익잠재력이 측정하기 극히 어려운 경우 과세관청은 사후 결과를 참고하여 사전 평가의 적절성을 재검토할 수 있습니다. 이 경우 가격 조정 조항(Price Adjustment Clause)을 계약에 포함하는 것이 권고됩니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 확인 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>📝 확인 퀴즈</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1.2rem">5문제 · 문제당 1점 · 즉시 피드백 제공</p>
+
+      <div class="q-block">
+        <div class="q-text">Q1. OECD 이전가격 지침서에 따른 사업구조조정 거래의 예외적 재분류(non-recognition) 조건으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a"> ① 구조조정의 목적이 절세인 경우</label>
+          <label><input type="radio" name="q1" value="b"> ② 경제적 실질이 법적 형식과 다르거나, 독립기업이 절대 동의하지 않을 만큼 상업적으로 비합리적인 경우</label>
+          <label><input type="radio" name="q1" value="c"> ③ 과세관청이 더 나은 구조를 생각할 수 있는 경우</label>
+          <label><input type="radio" name="q1" value="d"> ④ 구조조정으로 피구조조정법인의 이익이 감소하는 경우</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q2. 이익잠재력(Profit Potential)에 대한 설명으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a"> ① 이익잠재력은 구조조정 직전 연도의 실제 영업이익과 동일하다</label>
+          <label><input type="radio" name="q2" value="b"> ② 이익잠재력은 특정 기능·자산·위험 보유로부터 미래에 기대되는 이익의 현재가치(NPV)이다</label>
+          <label><input type="radio" name="q2" value="c"> ③ 이익잠재력은 구조조정 이후 실제 실현된 이익을 기준으로 사후적으로 측정한다</label>
+          <label><input type="radio" name="q2" value="d"> ④ 이익잠재력에는 예상치 못한 외부 요인(Windfall)으로 인한 이익도 항상 포함된다</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q3. A사(완전판매법인)가 LRD로 전환된다. 전환 전 연간 기대 영업이익은 100억 원이고, 전환 후 LRD 수수료는 연 20억 원이다. 할인율 10%, 약정기간 5년일 때 A사의 이익잠재력 NPV(Exit Charge 근사치)는?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a"> ① 80억 원 (연간 포기 이익만 산정)</label>
+          <label><input type="radio" name="q3" value="b"> ② 400억 원 (80억 × 5년, 할인 미적용)</label>
+          <label><input type="radio" name="q3" value="c"> ③ 약 303억 원 (80억을 5년간 10% 할인한 현재가치)</label>
+          <label><input type="radio" name="q3" value="d"> ④ 20억 원 (LRD 수수료만 기준)</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q4. 구조조정 보상 산정에서 Ex Ante(사전) 원칙의 의미로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a"> ① 구조조정 5년 후 사후 실현된 이익을 기준으로 보상을 재산정해야 한다</label>
+          <label><input type="radio" name="q4" value="b"> ② 보상 산정은 구조조정 결정 시점의 합리적 기대이익을 기준으로 하며, 독립기업도 미래를 완전히 알 수 없으므로 당시 예측 기준을 존중한다</label>
+          <label><input type="radio" name="q4" value="c"> ③ 사전 예측과 사후 결과가 다르면 항상 사후 결과로 보상을 조정해야 한다</label>
+          <label><input type="radio" name="q4" value="d"> ④ 구조조정 보상은 사전에 설정할 수 없으며 반드시 사후 결과를 기다려야 한다</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">Q5. 사업구조조정에서 과세관청이 "재분류(non-recognition)"보다 "이전가격 조정"을 선호하는 이유로 가장 적절한 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a"> ① 이전가격 조정이 법적으로 더 복잡하여 행정 비용이 더 들기 때문이다</label>
+          <label><input type="radio" name="q5" value="b"> ② 재분류는 극히 예외적이며, 거래를 인정하되 보상 금액만 ALP 수준으로 조정하는 것이 납세자의 사업 판단을 존중하면서도 세원을 보호하는 균형적 방법이기 때문이다</label>
+          <label><input type="radio" name="q5" value="c"> ③ 이전가격 조정은 납세자에게 더 불리한 결과를 초래하기 때문이다</label>
+          <label><input type="radio" name="q5" value="d"> ④ 재분류는 법적 근거가 없기 때문이다</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+
+      <button class="quiz-btn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 체크리스트 -->
+    <div class="card" id="check">
+      <h2>☑ 실무 체크리스트</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">거래인식·이익잠재력 측정·보상 산정 검토 사항 (¶9.34–9.47)</p>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c1">
+          <label for="c1">구조조정 거래의 경제적 실질이 법적 형식과 일치하는지 확인하고, 재분류 리스크 요인을 사전에 파악하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c2">
+          <label for="c2">구조조정이 독립기업 간에도 상업적으로 합리적인 거래임을 입증할 근거(비교 사례, 사업적 이유)를 준비하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c3">
+          <label for="c3">구조조정을 통해 이전된 <strong>이익잠재력의 종류</strong>(현재 사업, 미래 사업, Windfall 제외)를 명확히 구분하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c4">
+          <label for="c4">이익잠재력 측정에 <strong>DCF법</strong>(또는 비교 가능 시장 배수)을 적용하고, 할인율 근거와 기대 기간을 합리적으로 설정하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c5">
+          <label for="c5">피구조조정법인에게 지급되는 Exit Charge가 포기한 이익잠재력의 NPV를 충분히 반영하는지 검증하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c6">
+          <label for="c6">구조조정 보상 산정이 <strong>구조조정 결정 시점의 합리적 기대(ex ante)</strong>를 기준으로 이루어졌으며, 그 근거가 문서화되어 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c7">
+          <label for="c7">이익잠재력 측정이 어려운 경우(HTVI 유사 상황), <strong>가격 조정 조항(Price Adjustment Clause)</strong>을 구조조정 계약에 포함하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c8">
+          <label for="c8">구조조정 보상(Q1)과 구조조정 후 거래 조건(Q2)이 각각 독립적으로 ALP를 충족하는지, <strong>두 분석이 혼재되지 않도록</strong> 별도 문서화하였습니까?</label>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-bottom">
+      <a class="btn-nav secondary" href="M9-2_FAR분석_시너지_문서화.html">← 이전 모듈</a>
+      <span class="btn-nav secondary" onclick="alert('목차 페이지로 이동합니다.')">📋 목차로</span>
+      <a class="btn-nav" href="M9-4_가치이전_유형무형_계속기업.html">다음 모듈 →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const allAcc=document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent=allAcc.length;
+function toggleAcc(btn){
+  const body=btn.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  if(!btn.classList.contains('viewed')){btn.classList.add('viewed');updatePct();}
+}
+let quizCorrect=0;
+function updatePct(){
+  const viewed=document.querySelectorAll('.acc-header.viewed').length;
+  const total=allAcc.length;
+  const pct=Math.round(((total>0?viewed/total:0)*0.6+(quizCorrect/5)*0.4)*100);
+  document.getElementById('pctDisp').textContent=pct+'%';
+  document.getElementById('topBar').style.width=pct+'%';
+  document.getElementById('accDone').textContent=viewed;
+  document.getElementById('quizDone').textContent=quizCorrect;
+}
+const answers={q1:'b',q2:'b',q3:'c',q4:'b',q5:'b'};
+const feedbacks={
+  q1:{
+    a:'오답: 절세 목적 자체는 재분류의 근거가 되지 않습니다. OECD 지침서(¶9.37)는 세금 절감이 목적이라는 사실만으로 거래를 재분류할 수 없다고 명시합니다.',
+    b:'정답! ¶9.36–9.38에 따르면 재분류는 (①) 경제적 실질과 법적 형식이 다른 경우, 또는 (②) 독립기업이라면 절대 동의하지 않을 만큼 상업적으로 비합리적인 경우에만 예외적으로 허용됩니다.',
+    c:'오답: 과세관청이 더 나은 구조를 생각할 수 있다는 이유만으로 재분류할 수 없습니다. 납세자의 합리적 사업 판단을 존중합니다.',
+    d:'오답: 이익 감소 자체는 재분류 사유가 아닙니다. 구조조정으로 인한 이익 감소에 대해서는 적절한 ALP 보상이 이루어지면 됩니다.'
+  },
+  q2:{
+    a:'오답: 이익잠재력은 과거 실현 이익이 아닌 미래 기대이익의 현재가치입니다. 직전 연도 실적은 참고 자료일 뿐입니다.',
+    b:'정답! ¶9.40에 따르면 이익잠재력은 특정 기능·자산·위험을 보유·수행함으로써 미래에 창출될 것으로 기대되는 이익의 현재가치(NPV)입니다. 이는 사전(ex ante) 기대치를 기준으로 합니다.',
+    c:'오답: 이익잠재력은 사후 실현 이익이 아닌 사전 기대이익을 기준으로 측정합니다. ex ante 원칙이 핵심입니다.',
+    d:'오답: 구조조정 시점에 예측 불가능했던 Windfall 이익은 원칙적으로 이익잠재력 측정에서 제외됩니다. 예상 가능한 미래 이익만이 대상입니다.'
+  },
+  q3:{
+    a:'오답: 80억은 1년치 포기 이익입니다. 5년간의 이익잠재력은 할인율을 적용한 NPV로 계산해야 합니다.',
+    b:'오답: 400억은 할인율을 적용하지 않은 단순 합계입니다. 이익잠재력 측정에는 시간가치를 반영한 현재가치할인(DCF)이 필요합니다.',
+    c:'정답! 연간 포기 이익 80억 원을 5년간 할인율 10%로 DCF하면 약 303억 원의 NPV가 산출됩니다(80억 × 연금현가계수 3.791 = 303.3억 원). 이것이 A사가 수취해야 할 Exit Charge의 근사치입니다.',
+    d:'오답: 20억은 LRD 전환 후 수수료 수익이며, 포기한 이익잠재력이 아닙니다. Exit Charge는 포기한 이익(100억-20억=80억)의 NPV를 기준으로 합니다.'
+  },
+  q4:{
+    a:'오답: 사후 5년 결과로 재산정하는 것은 ex post 접근법입니다. OECD 지침서는 원칙적으로 ex ante 관점을 채택합니다.',
+    b:'정답! ¶9.47에 따르면 구조조정 보상은 구조조정 결정 당시의 합리적 기대(ex ante)를 기준으로 산정합니다. 독립기업도 계약 시점에 미래를 완전히 예측할 수 없으므로, 당시 합리적 예측에 기반한 가격 설정을 원칙적으로 존중합니다.',
+    c:'오답: 사후 결과가 다르다고 해서 항상 조정하는 것은 아닙니다. HTVI 유사 상황이나 근본적 평가 오류가 있는 경우에 한해 예외적으로 ex post 결과를 참고합니다.',
+    d:'오답: 구조조정 보상은 구조조정 시점에 ex ante로 설정하는 것이 원칙입니다. 사후 결과를 기다리는 것은 일반적인 방법이 아닙니다.'
+  },
+  q5:{
+    a:'오답: 이전가격 조정이 행정적으로 더 복잡한 것은 아닙니다. 오히려 재분류는 성격 재결정, 관련 세법 적용 변경 등 더 복잡한 법적 과정을 수반합니다.',
+    b:'정답! ¶9.34–9.35 및 ¶9.39에 따르면, 과세관청은 납세자의 사업 판단을 존중하면서도 ALP에 맞게 보상 금액을 조정하는 이전가격 조정 방식을 선호합니다. 재분류는 극히 예외적 상황에서만 적용하며, 이중과세 위험도 수반합니다.',
+    c:'오답: 이전가격 조정과 재분류 중 어느 것이 납세자에게 더 불리한지는 상황에 따라 다릅니다. 재분류는 거래의 법적 성격 자체가 바뀌어 더 큰 세금 효과를 초래할 수 있습니다.',
+    d:'오답: 재분류는 Chapter I 및 Chapter IX의 실제거래 분석 원칙에 근거하며 법적 근거가 있습니다. 다만 그 적용이 매우 제한적일 뿐입니다.'
+  }
+};
+let graded=false;
+function gradeQuiz(){
+  if(graded)return;
+  let correct=0;
+  ['q1','q2','q3','q4','q5'].forEach(function(q,i){
+    const sel=document.querySelector('input[name="'+q+'"]:checked');
+    const fb=document.getElementById('f'+(i+1));
+    fb.style.display='block';
+    if(sel && sel.value===answers[q]){
+      correct++;
+      fb.className='q-feedback correct';
+      fb.textContent='✅ '+feedbacks[q][sel.value];
+    } else {
+      fb.className='q-feedback wrong';
+      const chosen=sel?sel.value:null;
+      fb.textContent='❌ '+(chosen?feedbacks[q][chosen]:'선택하지 않았습니다. 정답: '+answers[q].toUpperCase()+'번');
+    }
+    document.querySelectorAll('input[name="'+q+'"]').forEach(function(r){r.disabled=true;});
+  });
+  quizCorrect=correct;
+  const sb=document.getElementById('scoreBox');
+  const score=correct*20;
+  document.getElementById('scoreNum').textContent=score+'점';
+  document.getElementById('scoreMsg').textContent=score>=80
+    ?`🎉 통과! ${correct}문항 정답. 다음 모듈로 진행하세요.`
+    :`${correct}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.querySelector('.quiz-btn').disabled=true;
+  graded=true;
+  updatePct();
+}
+function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+const sections=['obj','s1','s2','s3','quiz','check'];
+const navBtns=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY+150>=el.offsetTop)cur=id;});
+  navBtns.forEach(btn=>{
+    const fn=btn.getAttribute('onclick');
+    if(fn&&fn.includes(`'${cur}'`))btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+updatePct();
+</script>
+</body>
+</html>

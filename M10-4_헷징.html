@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M10-4: 헷징(Hedging)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#881337;--purple-light:#fff1f2;--purple-mid:#e11d48;--purple-dark:#4c0519;
+  --green:#0369a1;--green-light:#e0f2fe;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,#4c0519 0%,#881337 60%,#e11d48 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple-dark);line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#fff1f2;border-left:4px solid #fda4af;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple);line-height:1.75}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#fecdd3}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body p{margin-bottom:.65rem}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #fda4af;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p,.col-box ul{font-size:.85rem;color:var(--text2);margin:0;line-height:1.65}
+.col-box ul{padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.blue{border-color:#93c5fd;background:#eff6ff}
+.col-box.blue h4{color:#1d4ed8}
+.col-box.green{border-color:#6ee7b7;background:#ecfdf5}
+.col-box.green h4{color:#065f46}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.gray{border-color:#d1d5db;background:#f9fafb}
+.col-box.gray h4{color:#374151}
+/* 헷징 유형 3단 그리드 */
+.hedge-type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem;margin:.8rem 0}
+.ht-card{border-radius:12px;padding:1.1rem}
+.ht-card.fx{border:2px solid #fda4af;background:#fff1f2}
+.ht-card.fx .ht-icon{color:var(--purple)}
+.ht-card.fx h4{color:var(--purple)}
+.ht-card.ir{border:2px solid #93c5fd;background:#eff6ff}
+.ht-card.ir .ht-icon{color:#1d4ed8}
+.ht-card.ir h4{color:#1d4ed8}
+.ht-card.comm{border:2px solid #6ee7b7;background:#ecfdf5}
+.ht-card.comm .ht-icon{color:#065f46}
+.ht-card.comm h4{color:#065f46}
+.ht-icon{font-size:1.5rem;margin-bottom:.4rem}
+.ht-card h4{font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.ht-card p{font-size:.8rem;color:var(--text2);line-height:1.55;margin-bottom:.4rem}
+.ht-card ul{font-size:.78rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.5}
+.ht-card li{margin-bottom:.2rem}
+.ht-card .ht-example{font-size:.75rem;background:rgba(255,255,255,.7);border-radius:6px;padding:.4rem .7rem;margin-top:.5rem;color:var(--text);border:1px solid rgba(0,0,0,.07)}
+/* 집중 헷징 구조도 */
+.hedge-structure{background:#fff1f2;border:2px solid #fda4af;border-radius:14px;padding:1.3rem;margin:.8rem 0}
+.hs-title{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.8rem;text-align:center}
+.hs-diagram{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.hs-row{display:flex;gap:1rem;align-items:center;justify-content:center;width:100%}
+.hs-box{border-radius:10px;padding:.7rem 1rem;text-align:center;font-size:.82rem;font-weight:600}
+.hs-box.ext-bank{background:#f0f9ff;border:2px solid #0ea5e9;color:#0369a1;min-width:130px}
+.hs-box.treasury{background:var(--purple);color:#fff;min-width:160px}
+.hs-box.treasury span{font-size:.7rem;font-weight:400;display:block;opacity:.85}
+.hs-box.sub{background:#fff;border:2px solid #fda4af;color:var(--purple-dark);min-width:110px}
+.hs-arrow{font-size:1.1rem;color:var(--purple-mid);font-weight:700}
+.hs-arrow-v{font-size:1.1rem;color:var(--purple-mid);font-weight:700;text-align:center}
+.hs-label{font-size:.72rem;color:var(--text2);text-align:center;margin:.1rem 0}
+/* 헷징 vs 투기 비교 */
+.hvs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.hvs-card{border-radius:10px;padding:1rem 1.1rem}
+.hvs-card.hedge{border:2px solid #6ee7b7;background:#ecfdf5}
+.hvs-card.hedge h4{color:#065f46;font-size:.9rem;font-weight:700;margin-bottom:.5rem}
+.hvs-card.spec{border:2px solid #fca5a5;background:#fee2e2}
+.hvs-card.spec h4{color:#b91c1c;font-size:.9rem;font-weight:700;margin-bottom:.5rem}
+.hvs-card ul{font-size:.82rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.6}
+.hvs-card li{margin-bottom:.3rem}
+/* 백투백 vs 매크로 헷징 */
+.btb-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.btb-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid var(--gray-border);background:#fff}
+.btb-card .btb-badge{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:.4rem;display:inline-block}
+.btb-card.b2b{border-color:#fda4af}
+.btb-card.b2b .btb-badge{background:var(--purple);color:#fff}
+.btb-card.b2b h4{color:var(--purple);font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.btb-card.macro{border-color:#93c5fd}
+.btb-card.macro .btb-badge{background:#1d4ed8;color:#fff}
+.btb-card.macro h4{color:#1d4ed8;font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.btb-card p{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:.35rem}
+.btb-card ul{font-size:.8rem;color:var(--text2);padding-left:1.1rem;margin:.3rem 0 0;line-height:1.5}
+.btb-card li{margin-bottom:.25rem}
+/* 재분류 분석 흐름 */
+.rech-flow{margin:.8rem 0}
+.rf-step{display:flex;gap:.8rem;align-items:flex-start;padding:.75rem;background:#f9fafb;border:1px solid var(--gray-border);border-radius:8px;margin-bottom:.5rem}
+.rf-num{width:28px;height:28px;border-radius:50%;background:var(--purple);color:#fff;font-size:.78rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.rf-step h4{font-size:.87rem;font-weight:700;color:var(--text);margin-bottom:.2rem}
+.rf-step p{font-size:.8rem;color:var(--text2);margin:0;line-height:1.55}
+/* 헷징 비용 배분 테이블 */
+.cost-alloc{background:#fff1f2;border:2px solid #fda4af;border-radius:12px;padding:1.2rem;margin:.8rem 0}
+.ca-title{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.8rem}
+.ca-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.ca-table th{background:var(--purple);color:#fff;padding:.5rem .8rem;font-weight:600;text-align:center}
+.ca-table td{padding:.48rem .8rem;border-bottom:1px solid #fecdd3;text-align:center;color:var(--text2)}
+.ca-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.ca-table tr:last-child td{border:none}
+.ca-table tr.total td{background:var(--purple);color:#fff;font-weight:700}
+.ca-table tr.subtotal td{background:#fff1f2;font-weight:700;color:var(--purple-dark)}
+.ca-table td.ok{color:#065f46;font-weight:700}
+.ca-table td.warn{color:#b91c1c;font-weight:700}
+/* 비교가능성 분석 박스 */
+.comp-box{background:#f9fafb;border:1px solid var(--gray-border);border-radius:10px;padding:1rem 1.1rem;margin:.5rem 0}
+.comp-box h5{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.4rem}
+.comp-box p{font-size:.82rem;color:var(--text2);line-height:1.6;margin:0}
+.comp-box ul{font-size:.8rem;color:var(--text2);padding-left:1.1rem;margin:.3rem 0 0;line-height:1.5}
+.comp-box li{margin-bottom:.2rem}
+/* 종합 사례 */
+.case-study{background:#fff1f2;border:2px solid var(--purple-mid);border-radius:14px;padding:1.4rem;margin:.8rem 0}
+.case-study .cs-title{font-size:.95rem;font-weight:700;color:var(--purple);margin-bottom:.2rem}
+.case-study .cs-sub{font-size:.78rem;color:var(--text2);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid #fecdd3}
+.cs-setup{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+.cs-setup-item{background:#fff;border-radius:8px;padding:.7rem .9rem;border:1px solid #fecdd3}
+.cs-setup-item h5{font-size:.78rem;font-weight:700;color:var(--purple);margin-bottom:.3rem}
+.cs-setup-item p{font-size:.78rem;color:var(--text2);margin:0;line-height:1.5}
+.cs-calc-title{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.5rem}
+.cs-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;border-bottom:1px solid #fecdd3;font-size:.83rem}
+.cs-row:last-child{border:none}
+.cs-row.total{background:var(--purple);color:#fff;border-radius:6px;font-weight:700;font-size:.9rem;padding:.5rem .6rem}
+.cs-row.subtotal{background:#fff1f2;font-weight:700;color:var(--purple-dark)}
+.cs-row-label{color:var(--text2)}
+.cs-row.total .cs-row-label,.cs-row.subtotal .cs-row-label{color:inherit}
+.cs-row-val{font-weight:600;color:var(--text)}
+.cs-row.total .cs-row-val,.cs-row.subtotal .cs-row-val{color:inherit;font-weight:700}
+.cs-conclusion{margin-top:.8rem;background:#fff;border-radius:8px;padding:.8rem 1rem;font-size:.83rem;color:var(--text2);line-height:1.6;border:1px solid #fecdd3}
+.cs-conclusion strong{color:var(--purple-dark)}
+/* 퀴즈 */
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0f9ff;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+/* 체크리스트 */
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+/* 네비게이션 */
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .hedge-type-grid,.hvs-grid,.btb-grid,.two-col,.cs-setup{grid-template-columns:1fr}
+  .hs-row{flex-direction:column}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter X 금융거래(Financial Transactions) › M10-4 (4/6)</div>
+  <h1>M10-4. 헷징(Hedging)</h1>
+  <div class="sub">헷징 유형 &amp; 집중 헷징 구조 &amp; 내부 헷징 계약 재분류 &amp; 비용 배분 정상가격&nbsp;|&nbsp;¶10.120 – ¶10.145&nbsp;|&nbsp;예상 학습시간: 55분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('sec1')">1. 헷징 기초 개념 </button>
+      <button class="nav-item" onclick="goTo('sec2')">2. 정상가격 분석 </button>
+      <button class="nav-item" onclick="goTo('sec3')">3. 실무 이슈 </button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('chk')">☑ 핵심 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습 목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습 목표</h2>
+      <p>M10-4에서는 다국적기업 그룹이 외환·금리·상품 위험을 관리하기 위해 사용하는 <strong>헷징(Hedging)</strong> 거래의 이전가격 분석 방법을 학습합니다. 그룹 트레저리(Group Treasury)가 자회사를 대신하여 체결하는 집중 헷징 구조에서 내부 계약의 정상가격 요건과 비용 배분 방법을 실무 사례와 함께 이해합니다.</p>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>외환·금리·상품 헷징의 개념과 다국적기업 그룹에서의 활용 방식을 구별하여 설명할 수 있다</span></li>
+        <li><span class="obj-num">2</span><span>백투백 헷징(Back-to-back)과 매크로 헷징(Portfolio/Macro Hedging)의 구조적 차이와 이전가격 처리 방식을 비교할 수 있다</span></li>
+        <li><span class="obj-num">3</span><span>그룹 내 헷징 계약이 실질적으로 헷징인지 투기(Speculation)인지를 구별하여 분석할 수 있다</span></li>
+        <li><span class="obj-num">4</span><span>집중 헷징에서 발생하는 비용(프리미엄, 스왑 포인트 등)을 자회사에 ALP 기준으로 배분하는 방법을 적용할 수 있다</span></li>
+        <li><span class="obj-num">5</span><span>외부 헷징 시장 도구(선물환, 이자율 스왑, 옵션 등)와의 비교가능성 분석을 통해 내부 헷징 가격의 정상가격 여부를 검증할 수 있다</span></li>
+      </ul>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="card" id="sec1">
+      <h2>§1 헷징 기초 개념과 유형 <span class="tag tag-para">¶10.120–¶10.128</span></h2>
+      <p>헷징(Hedging)은 보유 자산·부채 또는 예상 현금흐름에 내재한 가격 변동 위험을 <strong>파생상품 계약을 통해 상쇄</strong>하는 위험 관리 기법입니다. OECD 지침서 ¶10.120은 다국적기업 그룹이 자회사별 헷징 대신 그룹 트레저리가 집중적으로 헷징을 수행하는 구조에서 이전가격 분석이 필요함을 명시합니다.</p>
+    </div>
+
+    <div class="accordion" id="acc1">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ① 헷징의 정의와 세 가지 주요 유형 <span class="para">¶10.120–¶10.123</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>다국적기업 그룹에서 발생하는 헷징 거래는 크게 <strong>외환 헷징(FX Hedging)</strong>, <strong>금리 헷징(Interest Rate Hedging)</strong>, <strong>상품 헷징(Commodity Hedging)</strong>의 세 가지로 분류됩니다. 각 유형은 헷지 대상 위험의 성격, 사용하는 파생상품 도구, 그리고 이전가격 분석의 핵심 쟁점이 다릅니다.</p>
+
+        <div class="hedge-type-grid">
+          <div class="ht-card fx">
+            <div class="ht-icon">💱</div>
+            <h4>외환 헷징 (FX Hedging)</h4>
+            <p>환율 변동으로 인한 손익 위험을 제거하거나 감소시키는 헷징입니다. 수출입 대금, 외화 차입금, 해외 자회사 투자 등에서 발생합니다.</p>
+            <ul>
+              <li>선물환(Forward) 계약</li>
+              <li>통화 스왑(Cross-currency Swap)</li>
+              <li>FX 옵션(Put/Call)</li>
+              <li>비딜리버러블 선물환(NDF)</li>
+            </ul>
+            <div class="ht-example">📌 예: 한국 A사가 3개월 후 USD 100만 수출 대금을 받을 예정 → USD 선물환 매도로 환율 고정</div>
+          </div>
+          <div class="ht-card ir">
+            <div class="ht-icon">📈</div>
+            <h4>금리 헷징 (Interest Rate Hedging)</h4>
+            <p>변동금리 차입금에 내재한 금리 상승 위험 또는 고정금리 자산·부채의 금리 하락 위험을 제거하는 헷징입니다.</p>
+            <ul>
+              <li>이자율 스왑(IRS: Interest Rate Swap)</li>
+              <li>금리 선물(Interest Rate Future)</li>
+              <li>금리 캡/플로어(Cap/Floor)</li>
+              <li>금리 칼라(Collar)</li>
+            </ul>
+            <div class="ht-example">📌 예: 변동금리(SOFR+2%) 차입 법인이 IRS로 고정금리(5.5%)를 지급하고 변동금리를 수취 → 금리 변동 위험 제거</div>
+          </div>
+          <div class="ht-card comm">
+            <div class="ht-icon">🛢️</div>
+            <h4>상품 헷징 (Commodity Hedging)</h4>
+            <p>원자재·에너지·농산물 등의 가격 변동 위험을 제거하는 헷징입니다. 원재료 조달 비용이 큰 제조업체에서 주로 사용합니다.</p>
+            <ul>
+              <li>상품 선물(Commodity Future)</li>
+              <li>상품 스왑(Commodity Swap)</li>
+              <li>상품 옵션</li>
+              <li>공급 계약 내 가격 고정 조항</li>
+            </ul>
+            <div class="ht-example">📌 예: 항공사가 향후 6개월 제트유 소비량에 대해 유가 선물 매수 → 연료비 상승 위험 제거</div>
+          </div>
+        </div>
+
+        <p><strong>이전가격 분석의 핵심 질문:</strong> 자회사가 직접 외부 시장에서 헷징 계약을 체결할 경우 부담하는 비용과, 그룹 트레저리를 통해 집중 헷징할 때 자회사가 부담하는 내부 비용이 동등한지(ALP 충족 여부)를 검토합니다.</p>
+
+        <div class="key-point">📌 핵심: 자회사가 그룹 트레저리를 통해 헷징하는 경우, ① 자회사가 부담하는 내부 헷징 비용이 외부 시장에서 독립적으로 헷징 시의 비용과 비교가능해야 하고, ② 그룹 트레저리의 집중 헷징으로 발생하는 효율화 편익(netting, 규모의 경제)이 자회사에 합리적으로 귀속되어야 합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc2">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ② 집중 헷징 구조 — 그룹 트레저리의 역할 <span class="para">¶10.124–¶10.126</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>다국적기업 그룹은 자회사가 각자 헷징하는 대신 <strong>그룹 트레저리(Group Treasury)</strong>가 모든 자회사의 위험을 집중 관리하는 방식을 채택하는 경우가 많습니다. 이 구조에서 그룹 트레저리는 자회사의 헷징 수요를 내부 계약으로 수집하고, 상계(Netting)된 순포지션을 외부 은행을 통해 헷징합니다.</p>
+
+        <div class="hedge-structure">
+          <div class="hs-title">▼ 집중 헷징(Centralised Hedging) 구조도</div>
+          <div class="hs-diagram">
+            <div class="hs-row">
+              <div class="hs-box ext-bank">외부 은행<br>(External Bank)</div>
+              <div>
+                <div class="hs-label">외부 헷징 계약 체결<br>(순포지션 기준)</div>
+                <div class="hs-arrow">↕</div>
+                <div class="hs-label">프리미엄·스왑 포인트 지급</div>
+              </div>
+              <div class="hs-box treasury">그룹 트레저리<br>(Group Treasury)<span>집중 헷징·내부 계약 관리</span></div>
+              <div>
+                <div class="hs-label">내부 헷징 계약 체결<br>(각 자회사별)</div>
+                <div class="hs-arrow">↕</div>
+                <div class="hs-label">배분된 헷징 비용 청구</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:.4rem">
+                <div class="hs-box sub">A사<br>(KRW/USD)</div>
+                <div class="hs-box sub">B사<br>(EUR/USD)</div>
+                <div class="hs-box sub">C사<br>(JPY/USD)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btb-grid">
+          <div class="btb-card b2b">
+            <span class="btb-badge">방식 ①</span>
+            <h4>백투백 헷징 (Back-to-back)</h4>
+            <p>자회사의 헷징 수요를 1:1로 외부 시장에 전달하는 방식입니다. 자회사의 내부 계약 조건이 외부 계약 조건과 동일(또는 유사)하게 설정됩니다.</p>
+            <ul>
+              <li>자회사 내부 계약 = 외부 계약의 mirror</li>
+              <li>그룹 트레저리 위험: 거의 없음</li>
+              <li>트레저리 보상: 낮은 관리 수수료</li>
+              <li>이전가격 단순: 외부 조건 + 소폭 마진</li>
+            </ul>
+          </div>
+          <div class="btb-card macro">
+            <span class="btb-badge">방식 ②</span>
+            <h4>매크로 헷징 (Portfolio/Macro)</h4>
+            <p>자회사들의 포지션을 모두 합산하여 <strong>순노출(Net Exposure)</strong>만 외부 헷징하는 방식입니다. 반대 방향 포지션을 상계하여 헷징 비용을 절감합니다.</p>
+            <ul>
+              <li>A사 USD 매수 + B사 USD 매도 → 상계</li>
+              <li>순포지션만 외부 헷징 → 비용 절감</li>
+              <li>그룹 트레저리: 잔여 위험 관리</li>
+              <li>이전가격 복잡: 절감 편익 배분 필요</li>
+            </ul>
+          </div>
+        </div>
+
+        <p><strong>매크로 헷징의 이전가격 핵심 이슈:</strong> 매크로 헷징에서는 자회사별로 부담하는 내부 헷징 비용이 실제 외부 헷징 비용(순포지션 기준)과 다를 수 있습니다. A사와 B사의 포지션이 상계되어 외부 헷징 비용이 절감된 경우, 이 절감 편익을 어떻게 A사와 B사에 배분할지가 핵심 이전가격 쟁점입니다.</p>
+
+        <div class="note-point">💡 그룹 트레저리 FAR: 매크로 헷징에서 그룹 트레저리가 순포지션 관리 위험을 실질적으로 부담한다면 더 높은 보상이 정당화됩니다. 반면 단순히 포지션을 집계하고 외부 헷징 결과를 전달하는 역할만 한다면 낮은 서비스 수수료 수준이 적절합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc3">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ③ 헷징과 투기의 구분 — 거래 성격 규정 <span class="para">¶10.127–¶10.128</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>OECD 지침서 ¶10.127은 그룹 내 헷징 계약의 이전가격 분석에서 <strong>거래의 실질적 성격</strong>을 먼저 파악해야 함을 강조합니다. 형식상 "헷징"이라고 명명되어 있어도, 실질적으로 자회사가 위험 노출을 줄이는 것이 아니라 오히려 위험 포지션을 취하고 있다면 이는 투기(Speculation)에 해당하며, 이전가격 처리가 달라집니다.</p>
+
+        <div class="hvs-grid">
+          <div class="hvs-card hedge">
+            <h4>✅ 진정한 헷징 (True Hedging)</h4>
+            <ul>
+              <li>기존 또는 예상 노출(Exposure)에 대한 상쇄</li>
+              <li>보유 자산·부채와 반대 방향 포지션</li>
+              <li>헷지 대상 거래가 실제로 존재하거나 확정적</li>
+              <li>내부 회계 기준(IFRS 9, K-IFRS)상 헷지 회계 적용 가능</li>
+              <li>헷징 전략이 위험 관리 정책에 명문화</li>
+            </ul>
+          </div>
+          <div class="hvs-card spec">
+            <h4>⚠️ 투기적 포지션 (Speculation)</h4>
+            <ul>
+              <li>기존 노출과 관계없는 독립적 방향성 베팅</li>
+              <li>헷지 대상 거래가 불명확하거나 없음</li>
+              <li>파생상품 만기와 기초 거래 만기 불일치</li>
+              <li>동일 방향 포지션(위험 증폭)</li>
+              <li>헷징 정책에 문서화 없음</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rech-flow">
+          <div class="rf-step">
+            <div class="rf-num">1</div>
+            <div><h4>헷지 대상(Hedged Item) 확인</h4><p>자회사가 헷징하려는 기초 자산·부채·예상 현금흐름이 실제로 존재하는지 확인합니다. 예: USD 수출 대금 수취 예정, EUR 차입금 보유 등 구체적 근거가 있어야 합니다.</p></div>
+          </div>
+          <div class="rf-step">
+            <div class="rf-num">2</div>
+            <div><h4>헷지 수단(Hedging Instrument)과의 관계 분석</h4><p>파생상품 계약의 방향·만기·금액이 헷지 대상과 논리적으로 상쇄 관계에 있는지 검토합니다. USD 수취 예정인데 USD 선물환 매수라면 오히려 노출 증가 → 투기에 해당.</p></div>
+          </div>
+          <div class="rf-step">
+            <div class="rf-num">3</div>
+            <div><h4>위험 관리 정책 문서 검토</h4><p>그룹의 위험 관리 정책(Hedging Policy)에 해당 헷징 전략이 명시되어 있는지 확인합니다. 정책 없이 사후적으로 "헷징"이라고 주장하는 경우 신뢰도가 낮습니다.</p></div>
+          </div>
+          <div class="rf-step">
+            <div class="rf-num">4</div>
+            <div><h4>결론 및 이전가격 처리</h4><p>진정한 헷징으로 인정되면 헷징 비용의 ALP 배분 분석으로 진행합니다. 투기로 규정되면 자회사가 독립적으로 투기 포지션을 취한 것으로 보아 관련 손익을 자회사에 귀속시킵니다.</p></div>
+          </div>
+        </div>
+
+        <div class="warn-point">⚠️ 실무 위험: 자회사가 그룹 트레저리와 내부 헷징 계약을 체결했으나, 실제 헷지 대상 거래가 없거나 만기·금액이 크게 불일치하는 경우, 세무당국은 이를 투기 포지션으로 규정하여 관련 파생상품 손익을 자회사에 전부 귀속시킬 수 있습니다.</div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="card" id="sec2">
+      <h2>§2 정상가격 분석 <span class="tag tag-para">¶10.129–¶10.138</span></h2>
+      <p>그룹 내 헷징 계약이 진정한 헷징으로 인정된 이후, 자회사에 배분되는 <strong>헷징 비용이 정상가격(ALP) 수준인지</strong>를 검토해야 합니다. 이 분석의 핵심은 자회사가 독립적으로 외부 시장에서 헷징했을 때의 비용과 내부 비용을 비교하는 것입니다.</p>
+    </div>
+
+    <div class="accordion" id="acc4">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ④ 내부 헷징 비용 배분의 정상가격 원칙 <span class="para">¶10.129–¶10.133</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>OECD 지침서 ¶10.129는 자회사가 그룹 트레저리를 통해 헷징할 때 부담하는 비용이 <strong>독립 기업 간 유사한 헷징 거래의 가격</strong>을 초과하거나 과소하게 설정되어서는 안 된다고 명시합니다. 이를 위해 내부 헷징 가격을 외부 파생상품 시장 가격과 비교하는 CUP 방식이 원칙적으로 적용됩니다.</p>
+
+        <div class="cost-alloc">
+          <div class="ca-title">📊 집중 FX 헷징 비용 배분 구조 (매크로 헷징 사례)</div>
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th style="text-align:left">항목</th>
+                <th>A사 (USD 매도 헷징)</th>
+                <th>B사 (USD 매수 헷징)</th>
+                <th>그룹 트레저리</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>헷징 수요 (명목)</td>
+                <td>USD 500만 매도</td>
+                <td>USD 300만 매수</td>
+                <td>순포지션: USD 200만 매도</td>
+              </tr>
+              <tr>
+                <td>외부 헷징 (개별 시)</td>
+                <td>비용: 원금의 0.25%<br>= USD 1.25만</td>
+                <td>비용: 원금의 0.25%<br>= USD 0.75만</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>실제 외부 비용</td>
+                <td colspan="2" style="text-align:center">순포지션 USD 200만 × 0.25% = USD 0.5만</td>
+                <td>USD 0.5만 지급</td>
+              </tr>
+              <tr class="subtotal">
+                <td>집중 헷징 절감 편익</td>
+                <td colspan="2" style="text-align:center">개별 합계 USD 2.0만 − 실제 USD 0.5만 = USD 1.5만 절감</td>
+                <td>배분 대상</td>
+              </tr>
+              <tr>
+                <td>편익 배분 (A사)</td>
+                <td class="ok">USD 500만 기여도 비례<br>= 절감분의 62.5% → USD 0.94만 귀속</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>편익 배분 (B사)</td>
+                <td>—</td>
+                <td class="ok">USD 300만 기여도 비례<br>= 절감분의 37.5% → USD 0.56만 귀속</td>
+                <td>—</td>
+              </tr>
+              <tr class="total">
+                <td>A사 실부담 비용 (ALP)</td>
+                <td>USD 1.25만 − USD 0.94만<br>= <strong>USD 0.31만</strong></td>
+                <td>USD 0.75만 − USD 0.56만<br>= <strong>USD 0.19만</strong></td>
+                <td>관리 수수료 별도</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:.78rem;color:var(--text2);margin-top:.5rem">※ 절감 편익의 배분 비율은 각 자회사의 명목 헷지 금액 기여도(500/800, 300/800) 비례 적용</p>
+        </div>
+
+        <p><strong>비용 구성 요소별 ALP 검토:</strong></p>
+        <table class="compare-table">
+          <thead>
+            <tr><th>비용 구성 요소</th><th>내용</th><th>ALP 기준</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>외부 헷징 프리미엄</strong></td>
+              <td>그룹 트레저리가 외부 은행에 지급한 선물환 스왑 포인트 또는 옵션 프리미엄</td>
+              <td>실제 외부 비용 그대로 자회사에 배분 (원가 기준)</td>
+            </tr>
+            <tr>
+              <td><strong>트레저리 서비스 마진</strong></td>
+              <td>그룹 트레저리의 집중 관리·행정·신용 중개 기능에 대한 보상</td>
+              <td>FAR 분석 기반: 루틴 기능 5~15% 마크업, 실질 위험 부담 시 더 높은 마진</td>
+            </tr>
+            <tr>
+              <td><strong>집중 헷징 절감 편익</strong></td>
+              <td>매크로 헷징에서 발생하는 netting 효과로 인한 비용 절감분</td>
+              <td>참여 자회사 간 기여도 비례로 배분; 트레저리 독점 금지</td>
+            </tr>
+            <tr>
+              <td><strong>미헷지 잔여 위험</strong></td>
+              <td>상계 후 남은 순포지션 중 외부 헷지 안 된 부분</td>
+              <td>트레저리가 부담: 추가 보상 정당화 또는 자회사에 귀속</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="key-point">📌 매크로 헷징의 이전가격 핵심: 그룹 트레저리는 자회사에게 최대한 ① 외부 개별 헷징 비용과 ② 집중 헷징 절감 편익의 공정한 배분 결과인 금액을 청구해야 합니다. 트레저리가 절감 편익을 모두 독점하거나, 반대로 비현실적으로 높은 비용을 자회사에 전가하는 것은 모두 이전가격 위반입니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc5">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑤ 비교가능성 분석 — 외부 시장 도구와의 비교 <span class="para">¶10.134–¶10.136</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>내부 헷징 계약의 정상가격 검증을 위해 외부 파생상품 시장의 유사 거래를 CUP 방법으로 비교합니다. 헷징 거래는 일반 상품·서비스 거래와 달리 <strong>시장 가격이 매우 투명</strong>하게 공시되므로, CUP 적용이 상대적으로 용이합니다.</p>
+
+        <div class="comp-box">
+          <h5>✅ 비교가능 외부 거래 요소 (선물환 헷징 사례)</h5>
+          <p>내부 FX 선물환 계약과 외부 시장의 선물환 계약을 비교할 때 다음 요소의 일치 여부를 확인합니다:</p>
+          <ul>
+            <li><strong>통화 쌍(Currency Pair):</strong> USD/KRW, EUR/USD 등 동일한 통화 쌍</li>
+            <li><strong>만기(Tenor):</strong> 1개월, 3개월, 6개월, 1년 등 동일 만기</li>
+            <li><strong>명목 금액(Notional):</strong> 규모 차이가 큰 경우 유동성 프리미엄 조정</li>
+            <li><strong>결제 방식(Settlement):</strong> 실물 인수도(Deliverable) vs NDF(Non-Deliverable)</li>
+            <li><strong>거래 시점:</strong> 동일 일자 또는 유사 시장 상황의 시장 가격 사용</li>
+          </ul>
+        </div>
+
+        <p><strong>외부 시장 데이터 활용 방법:</strong> 선물환 스왑 포인트는 Bloomberg, Reuters Eikon 등의 시장 데이터 서비스에서 실시간·이력 데이터로 조회할 수 있습니다. 이자율 스왑(IRS)의 경우 ICAP, Bloomberg의 스왑 곡선 데이터를, 상품 선물은 CME·LME의 공시 가격을 활용합니다.</p>
+
+        <table class="compare-table">
+          <thead>
+            <tr><th>헷징 유형</th><th>비교 기준 도구</th><th>시장 데이터 출처</th><th>비교가능성 조정 항목</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>FX 선물환</strong></td>
+              <td>동일 통화쌍 시장 선물환</td>
+              <td>Bloomberg FWD, Reuters</td>
+              <td>명목금액, 만기, 결제방식</td>
+            </tr>
+            <tr>
+              <td><strong>이자율 스왑(IRS)</strong></td>
+              <td>시장 IRS 스왑 곡선</td>
+              <td>Bloomberg SWPM, ICAP</td>
+              <td>만기, 통화, 고정금리 수준</td>
+            </tr>
+            <tr>
+              <td><strong>FX 옵션</strong></td>
+              <td>동일 행사가·만기 시장 옵션</td>
+              <td>Bloomberg OVML, 은행 호가</td>
+              <td>델타, 변동성(IV), 배리어 구조</td>
+            </tr>
+            <tr>
+              <td><strong>상품 선물</strong></td>
+              <td>CME·LME 공시 선물 가격</td>
+              <td>CME Group, LME</td>
+              <td>품질 기준, 인도 장소, 만기월</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note-point">💡 이전가격 문서화: 내부 헷징 계약 체결일자의 Bloomberg 또는 Reuters 시장 가격 스냅샷을 이전가격 문서에 첨부해야 합니다. 시장 가격 대비 내부 계약 가격의 차이와 그 차이에 대한 합리적 설명(트레저리 마진, netting 편익 배분 등)을 명시해야 국세청 조사에서 방어력이 높아집니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc6">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑥ 헷징 정책 문서화와 위험 관리 프레임워크 <span class="para">¶10.137–¶10.138</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>OECD 지침서 ¶10.137은 헷징 거래의 이전가격 분석에서 <strong>그룹 위험 관리 정책(Risk Management Policy)</strong>이 핵심 증거 자료임을 강조합니다. 헷징 계약이 진정한 위험 감소 목적을 가지고 있음을 입증하기 위해서는 사전에 수립된 문서화된 정책이 필요합니다.</p>
+
+        <p><strong>헷징 정책 문서(Hedging Policy Document)에 포함되어야 할 사항:</strong></p>
+        <ul>
+          <li><strong>헷징 대상 위험 유형:</strong> 어떤 위험(FX/금리/상품)을 헷징하는지 명시</li>
+          <li><strong>허용 헷지 비율:</strong> 전체 노출의 몇 %까지 헷징 허용 (예: 매출 예상액의 70~90%)</li>
+          <li><strong>허용 파생상품 도구:</strong> 선물환, 스왑, 옵션 중 허용 범위</li>
+          <li><strong>만기 정책:</strong> 최대 허용 헷징 만기 (예: 12개월 이내)</li>
+          <li><strong>승인 절차:</strong> 누가 어떤 한도 내에서 헷징을 승인하는지</li>
+          <li><strong>집중 헷징 지시:</strong> 자회사가 자체 헷징 금지 및 트레저리를 통해야 하는 규정</li>
+          <li><strong>보고 체계:</strong> 헷징 효과성 측정 및 보고 빈도</li>
+        </ul>
+
+        <div class="two-col">
+          <div class="col-box">
+            <h4>📋 문서화가 잘 된 경우</h4>
+            <ul>
+              <li>사전 수립된 서면 정책 존재</li>
+              <li>IFRS 9/K-IFRS 기준 헷지 회계 적용</li>
+              <li>효과성 테스트(Effectiveness Test) 수행</li>
+              <li>헷지 대상-수단 매핑 명확</li>
+              <li>이사회/CFO 승인 기록 존재</li>
+            </ul>
+          </div>
+          <div class="col-box orange">
+            <h4>⚠️ 문서화 부실 시 위험</h4>
+            <ul>
+              <li>사후적 "헷징" 주장 → 신뢰도 낮음</li>
+              <li>투기 포지션으로 재분류 위험</li>
+              <li>파생상품 손실의 손금 불인정 가능</li>
+              <li>이전가격 가산세 부과 위험</li>
+              <li>관련 이자 비용 조정 연쇄 위험</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="card" id="sec3">
+      <h2>§3 실무 이슈 <span class="tag tag-para">¶10.139–¶10.145</span></h2>
+      <p>헷징 거래의 이전가격 실무에서는 이론적 분석 외에도 몇 가지 복잡한 현실적 이슈가 등장합니다. 특히 매크로 헷징의 편익 배분 방식, 자회사가 직접 헷징을 금지당한 경우의 처리, 그리고 헷징 실패(Under-hedging/Over-hedging) 시의 이전가격 효과가 주요 쟁점입니다.</p>
+    </div>
+
+    <div class="accordion" id="acc7">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑦ 자회사의 독자 헷징 금지와 강제 집중 헷징 <span class="para">¶10.139–¶10.142</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>일부 다국적기업 그룹에서는 자회사가 스스로 헷징 계약을 체결하는 것을 <strong>그룹 정책으로 금지</strong>하고, 반드시 그룹 트레저리를 통해서만 헷징할 것을 요구합니다. 이 경우 자회사는 외부 시장에서 더 유리한 조건으로 헷징할 수 있었더라도 내부 계약을 사용해야 합니다. OECD 지침서 ¶10.139는 이러한 강제 집중 헷징 구조에서의 이전가격 분석을 다룹니다.</p>
+
+        <p><strong>핵심 쟁점 — 자회사의 기회비용:</strong> 독립 기업이라면 자체적으로 외부 은행과 유리한 조건으로 헷징할 수 있었을 것입니다. 하지만 그룹 정책으로 강제 집중 헷징을 사용하는 경우, 그 내부 비용이 외부 옵션보다 높다면 자회사는 기회비용을 부담하는 것입니다.</p>
+
+        <table class="compare-table">
+          <thead>
+            <tr><th>시나리오</th><th>이전가격 처리 방향</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>내부 비용 ≤ 외부 가능 비용</strong></td>
+              <td>자회사가 집중 헷징으로 인해 불이익 없음 → 이전가격 문제 없음</td>
+            </tr>
+            <tr>
+              <td><strong>내부 비용 > 외부 가능 비용</strong></td>
+              <td>자회사가 강제로 더 높은 비용을 부담 → 초과 비용이 이전가격 조정 대상<br>또는 그룹 정책 준수에 따른 추가 보상 필요</td>
+            </tr>
+            <tr>
+              <td><strong>집중 헷징 편익이 충분히 배분</strong></td>
+              <td>절감 편익이 공정하게 자회사에 귀속 → 강제 집중이 자회사에 유리한 결과</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note-point">💡 실무 접근법: 강제 집중 헷징 하에서 이전가격 문서화는 반드시 ① 내부 헷징 비용과 외부 가능 헷징 비용의 비교 분석, ② 집중 헷징의 편익 배분 내역, 그리고 ③ 자회사 입장에서 집중 헷징이 독립 거래에 비해 최소한 동등하거나 유리함을 입증하는 근거를 포함해야 합니다.</div>
+
+        <p><strong>매크로 헷징의 잔여 위험 처리:</strong> 자회사 포지션을 상계한 후 남은 순포지션이 외부에서 헷징되지 않은 경우, 이 잔여 위험의 소유자를 명확히 해야 합니다. 일반적으로 그룹 트레저리가 잔여 위험을 관리하고 이에 따른 손익도 귀속시킵니다. 하지만 자회사에 내부 계약으로 잔여 위험을 배분하는 경우 별도의 이전가격 분석이 필요합니다.</p>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc8">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑧ 종합 사례 연구: 한국 A사 FX 헷징 이전가격 검토 <span class="para">종합 적용</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>M10-4에서 학습한 모든 내용을 통합하여, 한국 제조 자회사의 FX 선물환 헷징에 대한 이전가격 적정성을 단계별로 검토합니다.</p>
+
+        <div class="case-study">
+          <div class="cs-title">📋 종합 사례: A사(한국) FX 선물환 헷징 — 그룹 트레저리(네덜란드) 집중 헷징</div>
+          <div class="cs-sub">분석 기준일: 2024년 3월 1일 | 헷지 통화: USD/KRW | 만기: 3개월 (2024년 6월 1일)</div>
+
+          <div class="cs-setup">
+            <div class="cs-setup-item">
+              <h5>🏭 A사 현황 (차주)</h5>
+              <p>한국 자동차 부품 수출업체<br>3개월 후 USD 100만 수출 대금 수취 예정<br>환율 노출: USD/KRW 환율 하락 위험<br>헷징 필요: USD 100만 선물환 매도</p>
+            </div>
+            <div class="cs-setup-item">
+              <h5>🏦 그룹 트레저리 구조</h5>
+              <p>네덜란드 소재 그룹 재무 법인<br>B사(독일)도 동시에 USD 40만 매수 헷징 요청<br>A사 USD매도 + B사 USD매수 → 순포지션 USD 60만 매도<br>외부 은행: USD 60만 선물환 계약 체결</p>
+            </div>
+            <div class="cs-setup-item">
+              <h5>💹 시장 조건 (2024.3.1)</h5>
+              <p>현물환율: USD/KRW 1,320<br>3개월 선물환율 (외부): 1,315 (USD 선매도 기준)<br>외부 헷징 비용: 원금의 0.20% = USD 2,000<br>은행 고시 스왑 포인트: −5원/USD</p>
+            </div>
+            <div class="cs-setup-item">
+              <h5>📋 내부 계약 조건</h5>
+              <p>A사 ← 트레저리 내부 선물환: 1,316<br>A사 부담 헷징 비용: USD 3,500<br>(외부 비용 USD 2,000 + 트레저리 마진 USD 1,500)<br>B사 내부 선물환: 1,314<br>B사 부담 헷징 비용: USD 1,200</p>
+            </div>
+          </div>
+
+          <div class="cs-calc-title">📊 ALP 검토 — A사 내부 헷징 비용의 정상가격 분석</div>
+          <div class="cs-row">
+            <span class="cs-row-label">① 외부 개별 헷징 시 A사 비용 (USD 100만 × 0.20%)</span>
+            <span class="cs-row-val">USD 2,000</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-row-label">② B사(USD 40만) 포지션과 상계 → 순포지션 USD 60만</span>
+            <span class="cs-row-val">절감 발생</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-row-label">③ 실제 외부 헷징 비용 (USD 60만 × 0.20%)</span>
+            <span class="cs-row-val">USD 1,200</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-row-label">④ 집중 헷징 총 절감 편익 (USD 2,000+800 − USD 1,200)</span>
+            <span class="cs-row-val">USD 1,600</span>
+          </div>
+          <div class="cs-row subtotal">
+            <span class="cs-row-label">A사 배분 절감 편익 (100만/140만 = 71.4% 기여도)</span>
+            <span class="cs-row-val">USD 1,142</span>
+          </div>
+          <div class="cs-row subtotal">
+            <span class="cs-row-label">ALP 기준 A사 실부담 비용 (USD 2,000 − USD 1,142 + 트레저리 마진 적정분)</span>
+            <span class="cs-row-val">USD 1,158 ~ 1,350</span>
+          </div>
+          <div class="cs-row" style="background:#fff3cd;border-radius:6px;margin-top:.4rem">
+            <span class="cs-row-label" style="color:#92400e">실제 청구된 A사 헷징 비용</span>
+            <span class="cs-row-val" style="color:#b91c1c;font-weight:700">USD 3,500</span>
+          </div>
+          <div class="cs-row" style="background:#fee2e2;border-radius:6px;margin-top:.3rem">
+            <span class="cs-row-label" style="color:#b91c1c">ALP 초과분 (이전가격 조정 대상)</span>
+            <span class="cs-row-val" style="color:#b91c1c;font-weight:700">USD 2,150 ~ 2,342</span>
+          </div>
+
+          <div class="cs-conclusion">
+            <strong>결론:</strong> 그룹 트레저리가 A사에 청구한 헷징 비용(USD 3,500)은 ALP 범위(USD 1,158~1,350)를 현저히 초과합니다. 트레저리는 ① 집중 헷징 절감 편익 USD 1,142를 A사에 전혀 배분하지 않았고, ② 트레저리 마진도 과도하게 설정했습니다. 매년 유사한 헷징 거래가 반복된다면 연간 이전가격 조정 규모가 상당할 수 있습니다. <strong>권고:</strong> ① 내부 헷징 가격 책정 시 절감 편익 배분 체계를 수립하고, ② 트레저리 마진을 외부 은행 헷징 비용 대비 5~15% 수준으로 설정하며, ③ 헷징 정책 문서와 이전가격 문서화.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>✏️ 확인 퀴즈</h2>
+      <div class="q-block">
+        <div class="q-text">① 매크로 헷징(Macro/Portfolio Hedging)의 특징으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a">㉠ 각 자회사의 헷지 수요를 1:1로 외부 시장에 전달하여 거울(mirror) 계약을 체결하는 방식이다</label>
+          <label><input type="radio" name="q1" value="b">㉡ 자회사들의 반대 방향 포지션을 상계하여 순노출(Net Exposure)만 외부 헷징함으로써 비용을 절감하는 방식이다</label>
+          <label><input type="radio" name="q1" value="c">㉢ 그룹 트레저리가 외부 시장에서 투기적 포지션을 취하여 추가 수익을 창출하는 방식이다</label>
+          <label><input type="radio" name="q1" value="d">㉣ 자회사별 개별 헷징을 허용하되 비용만 그룹 차원에서 집중 정산하는 방식이다</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">② 그룹 내 헷징 계약이 진정한 헷징인지 투기인지 판단할 때 가장 먼저 확인해야 할 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a">㉠ 파생상품 계약의 만기가 1년 이하인지 여부</label>
+          <label><input type="radio" name="q2" value="b">㉡ 헷지 대상(Hedged Item)이 실제로 존재하고, 파생상품 포지션이 이를 상쇄하는 방향인지 여부</label>
+          <label><input type="radio" name="q2" value="c">㉢ 그룹 트레저리의 외부 은행 신용등급</label>
+          <label><input type="radio" name="q2" value="d">㉣ 파생상품 거래에서 이익이 발생했는지 여부</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">③ 집중 헷징에서 발생하는 netting 절감 편익의 이전가격 원칙으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a">㉠ 절감 편익은 그룹 트레저리가 모두 귀속한다</label>
+          <label><input type="radio" name="q3" value="b">㉡ 절감 편익 전부를 모회사에 배당한다</label>
+          <label><input type="radio" name="q3" value="c">㉢ 절감 편익을 포지션 기여도에 비례하여 참여 자회사들에게 배분해야 한다</label>
+          <label><input type="radio" name="q3" value="d">㉣ 절감 편익은 이전가격 분석과 무관하다</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">④ 내부 헷징 계약의 정상가격 검증을 위한 최우선 방법은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a">㉠ 그룹 내 다른 자회사와의 유사 헷징 거래 비교</label>
+          <label><input type="radio" name="q4" value="b">㉡ 외부 파생상품 시장의 동일 통화쌍·만기·명목금액 헷징 가격과의 CUP 비교</label>
+          <label><input type="radio" name="q4" value="c">㉢ 그룹 내 자기자본이익률(ROE) 기준 이익분할법 적용</label>
+          <label><input type="radio" name="q4" value="d">㉣ 글로벌 평균 헷징 비용률 적용</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">⑤ 그룹 정책으로 자회사가 독자 헷징을 금지당하고 강제 집중 헷징을 사용해야 하는 경우, 내부 헷징 비용이 외부 가능 비용보다 높다면?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a">㉠ 그룹 정책 준수 비용이므로 이전가격 분석 대상에서 제외된다</label>
+          <label><input type="radio" name="q5" value="b">㉡ 자회사가 부담하는 초과 비용(외부 가능 비용 초과분)은 이전가격 조정 대상이 될 수 있다</label>
+          <label><input type="radio" name="q5" value="c">㉢ 강제 집중 헷징 자체가 이전가격 위반이므로 모든 비용을 손금 불산입한다</label>
+          <label><input type="radio" name="q5" value="d">㉣ 집중 헷징은 항상 외부 헷징보다 유리하므로 초과 비용이 발생하지 않는다</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+      <button class="quiz-btn" id="gradeBtn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 핵심 체크리스트 -->
+    <div class="card" id="chk">
+      <h2>✅ 핵심 개념 체크리스트</h2>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1"><label for="c1">헷징은 기존 위험 노출을 파생상품으로 상쇄하는 것이며, 외환·금리·상품 세 가지 유형으로 분류된다</label></li>
+        <li><input type="checkbox" id="c2"><label for="c2">백투백 헷징은 1:1 미러 계약으로 이전가격이 단순하고, 매크로 헷징은 netting 후 순포지션만 헷징하여 편익 배분이 핵심 이슈이다</label></li>
+        <li><input type="checkbox" id="c3"><label for="c3">내부 헷징 계약이 진정한 헷징인지 투기인지를 4단계(헷지 대상 확인 → 방향 분석 → 정책 검토 → 거래규정)로 판단해야 한다</label></li>
+        <li><input type="checkbox" id="c4"><label for="c4">집중 헷징 절감 편익은 트레저리가 독점하지 않고 참여 자회사의 기여도(포지션 비율)에 따라 배분해야 한다</label></li>
+        <li><input type="checkbox" id="c5"><label for="c5">내부 헷징 비용의 정상가격 검증은 Bloomberg·Reuters 시장 데이터를 활용한 CUP법이 원칙이다</label></li>
+        <li><input type="checkbox" id="c6"><label for="c6">헷징 정책 문서(사전 수립, 허용 도구, 승인 절차 포함)와 IFRS 9 헷지 회계 적용 여부가 이전가격 방어의 핵심 증거이다</label></li>
+        <li><input type="checkbox" id="c7"><label for="c7">강제 집중 헷징에서 내부 비용이 자회사 외부 헷징 가능 비용보다 높다면 초과분은 이전가격 조정 대상이다</label></li>
+        <li><input type="checkbox" id="c8"><label for="c8">트레저리 서비스 마진은 FAR 분석에 따라 루틴 기능이면 5~15% 마크업, 실질 위험 부담 시 더 높은 마진이 정당화된다</label></li>
+      </ul>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="nav-bottom">
+      <a href="M10-3_현금풀링.html" class="btn-nav secondary">← M10-3 현금풀링</a>
+      <a href="../index.html" class="btn-nav secondary">📋목차</a>
+      <a href="M10-5_그룹내보증.html" class="btn-nav">M10-5 그룹 내 보증 →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const allAcc=document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent=allAcc.length;
+function toggleAcc(btn){
+  const body=btn.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  if(!btn.classList.contains('viewed')){btn.classList.add('viewed');updatePct();}
+}
+let quizCorrect=0;
+function updatePct(){
+  const viewed=document.querySelectorAll('.acc-header.viewed').length;
+  const total=allAcc.length;
+  const pct=Math.round(((total>0?viewed/total:0)*0.6+(quizCorrect/5)*0.4)*100);
+  document.getElementById('pctDisp').textContent=pct+'%';
+  document.getElementById('topBar').style.width=pct+'%';
+  document.getElementById('accDone').textContent=viewed;
+  document.getElementById('quizDone').textContent=quizCorrect;
+}
+const answers={q1:'b',q2:'b',q3:'c',q4:'b',q5:'b'};
+const msgs=[
+  '아직 개념이 더 필요해요. §1~§3을 다시 복습해 보세요.',
+  '기초는 잡혔습니다. 매크로 헷징과 편익 배분 부분을 한 번 더 검토해 보세요.',
+  '절반 이상 이해했습니다. 거래분류 분석과 비교가능성 내용을 보완하세요.',
+  '잘 이해했습니다! 종합 사례(⑧)를 다시 확인하면 완벽합니다.',
+  '훌륭합니다! M10-4 내용을 완전히 습득했습니다. M10-5(그룹 내 보증)으로 진행하세요!'
+];
+function gradeQuiz(){
+  quizCorrect=0;
+  for(let i=1;i<=5;i++){
+    const sel=document.querySelector('input[name="q'+i+'"]:checked');
+    const fb=document.getElementById('f'+i);
+    if(!sel){fb.style.display='none';continue;}
+    if(sel.value===answers['q'+i]){
+      quizCorrect++;
+      fb.className='q-feedback correct';
+      const exps={
+        f1:'✅ 정답! 매크로 헷징은 자회사들의 반대 방향 포지션을 상계(Netting)하여 순노출만 외부 헷징합니다. 예: A사 USD매도 500만 + B사 USD매수 300만 → 순포지션 USD매도 200만만 외부 헷징. 이로써 개별 헷징 대비 비용을 절감합니다.',
+        f2:'✅ 정답! 진정한 헷징의 첫 번째 확인 사항은 헷지 대상(Hedged Item)의 실재 여부입니다. 기초 노출(수출 대금, 차입금 등)이 존재하고, 파생상품이 그것을 상쇄하는 방향이어야 합니다. 이 조건이 충족되지 않으면 투기로 재분류됩니다.',
+        f3:'✅ 정답! 매크로 헷징의 netting 절감 편익은 그룹 트레저리가 독점할 수 없으며, 포지션 규모 기여도에 비례하여 참여 자회사들에게 배분해야 합니다. 이것이 OECD 지침서 ¶10.114 편익 배분 원칙의 핵심입니다.',
+        f4:'✅ 정답! 내부 헷징 계약의 정상가격 검증은 Bloomberg, Reuters 등의 외부 파생상품 시장 가격과의 CUP 비교가 원칙입니다. 헷징 시장은 투명성이 높아 동일 조건(통화쌍, 만기, 명목금액)의 시장 가격을 직접 비교할 수 있습니다.',
+        f5:'✅ 정답! 자회사가 그룹 정책으로 강제 집중 헷징을 사용해야 하는 경우라도, 내부 헷징 비용이 외부 가능 비용을 초과한다면 초과분은 이전가격 조정 대상이 될 수 있습니다. 정책 준수 자체가 초과 비용을 면제해주지는 않습니다.'
+      };
+      fb.textContent=exps['f'+i];
+    } else {
+      fb.className='q-feedback wrong';
+      const wrgs={
+        f1:'❌ 오답. ㉠은 백투백(Back-to-back) 헷징의 설명입니다. 매크로 헷징은 자회사 포지션을 합산하여 순노출만 외부 헷징합니다. ㉢은 투기, ㉣은 단순 비용 정산으로 헷징 구조와 다릅니다.',
+        f2:'❌ 오답. 헷징·투기 판단의 핵심은 만기 길이나 이익 발생 여부가 아니라, 기초 노출이 실재하고 파생상품이 그것을 상쇄하는 방향인지 여부입니다. ¶10.127 참조.',
+        f3:'❌ 오답. 절감 편익을 트레저리나 모회사가 독점하는 것은 이전가격 위반입니다. OECD 지침서는 편익이 기여도에 비례하여 참여 자회사들에게 배분되어야 함을 명시합니다.',
+        f4:'❌ 오답. 그룹 내 유사 거래나 글로벌 평균은 비교가능성이 낮습니다. 외부 파생상품 시장 가격(Bloomberg, Reuters)과의 직접 비교가 CUP법으로서 가장 신뢰성 있는 방법입니다.',
+        f5:'❌ 오답. 그룹 정책 준수를 이유로 초과 비용이 자동 면제되지는 않습니다. 내부 비용이 외부 가능 비용을 초과하는 경우 그 차이는 이전가격 조정 대상이 되거나, 그룹 정책 준수에 따른 별도 보상이 필요합니다.'
+      };
+      fb.textContent=wrgs['f'+i];
+    }
+    fb.style.display='block';
+    document.querySelectorAll('input[name="q'+i+'"]').forEach(r=>r.disabled=true);
+  }
+  document.getElementById('gradeBtn').disabled=true;
+  const sb=document.getElementById('scoreBox');
+  const score=quizCorrect*20;
+  document.getElementById('scoreNum').textContent=score+'점';
+  document.getElementById('scoreMsg').textContent=score>=80
+    ?`🎉 통과! ${quizCorrect}문항 정답. 다음 모듈로 진행하세요.`
+    :`${quizCorrect}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  updatePct();
+}
+function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+const sections=['obj','sec1','sec2','sec3','quiz','chk'];
+const navBtns=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY+150>=el.offsetTop)cur=id;});
+  navBtns.forEach(btn=>{
+    const fn=btn.getAttribute('onclick');
+    if(fn&&fn.includes(`'${cur}'`))btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+updatePct();
+</script>
+</body>
+</html>

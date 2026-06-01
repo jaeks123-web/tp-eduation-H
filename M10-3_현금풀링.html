@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M10-3: 현금풀링(Cash Pooling)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#881337;--purple-light:#fff1f2;--purple-mid:#e11d48;--purple-dark:#4c0519;
+  --green:#0369a1;--green-light:#e0f2fe;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,#4c0519 0%,#881337 60%,#e11d48 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple-dark);line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#fff1f2;border-left:4px solid #fda4af;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple);line-height:1.75}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#fecdd3}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body p{margin-bottom:.65rem}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #fda4af;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p,.col-box ul{font-size:.85rem;color:var(--text2);margin:0;line-height:1.65}
+.col-box ul{padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.blue{border-color:#93c5fd;background:#eff6ff}
+.col-box.blue h4{color:#1d4ed8}
+.col-box.green{border-color:#6ee7b7;background:#ecfdf5}
+.col-box.green h4{color:#065f46}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.gray{border-color:#d1d5db;background:#f9fafb}
+.col-box.gray h4{color:#374151}
+/* 현금풀링 유형 비교 그리드 */
+.pool-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:.8rem 0}
+.pt-card{border-radius:12px;padding:1.2rem;border:2px solid}
+.pt-card.notional{border-color:#fda4af;background:#fff1f2}
+.pt-card.notional .pt-badge{background:var(--purple);color:#fff}
+.pt-card.notional h4{color:var(--purple)}
+.pt-card.physical{border-color:#93c5fd;background:#eff6ff}
+.pt-card.physical .pt-badge{background:#1d4ed8;color:#fff}
+.pt-card.physical h4{color:#1d4ed8}
+.pt-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:.5rem;display:inline-block}
+.pt-card h4{font-size:.95rem;font-weight:700;margin-bottom:.6rem}
+.pt-card p{font-size:.83rem;color:var(--text2);line-height:1.6;margin-bottom:.5rem}
+.pt-card ul{font-size:.8rem;color:var(--text2);padding-left:1.1rem;margin:0;line-height:1.55}
+.pt-card li{margin-bottom:.3rem}
+.pt-card .pt-example{background:rgba(255,255,255,.7);border-radius:8px;padding:.6rem .8rem;margin-top:.6rem;font-size:.8rem;color:var(--text);border:1px solid rgba(0,0,0,.08)}
+/* 구조 다이어그램 */
+.pool-structure{margin:.8rem 0}
+.ps-header{text-align:center;font-size:.8rem;font-weight:700;color:var(--gray);margin-bottom:.5rem;letter-spacing:.04em}
+.ps-diagram{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.ps-master{background:var(--purple);color:#fff;border-radius:10px;padding:.7rem 2rem;font-size:.88rem;font-weight:700;text-align:center;width:260px}
+.ps-master span{font-size:.72rem;font-weight:400;display:block;opacity:.85;margin-top:.1rem}
+.ps-connector{display:flex;align-items:center;gap:.5rem;width:100%;justify-content:center}
+.ps-line{height:30px;width:2px;background:#fda4af}
+.ps-line-h{height:2px;width:100%;max-width:400px;background:#fda4af;position:relative}
+.ps-line-h::before,.ps-line-h::after{content:'';position:absolute;top:-10px;width:2px;height:12px;background:#fda4af}
+.ps-line-h::before{left:20%}
+.ps-line-h::after{right:20%}
+.ps-subs{display:flex;gap:.8rem;width:100%;max-width:560px;justify-content:center}
+.ps-sub{background:#fff;border:2px solid #fda4af;border-radius:8px;padding:.6rem .8rem;text-align:center;flex:1;font-size:.78rem;font-weight:600;color:var(--purple-dark)}
+.ps-sub span{font-size:.68rem;font-weight:400;color:var(--text2);display:block;margin-top:.15rem}
+.ps-flow-label{font-size:.72rem;color:var(--text2);margin:.2rem 0;text-align:center}
+/* 이자율 밴드 */
+.rate-band{background:#fff1f2;border:2px solid #fda4af;border-radius:14px;padding:1.3rem;margin:.8rem 0}
+.rb-title{font-size:.9rem;font-weight:700;color:var(--purple);margin-bottom:1rem;text-align:center}
+.rb-scale{position:relative;margin:.8rem 0 1.6rem}
+.rb-bar{height:24px;background:linear-gradient(to right,#bbf7d0,#fef9c3,#fecdd3);border-radius:12px;position:relative}
+.rb-labels{display:flex;justify-content:space-between;margin-top:.3rem;font-size:.72rem;color:var(--text2)}
+.rb-markers{display:flex;justify-content:space-between;position:absolute;top:-10px;width:100%}
+.rb-marker{display:flex;flex-direction:column;align-items:center;position:absolute}
+.rb-marker .rm-line{width:2px;height:40px;background:var(--purple-dark)}
+.rb-marker .rm-label{font-size:.7rem;font-weight:700;white-space:nowrap;background:var(--purple);color:#fff;padding:1px 6px;border-radius:4px;margin-bottom:2px}
+.rb-zone{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin:.4rem 0}
+.rz-item{border-radius:8px;padding:.6rem .8rem;text-align:center}
+.rz-item.deposit{background:#d1fae5;border:1.5px solid #6ee7b7}
+.rz-item.deposit strong{color:#065f46}
+.rz-item.leader{background:#fff1f2;border:1.5px solid #fda4af}
+.rz-item.leader strong{color:var(--purple)}
+.rz-item.borrow{background:#fee2e2;border:1.5px solid #fca5a5}
+.rz-item.borrow strong{color:#b91c1c}
+.rz-item h5{font-size:.75rem;font-weight:600;margin-bottom:.2rem;color:var(--text)}
+.rz-item strong{font-size:.9rem;display:block;margin-bottom:.1rem}
+.rz-item p{font-size:.68rem;color:var(--text2);margin:0;line-height:1.4}
+/* 편익 배분 테이블 */
+.benefit-table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.8rem 0}
+.benefit-table th{background:var(--purple);color:#fff;padding:.55rem .85rem;font-weight:600;text-align:center}
+.benefit-table td{padding:.5rem .85rem;border-bottom:1px solid var(--gray-border);text-align:center;color:var(--text2);vertical-align:middle}
+.benefit-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.benefit-table tr:last-child td{border:none}
+.benefit-table td.gain{color:#065f46;font-weight:700}
+.benefit-table td.leader{color:var(--purple);font-weight:700}
+.benefit-table tr.total-row td{background:var(--purple-light);font-weight:700;color:var(--purple-dark)}
+/* 풀 리더 보상 방식 */
+.leader-comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.lc-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid}
+.lc-card.margin{border-color:#fda4af;background:#fff1f2}
+.lc-card.margin h4{color:var(--purple);font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.lc-card.fee{border-color:#6ee7b7;background:#ecfdf5}
+.lc-card.fee h4{color:#065f46;font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.lc-card p{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:.4rem}
+.lc-card ul{font-size:.8rem;color:var(--text2);padding-left:1.1rem;margin:.3rem 0 0;line-height:1.5}
+.lc-card li{margin-bottom:.25rem}
+.lc-formula{background:rgba(255,255,255,.8);border-radius:6px;padding:.5rem .8rem;margin-top:.5rem;font-size:.82rem;font-weight:600;color:var(--text);text-align:center;border:1px solid rgba(0,0,0,.08)}
+/* 장기화 경고 박스 */
+.rechar-box{background:#fff3e0;border:2px solid #fdba74;border-radius:12px;padding:1.2rem;margin:.8rem 0}
+.rechar-box .rb-head{font-size:.88rem;font-weight:700;color:var(--orange);margin-bottom:.5rem}
+.rechar-box p{font-size:.83rem;color:#6b3a00;line-height:1.6;margin-bottom:.4rem}
+.rechar-box ul{font-size:.82rem;color:#6b3a00;padding-left:1.1rem;margin:.3rem 0 0;line-height:1.55}
+.rechar-box li{margin-bottom:.25rem}
+/* 종합 사례 */
+.case-study{background:#fff1f2;border:2px solid var(--purple-mid);border-radius:14px;padding:1.4rem;margin:.8rem 0}
+.case-study .cs-title{font-size:.95rem;font-weight:700;color:var(--purple);margin-bottom:.2rem}
+.case-study .cs-sub{font-size:.78rem;color:var(--text2);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid #fecdd3}
+.cs-participants{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem}
+.cs-part{border-radius:8px;padding:.7rem .8rem;border:1.5px solid}
+.cs-part.leader{border-color:var(--purple-mid);background:#ffe4e6}
+.cs-part.leader h5{color:var(--purple);font-size:.82rem;font-weight:700;margin-bottom:.3rem}
+.cs-part.dep{border-color:#6ee7b7;background:#ecfdf5}
+.cs-part.dep h5{color:#065f46;font-size:.82rem;font-weight:700;margin-bottom:.3rem}
+.cs-part.bor{border-color:#fca5a5;background:#fee2e2}
+.cs-part.bor h5{color:#b91c1c;font-size:.82rem;font-weight:700;margin-bottom:.3rem}
+.cs-part p{font-size:.75rem;color:var(--text2);margin:0;line-height:1.5}
+.cs-rate-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.6rem 0}
+.cs-rate-table th{background:var(--purple);color:#fff;padding:.5rem .8rem;font-weight:600;text-align:center}
+.cs-rate-table td{padding:.48rem .8rem;border-bottom:1px solid #fecdd3;text-align:center;color:var(--text2)}
+.cs-rate-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.cs-rate-table tr:last-child td{border:none}
+.cs-rate-table td.ok{color:#065f46;font-weight:700}
+.cs-rate-table td.warn{color:#b91c1c;font-weight:700}
+.cs-conclusion{margin-top:.8rem;background:#fff;border-radius:8px;padding:.8rem 1rem;font-size:.83rem;color:var(--text2);line-height:1.6;border:1px solid #fecdd3}
+.cs-conclusion strong{color:var(--purple-dark)}
+/* 퀴즈 */
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0f9ff;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+/* 체크리스트 */
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+/* 네비게이션 */
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .pool-type-grid,.leader-comp-grid,.two-col,.cs-participants{grid-template-columns:1fr}
+  .rb-zone{grid-template-columns:1fr}
+  .ps-subs{flex-direction:column;align-items:center}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter X 금융거래(Financial Transactions) › M10-3 (3/6)</div>
+  <h1>M10-3. 현금풀링(Cash Pooling)</h1>
+  <div class="sub">가상 풀링 &amp; 물리적 풀링 &amp; 풀 리더 보상 &amp; 참여자 이자율 &amp; 편익 배분&nbsp;|&nbsp;¶10.101 – ¶10.119&nbsp;|&nbsp;예상 학습시간: 55분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('sec1')">1. 현금풀링 기초 개념 </button>
+      <button class="nav-item" onclick="goTo('sec2')">2. 정상가격 분석 </button>
+      <button class="nav-item" onclick="goTo('sec3')">3. 실무 이슈 </button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('chk')">☑ 핵심 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습 목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습 목표</h2>
+      <p>M10-3에서는 다국적기업 그룹이 널리 활용하는 <strong>현금풀링(Cash Pooling)</strong>의 구조와 이전가격 분석 방법을 학습합니다. 가상 풀링과 물리적 풀링의 차이, 풀 리더(Pool Leader)의 기능과 적절한 보상 수준, 그리고 참여자 간 편익 배분의 정상가격 원칙을 실무 사례와 함께 이해합니다.</p>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>가상 현금풀링(Notional Pooling)과 물리적 현금풀링(Physical/Zero-balancing Pooling)의 구조적 차이와 이전가격 처리 방식을 구별할 수 있다</span></li>
+        <li><span class="obj-num">2</span><span>현금풀링에서 풀 리더(Pool Leader)가 수행하는 기능과 부담하는 위험을 분석하고 적절한 보상(마진 또는 수수료) 방식을 결정할 수 있다</span></li>
+        <li><span class="obj-num">3</span><span>현금풀 예치자와 차입자의 정상가격 이자율 범위(ALP Band)를 외부 금리 기준으로 설정하고 그 근거를 설명할 수 있다</span></li>
+        <li><span class="obj-num">4</span><span>현금풀링에서 발생하는 집합 편익(Pooling Benefit)을 참여자에게 배분하는 원칙과 방법을 적용할 수 있다</span></li>
+        <li><span class="obj-num">5</span><span>현금풀 잔액이 장기화될 경우 단기 대출로 재분류(Recharacterisation)되는 기준과 세무 위험을 파악할 수 있다</span></li>
+      </ul>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="card" id="sec1">
+      <h2>§1 현금풀링 기초 개념 <span class="tag tag-para">¶10.101–¶10.107</span></h2>
+      <p>현금풀링은 다국적기업 그룹이 각 자회사의 잉여 자금과 부족 자금을 하나의 가상·실제 계좌로 통합 관리함으로써 외부 차입 비용을 줄이고 그룹 전체의 유동성을 효율적으로 운용하는 재무 기법입니다. OECD 지침서 ¶10.101은 현금풀링이 그룹 내 대출과 유사하나, 그 특수한 성격으로 인해 별도의 이전가격 분석이 필요하다고 명시합니다.</p>
+    </div>
+
+    <div class="accordion" id="acc1">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ① 현금풀링의 정의와 두 가지 유형 <span class="para">¶10.101–¶10.104</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>현금풀링은 크게 <strong>가상 풀링(Notional Pooling)</strong>과 <strong>물리적 풀링(Physical Pooling, 또는 Zero-balancing Pooling)</strong>으로 구분됩니다. 두 방식 모두 그룹 내 자금 집중 관리를 목적으로 하지만, 실제 자금의 이동 여부와 법적·세무적 처리에서 큰 차이가 있습니다.</p>
+
+        <div class="pool-type-grid">
+          <div class="pt-card notional">
+            <span class="pt-badge">유형 ①</span>
+            <h4>가상 현금풀링 (Notional Pooling)</h4>
+            <p>각 자회사 계좌의 잔액을 <strong>가상으로(notionally) 합산</strong>하여 이자를 계산합니다. 실제 자금은 각자 계좌에 그대로 있고, 은행이 그룹 전체의 순잔액(Net Balance)에 대해 이자를 정산하는 방식입니다.</p>
+            <ul>
+              <li>실제 자금 이동 없음 (법적 소유권 유지)</li>
+              <li>각 자회사 계좌는 독립적으로 유지</li>
+              <li>그룹 순잔액에 대한 이자 정산</li>
+              <li>세무상 복잡성 낮음 (자금 이전 없음)</li>
+              <li>주로 유럽 국가에서 허용</li>
+            </ul>
+            <div class="pt-example">📌 예: A사 예치 +500억, B사 차입 -300억 → 순잔액 +200억에 대해 예치 이자, B사는 별도 차입 이자 미발생(내부 상계)</div>
+          </div>
+          <div class="pt-card physical">
+            <span class="pt-badge">유형 ②</span>
+            <h4>물리적 현금풀링 (Physical / Zero-balancing)</h4>
+            <p>각 자회사 계좌의 잔액을 <strong>실제로 풀 리더(헤더 계좌)로 이체</strong>합니다. 영업 종료일 자회사 계좌는 목표 잔액(0 또는 특정 금액)으로 스윕(Sweep)되고, 다음 날 필요에 따라 반납됩니다.</p>
+            <ul>
+              <li>실제 자금 이체 발생 (법적 소유권 이전)</li>
+              <li>자회사 계좌는 매일 자동 스윕됨</li>
+              <li>풀 리더가 그룹 자금 통합 보유</li>
+              <li>자회사-풀 리더 간 대출 관계 형성</li>
+              <li>세무상 이자 수입/비용 실제 발생</li>
+            </ul>
+            <div class="pt-example">📌 예: A사 +500억 → 풀 리더 이체 후 A사 잔액 0. B사 부족분 300억 → 풀 리더가 300억 대출. 풀 리더는 A사에 예치이자, B사로부터 차입이자 수취</div>
+          </div>
+        </div>
+
+        <table class="compare-table">
+          <thead>
+            <tr><th>비교 항목</th><th>가상 풀링</th><th>물리적 풀링</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>자금 이동</strong></td><td>없음 (가상 합산만)</td><td>있음 (실제 이체)</td></tr>
+            <tr><td><strong>법적 관계</strong></td><td>독립 계좌 유지</td><td>대출 관계 성립</td></tr>
+            <tr><td><strong>이자 처리</strong></td><td>은행과 그룹 간 정산</td><td>자회사-풀 리더 간 실제 이자</td></tr>
+            <tr><td><strong>이전가격 이슈</strong></td><td>이자 배분 방식</td><td>참여자별 이자율, 리더 보상</td></tr>
+            <tr><td><strong>세무 복잡성</strong></td><td>상대적으로 낮음</td><td>상대적으로 높음</td></tr>
+            <tr><td><strong>한국 실무</strong></td><td>은행 허용 여부 제한적</td><td>더 일반적으로 사용</td></tr>
+          </tbody>
+        </table>
+
+        <div class="key-point">📌 이전가격 분석 관점: 가상 풀링은 편익 배분(이자 정산 방식)이 핵심 이슈이고, 물리적 풀링은 참여자별 ALP 이자율과 풀 리더 보상이 핵심 이슈입니다. 두 유형 모두 단순히 "그룹 내 거래"라는 이유로 이자율을 임의로 설정하면 이전가격 문제가 발생합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc2">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ② 현금풀 구조와 풀 리더의 역할 <span class="para">¶10.105–¶10.107</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>현금풀링 구조의 중심에는 <strong>풀 리더(Pool Leader)</strong> 또는 <strong>인하우스 뱅크(In-house Bank)</strong>가 있습니다. 물리적 풀링에서 풀 리더는 예치자 자회사로부터 자금을 수취하고, 차입자 자회사에 자금을 공급하는 중간 은행 역할을 수행합니다. 풀 리더는 그룹 내 재무 회사(Treasury Company) 또는 별도의 특수목적법인으로 설립되는 경우가 많습니다.</p>
+
+        <div class="pool-structure">
+          <div class="ps-header">▼ 물리적 현금풀링 구조도 (Physical Cash Pool)</div>
+          <div class="ps-diagram">
+            <div style="display:flex;justify-content:center;gap:2rem;margin-bottom:.3rem">
+              <div style="text-align:center;font-size:.78rem;color:var(--text2)">자금 예치 ↓</div>
+              <div style="width:200px"></div>
+              <div style="text-align:center;font-size:.78rem;color:var(--text2)">자금 인출 ↑</div>
+            </div>
+            <div style="display:flex;gap:1.5rem;align-items:center;width:100%;max-width:560px;justify-content:center">
+              <div class="ps-sub" style="border-color:#6ee7b7;background:#ecfdf5;color:#065f46">A사 (예치자)<span>잔액 +500억</span></div>
+              <div style="font-size:1.3rem;color:#fda4af">←</div>
+              <div class="ps-master">풀 리더 (Pool Leader)<span>헤더 계좌 통합 운용</span></div>
+              <div style="font-size:1.3rem;color:#fca5a5">←</div>
+              <div class="ps-sub" style="border-color:#fca5a5;background:#fee2e2;color:#b91c1c">B사 (차입자)<span>잔액 -300억</span></div>
+            </div>
+            <div style="display:flex;gap:1.5rem;align-items:center;width:100%;max-width:560px;justify-content:center;margin-top:.3rem">
+              <div style="text-align:center;font-size:.75rem;color:#065f46;flex:1">예치 이자 지급<br>(ALP 예치금리)</div>
+              <div style="width:120px"></div>
+              <div style="text-align:center;font-size:.75rem;color:#b91c1c;flex:1">차입 이자 수취<br>(ALP 차입금리)</div>
+            </div>
+            <div style="margin-top:.8rem;text-align:center;font-size:.78rem;color:var(--text2)">풀 리더 수익 = 차입 이자 수취 − 예치 이자 지급 (스프레드 마진)</div>
+          </div>
+        </div>
+
+        <p><strong>풀 리더의 주요 기능과 위험:</strong></p>
+        <table class="compare-table">
+          <thead>
+            <tr><th>기능</th><th>세부 내용</th><th>이에 따른 위험</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>유동성 관리</strong></td>
+              <td>그룹 자금 수요·공급 매칭, 외부 차입 최소화</td>
+              <td>순잔액이 마이너스일 경우 외부 차입 필요 → 조달 위험</td>
+            </tr>
+            <tr>
+              <td><strong>금리 위험 관리</strong></td>
+              <td>고정금리·변동금리 참여자 간 조율</td>
+              <td>금리 변동에 따른 이자율 불일치 위험</td>
+            </tr>
+            <tr>
+              <td><strong>신용 위험 흡수</strong></td>
+              <td>차입자 자회사의 채무 불이행 위험 부담</td>
+              <td>자회사 부실화 시 대출 손실 가능성</td>
+            </tr>
+            <tr>
+              <td><strong>환위험 통합</strong></td>
+              <td>다통화 풀의 경우 FX 리스크 집중 관리</td>
+              <td>통화별 불일치 포지션 위험</td>
+            </tr>
+            <tr>
+              <td><strong>규정 준수</strong></td>
+              <td>각국 외환 규정, 이자 원천징수, 세무 신고</td>
+              <td>규정 위반 시 과징금 및 이전가격 위험</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note-point">💡 FAR 분석 관점: 풀 리더가 단순히 자금 중개 기능만 수행하고(routine function), 실질적인 신용 위험은 모회사가 부담한다면 — 풀 리더의 보상은 낮은 수수료(서비스 피) 수준이 적절합니다. 반면 풀 리더가 실질적으로 신용 위험, 유동성 위험, 금리 위험을 스스로 부담한다면 더 높은 스프레드 마진이 정당화됩니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc3">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ③ 현금풀링의 집합 편익 — 외부 차입 절감과 이자 수익 증대 <span class="para">¶10.107</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>현금풀링의 핵심 경제적 가치는 <strong>집합 편익(Pooling Benefit)</strong>에 있습니다. 각 자회사가 개별적으로 자금을 운용할 때 발생하는 비효율(예치자는 낮은 금리를, 차입자는 높은 금리를 부담)을 그룹 단위로 통합 관리함으로써 제거하는 것입니다.</p>
+
+        <p><strong>집합 편익의 발생 원리:</strong></p>
+        <ul>
+          <li>독립 기업 상황: A사 500억을 은행에 예치 → 연 4.0% 수취. B사 300억 외부 차입 → 연 6.5% 지급. A사 이자 수익 20억, B사 이자 비용 19.5억</li>
+          <li>풀링 후: B사는 A사 자금 300억을 이용 → B사 외부 차입 불필요. 외부 은행 스프레드(6.5%−4.0% = 2.5%) 절감분이 그룹 집합 편익</li>
+          <li>집합 편익 = 차입자의 외부 차입 금리 − 예치자의 외부 예치 금리 = 6.5% − 4.0% = 2.5% (× 순매칭 금액 300억 = 7.5억/년)</li>
+        </ul>
+
+        <table class="compare-table">
+          <thead>
+            <tr><th>시나리오</th><th>A사 이자 수익</th><th>B사 이자 비용</th><th>그룹 순비용</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>개별 운용 (풀링 없음)</strong></td>
+              <td>500억 × 4.0% = 20억</td>
+              <td>300억 × 6.5% = 19.5억</td>
+              <td>−19.5억 + 20억 = +0.5억</td>
+            </tr>
+            <tr>
+              <td><strong>풀링 후 (ALP 배분)</strong></td>
+              <td>300억 × 5.5% = 16.5억<br>+ 200억 × 4.5% = 9억 = 25.5억</td>
+              <td>300억 × 5.5% = 16.5억</td>
+              <td>−16.5억 + 25.5억 = +9억</td>
+            </tr>
+            <tr>
+              <td><strong>편익 증가</strong></td>
+              <td colspan="2" style="text-align:center;color:#065f46;font-weight:700">그룹 이자 순수익 +8.5억 증가 (집합 편익)</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>이 집합 편익(7.5억~8.5억)은 풀 리더와 참여자들 모두에게 합리적으로 분배되어야 합니다. 어느 한 당사자가 편익 전부를 독점하는 것은 정상가격 원칙에 위반됩니다.</p>
+
+        <div class="key-point">📌 핵심 원칙: ① 예치자는 개별 운용 시 받을 수 있는 외부 예치 금리(4.0%)보다 <u>낮지 않은</u> 이자를 받아야 한다. ② 차입자는 개별 운용 시 부담해야 할 외부 차입 금리(6.5%)보다 <u>높지 않은</u> 이자를 내야 한다. ③ 이 두 경계 사이의 편익이 풀 리더와 참여자 간에 배분된다.</div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="card" id="sec2">
+      <h2>§2 정상가격 분석 <span class="tag tag-para">¶10.108–¶10.115</span></h2>
+      <p>현금풀링의 정상가격 분석은 세 가지 핵심 요소로 구성됩니다. <strong>① 참여자 이자율(예치·차입)</strong>이 ALP 범위 내에 있는지, <strong>② 풀 리더의 보상</strong>이 그 기능과 위험에 비례하는지, 그리고 <strong>③ 집합 편익</strong>이 참여자들에게 합리적으로 배분되는지입니다.</p>
+    </div>
+
+    <div class="accordion" id="acc4">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ④ 참여자 이자율 결정 — ALP 범위(Band) 설정 <span class="para">¶10.108–¶10.111</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>OECD 지침서 ¶10.108은 현금풀 참여자 이자율을 결정할 때 <strong>외부 금리를 기준으로 하는 ALP 범위(Band)</strong>를 설정해야 한다고 명시합니다. 참여자가 풀링에 참여함으로써 개별 외부 거래보다 불리한 조건에 처해서는 안 됩니다.</p>
+
+        <div class="rate-band">
+          <div class="rb-title">📊 현금풀 이자율 ALP 범위 (Band)</div>
+          <div class="rb-zone">
+            <div class="rz-item deposit">
+              <h5>예치자(Depositor)</h5>
+              <strong>외부 예치 금리 이상</strong>
+              <p>예: EURIBOR + 0.50%<br>= 4.40%</p>
+              <p style="margin-top:.3rem;font-size:.7rem;color:#065f46">최저 기준선</p>
+            </div>
+            <div class="rz-item leader">
+              <h5>풀 리더(Pool Leader)</h5>
+              <strong>스프레드 마진 수취</strong>
+              <p>예: 4.40%→5.60%<br>스프레드 1.20%</p>
+              <p style="margin-top:.3rem;font-size:.7rem;color:var(--purple)">기능·위험 보상</p>
+            </div>
+            <div class="rz-item borrow">
+              <h5>차입자(Borrower)</h5>
+              <strong>외부 차입 금리 이하</strong>
+              <p>예: EURIBOR + 2.10%<br>= 6.00%</p>
+              <p style="margin-top:.3rem;font-size:.7rem;color:#b91c1c">최고 기준선</p>
+            </div>
+          </div>
+          <div style="font-size:.78rem;color:var(--text2);margin-top:.5rem;text-align:center">
+            EURIBOR 3.90% 가정 | 외부 예치금리 4.40%(EURIBOR+0.50%) | 외부 차입금리 6.00%(EURIBOR+2.10%)<br>
+            총 풀링 편익 = 6.00% − 4.40% = <strong style="color:var(--purple)">1.60%p</strong> → 풀 리더 + 참여자 간 배분
+          </div>
+        </div>
+
+        <p><strong>이자율 설정 시 검토 사항:</strong></p>
+        <ul>
+          <li><strong>예치자 최저 이자율:</strong> 참여자가 독립 은행에 단기 예치 시 받을 수 있는 금리(일반적으로 EURIBOR/SOFR + 소액 스프레드). 이보다 낮으면 예치자는 풀 참여 유인이 없으며, 이전가격 조정 대상이 됩니다.</li>
+          <li><strong>차입자 최고 이자율:</strong> 참여자가 독립 은행에서 단기 자금 차입 시 지급해야 하는 금리(일반적으로 기준금리 + 신용 스프레드). 이보다 높으면 차입자는 풀 참여 유인이 없으며, 차입자에게 불리한 이전가격 거래가 됩니다.</li>
+          <li><strong>풀 리더 마진:</strong> 두 기준 사이의 차이에서 풀 리더의 기능·위험에 비례한 보상을 제하고 나머지를 참여자에게 배분합니다.</li>
+        </ul>
+
+        <div class="warn-point">⚠️ 주의: 그룹 내에서 예치자에게는 지나치게 낮은 이자를, 차입자에게는 지나치게 높은 이자를 적용하는 방식으로 편익을 풀 리더에 몰아주는 것은 이전가격 위반입니다. 반대로 모회사에 유리하게 편익을 자회사에 모두 이전하는 것도 문제입니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc5">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑤ 풀 리더 보상 결정 — 마진 방식 vs 수수료 방식 <span class="para">¶10.112–¶10.113</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>풀 리더가 수행하는 기능의 성격과 부담하는 위험의 수준에 따라 보상 방식이 달라집니다. OECD 지침서 ¶10.112는 풀 리더의 역할을 면밀히 분석하여 적절한 보상 수준을 결정해야 한다고 강조합니다.</p>
+
+        <div class="leader-comp-grid">
+          <div class="lc-card margin">
+            <h4>① 이자 마진(Spread Margin) 방식</h4>
+            <p>풀 리더가 실질적인 신용 위험과 유동성 위험을 부담하는 경우 적용합니다. 예치자에게 지급하는 이자율과 차입자로부터 수취하는 이자율의 <strong>차이(스프레드)</strong>가 보상입니다.</p>
+            <ul>
+              <li>풀 리더가 실질적으로 차입자 신용 위험 부담</li>
+              <li>순잔액 마이너스 시 외부 조달 의무 및 비용 부담</li>
+              <li>그룹 외부와의 자금 거래 능동적 관리</li>
+              <li>상대적으로 높은 보상 정당화</li>
+            </ul>
+            <div class="lc-formula">보상 = (차입자 이자율) − (예치자 이자율)<br>예: 5.60% − 4.40% = 1.20%p × 매칭 금액</div>
+          </div>
+          <div class="lc-card fee">
+            <h4>② 서비스 수수료(Service Fee) 방식</h4>
+            <p>풀 리더가 단순 관리·중개 기능만 수행하고 실질적 위험은 모회사 또는 참여자가 부담하는 경우 적용합니다. 별도의 <strong>서비스 수수료</strong>를 수취하는 방식입니다.</p>
+            <ul>
+              <li>풀 리더 기능: 행정·관리·보고 등 루틴 업무</li>
+              <li>신용 위험은 그룹 모회사가 부담</li>
+              <li>실질적 의사결정 권한 없음</li>
+              <li>낮은 수수료(원가 기준 + 소폭 마진)</li>
+            </ul>
+            <div class="lc-formula">보상 = 운용 원가 × (1 + 마크업)<br>예: 연간 운용 원가 5억 × 1.05 = 5.25억 수수료</div>
+          </div>
+        </div>
+
+        <p><strong>풀 리더 보상 수준 결정 — FAR 분석 체크리스트:</strong></p>
+        <table class="compare-table">
+          <thead>
+            <tr><th>평가 항목</th><th>루틴 기능 (수수료)</th><th>실질 기능 (마진)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>신용 위험 부담</strong></td><td>없음 (모회사 보증)</td><td>있음 (자체 부담)</td></tr>
+            <tr><td><strong>외부 차입 의무</strong></td><td>없음 (모회사가 결정)</td><td>있음 (풀 리더 책임)</td></tr>
+            <tr><td><strong>금리 결정 권한</strong></td><td>없음 (정책 지침 따름)</td><td>있음 (자체 결정)</td></tr>
+            <tr><td><strong>잉여·부족 처리</strong></td><td>모회사에 이전</td><td>자체 운용</td></tr>
+            <tr><td><strong>적정 보상 수준</strong></td><td>원가 + 5~15% 마크업</td><td>외부 은행 스프레드의 50~80%</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note-point">💡 실무 팁: 한국 자회사가 그룹 내 현금풀의 풀 리더 역할을 수행하는 경우, 국세청은 FAR 분석을 통해 실질적 기능·위험을 평가합니다. 형식상 풀 리더이더라도 모회사의 지시에 따라 단순 행정 역할만 한다면 높은 마진을 인정받기 어렵습니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc6">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑥ 현금풀링 편익의 배분 원칙 <span class="para">¶10.114–¶10.115</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>OECD 지침서 ¶10.114는 현금풀링에서 발생하는 집합 편익이 단순히 풀 리더에 귀속되어서는 안 되며, 편익 발생에 기여한 참여자들에게 합리적으로 배분되어야 한다고 명시합니다. 편익 배분의 기준은 각 참여자의 <strong>기여도</strong>와 <strong>편익 수혜 가능성</strong>입니다.</p>
+
+        <p><strong>편익 배분 방법 — 사례 적용:</strong></p>
+        <p>아래 표는 5개 자회사가 참여하는 현금풀에서 집합 편익을 배분하는 방식을 보여줍니다. 외부 예치 금리 4.0%, 외부 차입 금리 6.0%, 총 편익 풀 2.0%p 기준입니다.</p>
+
+        <table class="benefit-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">참여자</th>
+              <th>포지션 (평균)</th>
+              <th>외부 금리 기준</th>
+              <th>풀 내 적용 금리</th>
+              <th>편익 (vs 외부)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A사 (예치자)</td>
+              <td>+400억</td>
+              <td>예치 4.0% 수취</td>
+              <td class="ok">4.70% 수취</td>
+              <td class="gain">+0.70%p (연 2.8억)</td>
+            </tr>
+            <tr>
+              <td>B사 (예치자)</td>
+              <td>+200억</td>
+              <td>예치 4.0% 수취</td>
+              <td class="ok">4.70% 수취</td>
+              <td class="gain">+0.70%p (연 1.4억)</td>
+            </tr>
+            <tr>
+              <td>C사 (차입자)</td>
+              <td>−300억</td>
+              <td>차입 6.0% 지급</td>
+              <td class="ok">5.30% 지급</td>
+              <td class="gain">−0.70%p 절감 (연 2.1억)</td>
+            </tr>
+            <tr>
+              <td>D사 (차입자)</td>
+              <td>−200억</td>
+              <td>차입 6.0% 지급</td>
+              <td class="ok">5.30% 지급</td>
+              <td class="gain">−0.70%p 절감 (연 1.4억)</td>
+            </tr>
+            <tr class="total-row">
+              <td>풀 리더 (중개)</td>
+              <td>순잔액 +100억</td>
+              <td>스프레드 2.0%p 중</td>
+              <td class="leader">수취 5.30%, 지급 4.70%<br>마진 0.60%p</td>
+              <td class="leader">보상 연 ~1.8억</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size:.78rem;color:var(--text2);margin-top:.3rem">※ 풀링 편익 2.0%p = 참여자 배분 1.40%p(×0.70%p 예치/차입 각각) + 풀 리더 마진 0.60%p</p>
+
+        <p>편익 배분에서 중요한 점은 <strong>참여자 모두가 독립 거래에 비해 개선된 조건</strong>을 받아야 한다는 것입니다. 예치자는 외부 예치 금리(4.0%)보다 높은 4.70%를 받고, 차입자는 외부 차입 금리(6.0%)보다 낮은 5.30%를 지급합니다. 풀 리더는 기능·위험 보상으로 0.60%p(연 1.8억)를 수취합니다.</p>
+
+        <div class="key-point">📌 정상가격 검증 기준: ① 예치자 이자율(4.70%) ≥ 외부 예치 금리(4.0%) ✅ ② 차입자 이자율(5.30%) ≤ 외부 차입 금리(6.0%) ✅ ③ 풀 리더 마진(0.60%p)이 FAR 분석상 적정 보상 범위 내 ✅ — 세 조건 모두 충족해야 정상가격 요건 성립</div>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="card" id="sec3">
+      <h2>§3 실무 이슈 <span class="tag tag-para">¶10.116–¶10.119</span></h2>
+      <p>현금풀링은 단기 유동성 관리 도구로 설계되지만, 실무에서는 잔액이 장기화되거나 특정 자회사가 구조적으로 예치 또는 차입 포지션을 유지하는 경우가 많습니다. 이때 세무당국은 현금풀 거래를 단기 대출이 아닌 <strong>장기 대출 또는 자본 출자</strong>로 재분류할 수 있습니다.</p>
+    </div>
+
+    <div class="accordion" id="acc7">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑦ 현금풀 잔액 장기화 — 단기 대출 재분류 위험 <span class="para">¶10.116–¶10.117</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>OECD 지침서 ¶10.116은 현금풀링이 본래 <strong>단기(short-term)</strong> 유동성 관리 도구임을 전제합니다. 그러나 특정 자회사의 현금풀 포지션이 수년간 지속적으로 유지된다면, 이는 사실상 중장기 대출과 경제적으로 동일하게 작동합니다. 이 경우 세무당국은 해당 잔액을 <strong>장기 대출로 재분류(Recharacterisation)</strong>하고, 단기 금리가 아닌 만기에 맞는 장기 금리를 적용할 것을 요구할 수 있습니다.</p>
+
+        <div class="rechar-box">
+          <div class="rb-head">⚠️ 장기화 재분류 위험 신호 (Red Flags)</div>
+          <p>다음 상황 중 하나 이상에 해당하면 현금풀 잔액이 장기 대출로 재분류될 위험이 높습니다:</p>
+          <ul>
+            <li>동일 자회사가 3년 이상 지속적으로 순차입 포지션 유지</li>
+            <li>풀 잔액이 해당 자회사의 연간 매출 또는 자산의 상당 비율을 초과</li>
+            <li>자회사가 현금풀 외에 별도 장기 차입 계획이 없음 (현금풀을 장기 자금원으로 사용)</li>
+            <li>만기 상환 일정 없이 잔액이 자동 연장됨</li>
+            <li>차입 자회사의 독립 신용등급상 외부 장기 차입이 불가능한 수준</li>
+          </ul>
+        </div>
+
+        <p><strong>재분류 시 세무 효과:</strong> 단기 풀 금리(예: SOFR + 0.50%)로 적용되던 이자가 장기 대출 금리(예: SOFR + 3.50%)로 재산정되면, 차입 자회사는 추가 이자 비용(3.00%p × 잔액)을 소급 인정받지 못하고 손금 조정 대상이 됩니다. 대주 풀 리더 측에서는 이자 수익이 과소 계상된 것으로 처리됩니다.</p>
+
+        <table class="compare-table">
+          <thead>
+            <tr><th>항목</th><th>단기 풀 처리</th><th>장기 대출 재분류</th><th>차이·영향</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>적용 기준금리</strong></td><td>SOFR 1개월물</td><td>SOFR 5년물</td><td>만기 프리미엄 가산</td></tr>
+            <tr><td><strong>신용 스프레드</strong></td><td>단기 스프레드 (낮음)</td><td>장기 스프레드 (높음)</td><td>BBB 기준 +1.0~1.5%p</td></tr>
+            <tr><td><strong>담보·약정</strong></td><td>통상 없음</td><td>정상 장기 대출 수준</td><td>무담보 가산 추가</td></tr>
+            <tr><td><strong>총 조정 이자율</strong></td><td>예: 5.50%</td><td>예: 8.00%</td><td>+2.50%p 추가 부담</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note-point">💡 실무 대응: 현금풀 참여 약정에 만기 조항(예: 6개월 또는 1년 단위 갱신)을 명시하고, 각 자회사의 풀 잔액 한도를 설정하여 장기화를 방지해야 합니다. 특정 자회사의 구조적 차입 필요성이 있다면 현금풀이 아닌 별도의 그룹 내 대출 계약을 체결하는 것이 이전가격 위험 관리 측면에서 바람직합니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion" id="acc8">
+      <button class="acc-header" onclick="toggleAcc(this)">
+        ⑧ 종합 사례 연구: 5개국 현금풀 이자율 및 편익 배분 검토 <span class="para">종합 적용</span><span class="arrow">▼</span>
+      </button>
+      <div class="acc-body">
+        <p>M10-3에서 학습한 내용을 통합하여, EUR 기반 유럽 그룹의 현금풀 이전가격 적정성을 단계별로 검토합니다.</p>
+
+        <div class="case-study">
+          <div class="cs-title">📋 종합 사례: EuroCo 그룹 물리적 현금풀 이전가격 검토</div>
+          <div class="cs-sub">분석 기준일: 2024년 1월 | 통화: EUR | 기준금리: EURIBOR 3M 3.90%</div>
+
+          <div class="cs-participants">
+            <div class="cs-part leader">
+              <h5>🏦 EuroTreasury (풀 리더)</h5>
+              <p>네덜란드 소재 재무 법인<br>FAR: 유동성·신용 위험 실질 부담<br>적정 보상: 마진 방식</p>
+            </div>
+            <div class="cs-part dep">
+              <h5>💰 독일 A사 (예치자)</h5>
+              <p>평균 잔액: +€ 800만<br>외부 예치 가능 금리:<br>EURIBOR + 0.40% = 4.30%</p>
+            </div>
+            <div class="cs-part dep">
+              <h5>💰 프랑스 B사 (예치자)</h5>
+              <p>평균 잔액: +€ 500만<br>외부 예치 가능 금리:<br>EURIBOR + 0.40% = 4.30%</p>
+            </div>
+            <div class="cs-part bor">
+              <h5>📤 한국 C사 (차입자)</h5>
+              <p>평균 잔액: −€ 600만<br>외부 차입 금리 (BBB):<br>EURIBOR + 2.20% = 6.10%</p>
+            </div>
+          </div>
+
+          <div class="cs-calc-title" style="font-size:.85rem;font-weight:700;margin-bottom:.6rem">📊 현행 그룹 내 이자율 vs ALP 검토</div>
+          <table class="cs-rate-table">
+            <thead>
+              <tr>
+                <th style="text-align:left">참여자</th>
+                <th>현행 적용 이자율</th>
+                <th>ALP 기준 (최저/최고)</th>
+                <th>판정</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>독일 A사 (예치자)</td>
+                <td>EURIBOR + 0.10% = 4.00%</td>
+                <td>최저: 4.30% (외부 예치)</td>
+                <td class="warn">⚠ 기준 미달 −0.30%p</td>
+              </tr>
+              <tr>
+                <td>프랑스 B사 (예치자)</td>
+                <td>EURIBOR + 0.10% = 4.00%</td>
+                <td>최저: 4.30% (외부 예치)</td>
+                <td class="warn">⚠ 기준 미달 −0.30%p</td>
+              </tr>
+              <tr>
+                <td>한국 C사 (차입자)</td>
+                <td>EURIBOR + 1.00% = 4.90%</td>
+                <td>최고: 6.10% (외부 차입)</td>
+                <td class="ok">✅ ALP 범위 내</td>
+              </tr>
+              <tr>
+                <td>EuroTreasury (마진)</td>
+                <td>4.90% − 4.00% = 0.90%p</td>
+                <td>FAR상 적정: 0.50~0.80%p</td>
+                <td class="warn">⚠ 마진 과다 +0.10~0.40%p</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="cs-conclusion">
+            <strong>진단 및 권고:</strong> 독일 A사·프랑스 B사의 예치 이자율(4.00%)이 외부 예치 가능 금리(4.30%)에 미달합니다. 이는 예치자 자회사가 현금풀 참여로 인해 독립 거래보다 불리한 조건에 처해 있음을 의미하며, 차액(0.30%p × €1,300만 = 연간 €3.9만)은 이전가격 조정 대상입니다. 또한 EuroTreasury의 마진(0.90%p)은 FAR 분석상 루틴-플러스 수준(0.50~0.80%p)을 초과합니다. <strong>권고 조치:</strong> ① 예치자 이자율을 EURIBOR + 0.50%~0.60%(= 4.40%~4.50%)로 상향, ② EuroTreasury 마진을 0.50~0.70%p로 조정, ③ 한국 C사 이자율은 현행 4.90%가 ALP 범위 내이므로 조정 불필요, ④ 잔액 장기화 방지를 위한 연 단위 갱신 조항 도입 권고.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>✏️ 확인 퀴즈</h2>
+      <div class="q-block">
+        <div class="q-text">① 물리적 현금풀링(Physical Cash Pooling)의 특징으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a">㉠ 실제 자금 이동 없이 각 자회사 계좌의 잔액을 가상으로 합산하여 이자를 계산한다</label>
+          <label><input type="radio" name="q1" value="b">㉡ 각 자회사 계좌 잔액이 실제로 풀 리더의 헤더 계좌로 이체되며, 자회사-풀 리더 간 대출 관계가 형성된다</label>
+          <label><input type="radio" name="q1" value="c">㉢ 외부 은행과 직접 거래하는 방식으로 그룹 내 이전가격 이슈가 없다</label>
+          <label><input type="radio" name="q1" value="d">㉣ 가상 풀링보다 세무 복잡성이 낮고 주로 아시아 국가에서 허용된다</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">② 현금풀 예치자(Depositor)의 ALP 이자율 최저 기준선은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a">㉠ 차입자의 외부 차입 금리</label>
+          <label><input type="radio" name="q2" value="b">㉡ 예치자가 독립 은행에 예치 시 받을 수 있는 외부 예치 금리</label>
+          <label><input type="radio" name="q2" value="c">㉢ 풀 리더의 외부 조달 금리</label>
+          <label><input type="radio" name="q2" value="d">㉣ 예치자의 독립 신용등급 기반 장기 차입 금리</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">③ 풀 리더가 단순 행정·중개 기능만 수행하고 실질적 위험은 모회사가 부담하는 경우 적절한 보상 방식은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a">㉠ 예치자-차입자 간 전체 이자 스프레드를 독점하는 높은 마진 방식</label>
+          <label><input type="radio" name="q3" value="b">㉡ 운용 원가에 소폭 마크업을 가산한 서비스 수수료(Service Fee) 방식</label>
+          <label><input type="radio" name="q3" value="c">㉢ 그룹 전체 이익의 일정 비율로 산정하는 이익분할 방식</label>
+          <label><input type="radio" name="q3" value="d">㉣ 그룹 내 약정이므로 보상 없음</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">④ 현금풀 잔액이 장기화될 경우 세무당국이 취할 수 있는 조치는?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a">㉠ 현금풀 거래 자체를 부인하고 이자 비용 전액 손금 불산입</label>
+          <label><input type="radio" name="q4" value="b">㉡ 해당 잔액을 장기 대출로 재분류하고 단기 풀 금리 대신 장기 ALP 금리를 적용</label>
+          <label><input type="radio" name="q4" value="c">㉢ 풀 리더를 외국 법인으로 간주하여 원천징수세 부과</label>
+          <label><input type="radio" name="q4" value="d">㉣ 현금풀 참여 자회사에 대한 과세 특례 적용</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">⑤ 현금풀링 집합 편익(Pooling Benefit) 배분의 정상가격 원칙으로 옳지 않은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a">㉠ 예치자는 외부 예치 금리보다 높은 이자를 받아야 한다</label>
+          <label><input type="radio" name="q5" value="b">㉡ 차입자는 외부 차입 금리보다 낮은 이자를 지급해야 한다</label>
+          <label><input type="radio" name="q5" value="c">㉢ 풀 리더는 기능·위험에 비례한 보상을 받아야 한다</label>
+          <label><input type="radio" name="q5" value="d">㉣ 집합 편익 전부를 그룹 모회사가 귀속시키는 것이 원칙이다</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+      <button class="quiz-btn" id="gradeBtn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 핵심 체크리스트 -->
+    <div class="card" id="chk">
+      <h2>✅ 핵심 개념 체크리스트</h2>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1"><label for="c1">가상 풀링은 실제 자금 이동 없이 가상 합산으로 이자를 계산하고, 물리적 풀링은 자금이 실제로 이체되어 대출 관계가 형성된다</label></li>
+        <li><input type="checkbox" id="c2"><label for="c2">풀 리더(Pool Leader)는 그룹 자금 통합 운용, 유동성·신용·금리 위험 관리 기능을 수행하며 그 역할 수준에 따라 마진 또는 수수료로 보상받는다</label></li>
+        <li><input type="checkbox" id="c3"><label for="c3">예치자 이자율 최저선 = 외부 예치 금리, 차입자 이자율 최고선 = 외부 차입 금리 — 이 두 경계 사이에서 편익이 배분된다</label></li>
+        <li><input type="checkbox" id="c4"><label for="c4">집합 편익(Pooling Benefit) = 외부 차입금리 − 외부 예치금리이며, 풀 리더와 참여자 모두가 공정하게 나눠가져야 한다</label></li>
+        <li><input type="checkbox" id="c5"><label for="c5">풀 리더가 단순 행정 기능만 수행하면 서비스 수수료(원가+마크업), 실질 위험을 부담하면 스프레드 마진 방식으로 보상한다</label></li>
+        <li><input type="checkbox" id="c6"><label for="c6">현금풀 잔액이 수년간 장기화되면 세무당국은 이를 장기 대출로 재분류하고 단기 풀 금리 대신 장기 ALP 금리를 적용할 수 있다</label></li>
+        <li><input type="checkbox" id="c7"><label for="c7">이전가격 문서화 시 풀 참여 약정서, 잔액 한도 설정, 이자율 결정 근거, FAR 분석을 포함해야 한다</label></li>
+        <li><input type="checkbox" id="c8"><label for="c8">한국 자회사가 현금풀에 구조적 차입자로 참여하는 경우, 잔액 장기화 방지를 위한 별도 장기 대출 계약 전환을 검토해야 한다</label></li>
+      </ul>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="nav-bottom">
+      <a href="M10-2_그룹내대출_이자율산정.html" class="btn-nav secondary">← M10-2 그룹 내 대출</a>
+      <a href="../index.html" class="btn-nav secondary">📋목차</a>
+      <a href="M10-4_헷징.html" class="btn-nav">M10-4 헷징 →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const allAcc=document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent=allAcc.length;
+function toggleAcc(btn){
+  const body=btn.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  if(!btn.classList.contains('viewed')){btn.classList.add('viewed');updatePct();}
+}
+let quizCorrect=0;
+function updatePct(){
+  const viewed=document.querySelectorAll('.acc-header.viewed').length;
+  const total=allAcc.length;
+  const pct=Math.round(((total>0?viewed/total:0)*0.6+(quizCorrect/5)*0.4)*100);
+  document.getElementById('pctDisp').textContent=pct+'%';
+  document.getElementById('topBar').style.width=pct+'%';
+  document.getElementById('accDone').textContent=viewed;
+  document.getElementById('quizDone').textContent=quizCorrect;
+}
+const answers={q1:'b',q2:'b',q3:'b',q4:'b',q5:'d'};
+const msgs=[
+  '아직 개념이 더 필요해요. §1~§3을 다시 복습해 보세요.',
+  '기초는 잡혔습니다. 풀 리더 보상과 편익 배분 부분을 한 번 더 검토해 보세요.',
+  '절반 이상 이해했습니다. ALP 범위 설정과 재분류 위험 내용을 보완하세요.',
+  '잘 이해했습니다! 종합 사례(⑧)를 다시 확인하면 완벽합니다.',
+  '훌륭합니다! M10-3 내용을 완전히 습득했습니다. M10-4(헷징)으로 진행하세요!'
+];
+function gradeQuiz(){
+  quizCorrect=0;
+  for(let i=1;i<=5;i++){
+    const sel=document.querySelector('input[name="q'+i+'"]:checked');
+    const fb=document.getElementById('f'+i);
+    if(!sel){fb.style.display='none';continue;}
+    if(sel.value===answers['q'+i]){
+      quizCorrect++;
+      fb.className='q-feedback correct';
+      const exps={
+        f1:'✅ 정답! 물리적 현금풀링은 자회사 계좌 잔액이 실제로 풀 리더 헤더 계좌로 이체되며, 자회사와 풀 리더 간 대출 관계가 형성됩니다. 가상 풀링과 달리 이자 수입·비용이 실제로 발생합니다.',
+        f2:'✅ 정답! 예치자는 독립 은행에 예치 시 받을 수 있는 외부 예치 금리보다 낮지 않은 이자를 받아야 합니다. 이보다 낮으면 예치자는 풀 참여로 인해 손해를 보는 것으로, 정상가격 원칙 위반입니다.',
+        f3:'✅ 정답! 풀 리더가 단순 행정·중개 기능만 수행하고 실질 위험은 모회사가 부담하는 경우, 운용 원가에 소폭 마크업을 가산한 서비스 수수료(Service Fee) 방식이 적절합니다. 높은 이자 마진은 정당화되지 않습니다.',
+        f4:'✅ 정답! 현금풀 잔액이 장기화되면 세무당국은 이를 장기 대출로 재분류하고, 단기 풀 금리 대신 해당 만기에 맞는 장기 ALP 이자율(더 높은 금리)을 적용하도록 요구할 수 있습니다.',
+        f5:'✅ 정답! ㉣이 틀린 설명입니다. 집합 편익을 그룹 모회사가 독점하는 것은 정상가격 원칙 위반입니다. 편익은 풀 리더(기능·위험 보상)와 예치자·차입자(외부 거래 대비 개선된 조건) 모두에게 합리적으로 배분되어야 합니다.'
+      };
+      fb.textContent=exps['f'+i];
+    } else {
+      fb.className='q-feedback wrong';
+      const wrgs={
+        f1:'❌ 오답. ㉡이 물리적 풀링의 설명입니다. ㉠은 가상 풀링입니다. 물리적 풀링은 실제 자금 이체가 발생하고 대출 관계가 성립하여 이전가격 이슈가 명확히 존재합니다.',
+        f2:'❌ 오답. 예치자의 ALP 최저선은 해당 예치자가 독립 은행에 자금을 예치 시 받을 수 있는 금리입니다. 차입자의 외부 차입 금리는 차입자의 최고 기준선입니다.',
+        f3:'❌ 오답. 단순 행정 기능만 수행하는 풀 리더에게 높은 마진이나 이익분할 방식은 과도한 보상입니다. 서비스 수수료(원가+소폭 마크업) 방식이 FAR 분석에 부합합니다.',
+        f4:'❌ 오답. 세무당국은 현금풀 전체를 부인하거나 원천징수를 부과하는 것이 아니라, 잔액을 장기 대출로 재분류하고 장기 금리를 적용하는 방식으로 이전가격을 조정합니다.',
+        f5:'❌ 오답. ㉣이 틀린 설명입니다. 집합 편익을 모회사가 독점하는 것은 OECD 정상가격 원칙에 위반됩니다. ㉠㉡㉢은 모두 올바른 ALP 배분 원칙입니다.'
+      };
+      fb.textContent=wrgs['f'+i];
+    }
+    fb.style.display='block';
+    document.querySelectorAll('input[name="q'+i+'"]').forEach(r=>r.disabled=true);
+  }
+  document.getElementById('gradeBtn').disabled=true;
+  const sb=document.getElementById('scoreBox');
+  const score=quizCorrect*20;
+  document.getElementById('scoreNum').textContent=score+'점';
+  document.getElementById('scoreMsg').textContent=score>=80
+    ?`🎉 통과! ${quizCorrect}문항 정답. 다음 모듈로 진행하세요.`
+    :`${quizCorrect}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display='block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  updatePct();
+}
+function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+const sections=['obj','sec1','sec2','sec3','quiz','chk'];
+const navBtns=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY+150>=el.offsetTop)cur=id;});
+  navBtns.forEach(btn=>{
+    const fn=btn.getAttribute('onclick');
+    if(fn&&fn.includes(`'${cur}'`))btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+updatePct();
+</script>
+</body>
+</html>

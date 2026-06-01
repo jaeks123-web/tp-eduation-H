@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M10-6: 자기보험·캡티브보험(Captive Insurance)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#881337;--purple-light:#fff1f2;--purple-mid:#e11d48;--purple-dark:#4c0519;
+  --green:#0369a1;--green-light:#e0f2fe;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,#4c0519 0%,#881337 60%,#e11d48 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple-dark);line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#fff1f2;border-left:4px solid #fda4af;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:var(--purple);line-height:1.75}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#fecdd3}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body p{margin-bottom:.65rem}
+.acc-body h4{font-size:.93rem;font-weight:700;color:var(--purple);margin:1rem 0 .4rem}
+.acc-body ul{padding-left:1.3rem;margin-bottom:.6rem}
+.acc-body li{margin-bottom:.3rem}
+.acc-body table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.85rem}
+.acc-body th{background:var(--purple);color:#fff;padding:.5rem .75rem;text-align:center}
+.acc-body td{padding:.45rem .75rem;border:1px solid var(--gray-border);text-align:center}
+.acc-body tr:nth-child(even) td{background:var(--purple-light)}
+
+/* 캡티브 유형 그리드 */
+.captive-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+.captive-type-card{border:2px solid var(--gray-border);border-radius:8px;padding:1rem;background:#fff}
+.captive-type-card.primary{border-color:var(--purple-mid);background:var(--purple-light)}
+.captive-type-card h5{font-size:.88rem;font-weight:700;color:var(--purple-dark);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.captive-type-card p{font-size:.82rem;color:var(--text2);line-height:1.65;margin:0}
+.captive-type-card .badge{font-size:.7rem;padding:2px 7px;border-radius:10px;background:var(--purple-mid);color:#fff;font-weight:600}
+
+/* 캡티브 구조 다이어그램 */
+.captive-structure{background:var(--gray-light);border-radius:8px;padding:1.2rem;margin:1rem 0;text-align:center}
+.cs-row{display:flex;justify-content:center;align-items:center;gap:1rem;flex-wrap:wrap;margin:.5rem 0}
+.cs-box{background:#fff;border:2px solid var(--purple);border-radius:8px;padding:.6rem 1rem;font-size:.82rem;font-weight:600;color:var(--purple-dark);min-width:110px;text-align:center}
+.cs-box.captive{background:var(--purple);color:#fff;border-color:var(--purple-dark)}
+.cs-box.reinsurer{background:var(--green-light);border-color:var(--green);color:var(--green)}
+.cs-arrow{font-size:.75rem;color:var(--gray);text-align:center;line-height:1.3}
+.cs-label{font-size:.72rem;color:var(--purple);background:var(--purple-light);padding:1px 7px;border-radius:10px;margin:.1rem}
+
+/* FAR 분석 그리드 */
+.far-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1rem 0}
+.far-col{background:#fff;border-radius:8px;border-top:4px solid var(--purple);box-shadow:var(--shadow);padding:.9rem}
+.far-col h5{font-size:.82rem;font-weight:700;color:var(--purple);margin-bottom:.5rem;text-align:center}
+.far-col ul{list-style:none;padding:0}
+.far-col li{font-size:.79rem;color:var(--text2);padding:.2rem 0;border-bottom:1px dashed #eee;display:flex;gap:.3rem}
+.far-col li:last-child{border:none}
+.far-col li::before{content:"•";color:var(--purple-mid);flex-shrink:0}
+
+/* 보험료 산정 방법 그리드 */
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+.method-card{background:#fff;border-radius:8px;border-left:4px solid var(--purple-mid);box-shadow:var(--shadow);padding:1rem}
+.method-card h5{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.5rem}
+.method-card .formula{background:var(--purple-light);padding:.5rem .8rem;border-radius:6px;font-size:.83rem;font-family:monospace;color:var(--purple-dark);margin:.5rem 0}
+.method-card p{font-size:.82rem;color:var(--text2);line-height:1.65;margin:.3rem 0}
+
+/* 계리적 산정 테이블 */
+.actuarial-table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.85rem}
+.actuarial-table th{background:var(--purple-dark);color:#fff;padding:.55rem .8rem;text-align:left}
+.actuarial-table td{padding:.45rem .8rem;border:1px solid var(--gray-border)}
+.actuarial-table tr:nth-child(even) td{background:var(--purple-light)}
+.actuarial-table .total-row td{background:#881337;color:#fff;font-weight:700}
+.actuarial-table .sub-row td{background:#f8e7ea;font-style:italic;font-size:.8rem}
+
+/* 다각화 이익 박스 */
+.divers-box{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border:1px solid #fecdd3;border-radius:8px;padding:1rem;margin:.8rem 0}
+.divers-box h5{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.5rem}
+.divers-row{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--text2);margin:.2rem 0}
+.divers-num{font-weight:700;color:var(--purple);min-width:60px}
+
+/* 프론팅 구조 */
+.fronting-flow{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;background:var(--gray-light);padding:1rem;border-radius:8px;margin:.8rem 0;justify-content:center}
+.ff-box{background:#fff;border:1.5px solid var(--purple);border-radius:6px;padding:.5rem .9rem;font-size:.8rem;font-weight:600;color:var(--purple-dark);text-align:center}
+.ff-box.cap{background:var(--purple);color:#fff}
+.ff-arrow{font-size:.8rem;color:var(--purple-mid);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.7rem;color:var(--gray)}
+
+/* 적격 보험 요건 체크 */
+.qual-check{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:.8rem 0}
+.qc-item{display:flex;gap:.5rem;align-items:flex-start;background:#fff;border-radius:6px;padding:.7rem;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.qc-icon{font-size:1rem;flex-shrink:0;margin-top:.05rem}
+.qc-text{font-size:.82rem;color:var(--text2);line-height:1.55}
+.qc-text strong{color:var(--purple-dark);display:block;margin-bottom:.2rem;font-size:.83rem}
+
+/* ALP 밴드 */
+.alp-band{display:flex;gap:0;margin:1rem 0;border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+.alp-zone{flex:1;padding:.8rem;text-align:center}
+.alp-zone.floor{background:#d1fae5;border-right:2px solid #6ee7b7}
+.alp-zone.alp{background:var(--purple-light);border-right:2px solid #fda4af}
+.alp-zone.ceiling{background:#fee2e2}
+.alp-zone .label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.alp-zone.floor .label{color:#065f46}
+.alp-zone.alp .label{color:var(--purple)}
+.alp-zone.ceiling .label{color:#991b1b}
+.alp-zone .range{font-size:1rem;font-weight:800;margin:.2rem 0}
+.alp-zone .desc{font-size:.75rem;color:var(--gray)}
+
+/* 실체 요건 */
+.substance-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:.8rem 0}
+.sub-item{background:#fff;border-radius:8px;padding:.8rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.07);border-top:3px solid var(--purple-mid)}
+.sub-item .icon{font-size:1.4rem;margin-bottom:.3rem}
+.sub-item .label{font-size:.78rem;font-weight:700;color:var(--purple-dark);margin-bottom:.2rem}
+.sub-item .desc{font-size:.73rem;color:var(--gray);line-height:1.5}
+
+/* 재보험 다이어그램 */
+.reins-diagram{background:var(--gray-light);border-radius:8px;padding:1rem;margin:.8rem 0}
+.rd-row{display:flex;justify-content:space-around;align-items:center;margin:.4rem 0;flex-wrap:wrap;gap:.5rem}
+.rd-box{background:#fff;border:2px solid var(--gray-border);border-radius:6px;padding:.5rem .8rem;font-size:.8rem;text-align:center;font-weight:600;min-width:90px}
+.rd-box.cap{background:var(--purple);color:#fff;border-color:var(--purple-dark)}
+.rd-box.rein{background:var(--green-light);border-color:var(--green);color:var(--green)}
+.rd-arrow{font-size:.7rem;color:var(--gray);text-align:center}
+
+/* 사례 연구 */
+.case-study{background:#fff;border:2px solid var(--purple);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0}
+.case-study h5{color:var(--purple);font-size:.92rem;font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+.case-study h5::before{content:"📋";font-size:1rem}
+.cs-fact{background:var(--gray-light);border-radius:6px;padding:.7rem 1rem;margin:.5rem 0;font-size:.86rem;color:var(--text2)}
+.cs-calc{background:var(--purple-light);border-radius:6px;padding:.7rem 1rem;margin:.5rem 0;font-size:.86rem;color:var(--purple-dark)}
+.cs-result{background:linear-gradient(90deg,var(--purple-dark),var(--purple-mid));color:#fff;border-radius:6px;padding:.6rem 1rem;margin:.5rem 0;font-size:.88rem;font-weight:700}
+
+/* 퀴즈 */
+.quiz-wrap{margin-bottom:1.5rem}
+.quiz-q{font-weight:600;font-size:.95rem;margin-bottom:.75rem;color:var(--text)}
+.quiz-opts{list-style:none;padding:0}
+.quiz-opts li{margin-bottom:.5rem}
+.quiz-opts label{display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;font-size:.91rem;padding:.5rem .75rem;border-radius:6px;border:1px solid var(--gray-border);transition:background .1s}
+.quiz-opts label:hover{background:var(--purple-light)}
+.quiz-opts input{margin-top:.15rem;accent-color:var(--purple);flex-shrink:0}
+.quiz-feedback{margin-top:.5rem;padding:.5rem .9rem;border-radius:6px;font-size:.88rem;display:none}
+.quiz-feedback.correct{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.quiz-feedback.wrong{background:var(--red-light);color:var(--red);border:1px solid #f5b8b8}
+.btn-quiz{margin-top:1rem;padding:.6rem 1.6rem;background:var(--purple);color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-quiz:hover{background:var(--purple-dark)}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+
+/* 체크리스트 */
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.75rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid var(--gray-border);font-size:.91rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{margin-top:.2rem;accent-color:var(--purple);width:15px;height:15px;flex-shrink:0}
+
+/* 하단 네비게이션 */
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:10px;padding:1rem 1.5rem;box-shadow:var(--shadow);margin-top:1rem}
+.nav-bottom a,.nav-bottom button{font-size:.88rem;color:var(--purple);font-weight:600;cursor:pointer;border:1.5px solid var(--purple);padding:.4rem 1rem;border-radius:6px;background:#fff;font-family:inherit;text-decoration:none;transition:background .12s}
+.nav-bottom a:hover,.nav-bottom button:hover{background:var(--purple-light)}
+.nav-bottom .center{font-size:.85rem;color:var(--gray)}
+
+/* Chapter X 완료 배너 */
+.completion-banner{background:linear-gradient(135deg,#4c0519 0%,#881337 60%,#e11d48 100%);color:#fff;border-radius:12px;padding:2rem;margin-top:2rem;text-align:center;box-shadow:0 4px 20px rgba(136,19,55,.35)}
+.completion-banner h3{font-size:1.3rem;font-weight:700;margin-bottom:.5rem}
+.completion-banner p{font-size:.9rem;opacity:.9;margin-bottom:1.2rem}
+.module-list-banner{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin:1rem 0}
+.mod-chip{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:.3rem .85rem;font-size:.78rem;font-weight:600;white-space:nowrap}
+.mod-chip.done{background:rgba(255,255,255,.35)}
+
+@media(max-width:700px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static;max-height:none}
+  .captive-type-grid,.method-grid,.far-grid,.qual-check,.substance-grid{grid-template-columns:1fr}
+  .alp-band{flex-direction:column}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<div class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter X: 금융거래 › M10-6</div>
+  <h1>M10-6: 자기보험·캡티브보험 (Captive Insurance)</h1>
+  <div class="sub">OECD 이전가격 지침서 ¶10.176–¶10.220 | Chapter X 최종 모듈</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="progStrip" style="width:0%"></div></div>
+</div>
+
+<div class="layout">
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('sec1')">1. 캡티브 보험의 개념과 유형 </button>
+      <button class="nav-item" onclick="goTo('sec2')">2. 정상가격 보험료 산정 방법론 </button>
+      <button class="nav-item" onclick="goTo('sec3')">3. 실무 적용 이슈 </button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('chk')">☑ 실무 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 본문 -->
+  <main class="content">
+
+    <!-- 학습목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습목표</h2>
+      <p>이 모듈을 완료하면 다음을 할 수 있습니다:</p>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span>캡티브 보험의 정의, 유형(순수/상호/렌트어캡티브)과 그룹 내 역할을 설명할 수 있다.</li>
+        <li><span class="obj-num">2</span>적격 보험 여부 판단 기준(위험 이전·분산·인수 실질)을 적용할 수 있다.</li>
+        <li><span class="obj-num">3</span>CUP방법, 계리적 방법, 결합비율 접근법으로 ALP 보험료를 산정할 수 있다.</li>
+        <li><span class="obj-num">4</span>다각화 이익 배분 논리와 프론팅 거래의 이전가격 처리를 설명할 수 있다.</li>
+        <li><span class="obj-num">5</span>자본적정성·실체 요건·위장 보험(sham insurance) 리스크를 관리할 수 있다.</li>
+      </ul>
+    </div>
+
+    <!-- 섹션 1 -->
+    <div class="card" id="sec1">
+      <h2>1. 캡티브 보험의 개념과 유형 <span class="tag tag-para">¶10.176–10.190</span></h2>
+      <p>캡티브 보험(Captive Insurance)이란 그룹 내 피보험자(관계사)의 위험을 인수하기 위해 설립된 비공개 보험 자회사입니다. OECD 지침은 캡티브 거래를 분석할 때 <strong>경제적 실질</strong>을 최우선으로 검토합니다.</p>
+
+      <!-- 아코디언 1 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>① 캡티브 보험의 정의와 설립 동기<span class="para">¶10.176–10.180</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <h4>캡티브 보험이란?</h4>
+          <p>캡티브(Captive)는 모기업 또는 그룹이 자신의 위험 관리 목적으로 설립·소유하는 보험회사입니다. 일반 상업 보험시장과 달리, 제3자 피보험자를 인수하지 않고(또는 최소한으로) 그룹 내 계열사를 주된 피보험자로 합니다.</p>
+          <h4>설립 동기</h4>
+          <ul>
+            <li><strong>보험료 절감:</strong> 시장 보험료가 과도하게 높거나 특정 위험의 보험이 어려운 경우, 내부화하여 비용 절감</li>
+            <li><strong>위험 집중 관리:</strong> 그룹 전체 위험을 한 곳에서 통합·관리하여 포트폴리오 분산 효과 획득</li>
+            <li><strong>맞춤형 커버리지:</strong> 시장에서 구하기 어려운 특수 위험(사이버, 제품 책임, 정치적 위험 등)에 대한 보장 설계 가능</li>
+            <li><strong>세무상 이익(주의):</strong> 보험료를 손금 처리하여 과세소득 이전 — 과세 당국의 최우선 관심 대상</li>
+          </ul>
+          <div class="warn-point">⚠️ <strong>세무 목적 캡티브 vs. 사업 목적 캡티브:</strong> OECD ¶10.178은 캡티브 설립이 세무 절감만을 목적으로 하는 경우, 보험 거래로 인정받지 못할 수 있다고 명시합니다. 사업상 합리적 이유(business purpose)가 존재해야 합니다.</div>
+          <h4>캡티브의 법적·감독 지위</h4>
+          <p>캡티브는 보통 버뮤다, 케이맨, 더블린, 룩셈부르크 등 캡티브 친화적 관할권에 설립됩니다. 해당 관할권의 보험업법 인가를 받고 감독을 받습니다. 이 감독 실체(regulatory substance)가 이전가격 상 진정한 보험 여부 판단의 중요한 근거가 됩니다.</p>
+          <div class="key-point">💡 <strong>핵심:</strong> 캡티브의 이전가격 분석 출발점은 항상 "이 거래가 경제적으로 진정한 보험 거래인가?"입니다. 위험 이전(Risk Transfer)·위험 분산(Risk Distribution)·보험 인수 역량(Underwriting Capacity) 세 가지를 확인해야 합니다.</div>
+        </div>
+      </div>
+
+      <!-- 아코디언 2 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>② 캡티브 유형과 구조<span class="para">¶10.181–10.185</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <h4>캡티브 유형 비교</h4>
+          <div class="captive-type-grid">
+            <div class="captive-type-card primary">
+              <h5>🏢 순수 캡티브 <span class="badge">Pure Captive</span></h5>
+              <p>모기업 및 그룹 관계사만을 피보험자로 하는 캡티브. 가장 일반적인 형태. 위험 이전 분석이 상대적으로 명확하나, 위험 분산 요건 충족 여부가 핵심 쟁점.</p>
+            </div>
+            <div class="captive-type-card">
+              <h5>🤝 상호 캡티브 <span class="badge">Mutual Captive</span></h5>
+              <p>복수의 비관련 기업들이 공동 출자하여 운영하는 캡티브. 제3자 간 거래가 존재하므로 위험 분산 요건 충족이 용이. CUP방법 비교가능성도 높아짐.</p>
+            </div>
+            <div class="captive-type-card">
+              <h5>🔑 렌트어캡티브 <span class="badge">Rent-a-Captive</span></h5>
+              <p>기존 캡티브의 자본을 임차하여 보험 거래를 처리하는 방식. 소규모 그룹이 자체 캡티브 설립 없이 혜택을 누릴 수 있음. 별도 자본 요건 없음.</p>
+            </div>
+            <div class="captive-type-card">
+              <h5>🔄 프론팅 캡티브 <span class="badge">Fronting Arrangement</span></h5>
+              <p>인허가된 외부 보험사(프론터)가 피보험자와 계약하고 보험료 대부분을 캡티브에 재보험으로 출재. 규제 요건 충족 + 캡티브 실질 활용 가능.</p>
+            </div>
+          </div>
+
+          <h4>캡티브 기본 구조 (순수 캡티브)</h4>
+          <div class="captive-structure">
+            <div class="cs-row">
+              <div class="cs-box">모기업<br><small>그룹 헤드쿼터</small></div>
+            </div>
+            <div class="cs-row">
+              <span class="cs-arrow">자본 출자 ↓<br>배당 ↑</span>
+            </div>
+            <div class="cs-row">
+              <div class="cs-box captive">캡티브 보험사<br><small>(예: Bermuda)</small></div>
+            </div>
+            <div class="cs-row" style="gap:2rem">
+              <span class="cs-arrow">← 보험료<br>보험금 →</span>
+              <span style="width:60px"></span>
+              <span class="cs-arrow">← 보험료<br>보험금 →</span>
+            </div>
+            <div class="cs-row" style="gap:4rem">
+              <div class="cs-box">관계사 A<br><small>피보험자</small></div>
+              <div class="cs-box">관계사 B<br><small>피보험자</small></div>
+            </div>
+            <div style="margin-top:.8rem;font-size:.75rem;color:var(--gray)">
+              ※ 캡티브는 관계사로부터 보험료를 수취, 손실 발생 시 보험금 지급
+            </div>
+          </div>
+          <div class="note-point">📌 <strong>위험 분산 요건 (Risk Distribution):</strong> 단일 피보험자 1개사만 있으면 위험 분산이 없어 "진정한 보험"이 아닐 수 있습니다. 통상 10개 이상의 비관련 위험 단위(exposure units)가 있어야 안전합니다(미국 Tax Court 기준).</div>
+        </div>
+      </div>
+
+      <!-- 아코디언 3 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>③ 적격 보험 여부 판단 기준<span class="para">¶10.186–10.190</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <h4>OECD 3단계 분석 프레임워크</h4>
+          <div class="qual-check">
+            <div class="qc-item">
+              <span class="qc-icon">🔄</span>
+              <div class="qc-text">
+                <strong>① 위험 이전 (Risk Transfer)</strong>
+                캡티브가 피보험자로부터 경제적 위험을 실질적으로 인수하는가? 연간 집합 손실 한도(aggregate stop-loss), 최대 단일 손실 등을 확인.
+              </div>
+            </div>
+            <div class="qc-item">
+              <span class="qc-icon">📊</span>
+              <div class="qc-text">
+                <strong>② 위험 분산 (Risk Distribution)</strong>
+                충분히 많은 수의 피보험자·위험 단위가 존재하여 대수의 법칙(Law of Large Numbers)이 작동하는가?
+              </div>
+            </div>
+            <div class="qc-item">
+              <span class="qc-icon">💼</span>
+              <div class="qc-text">
+                <strong>③ 보험 인수 역량 (Underwriting Capacity)</strong>
+                캡티브가 충분한 자본·준비금을 보유하여 손실 지급 능력이 있는가? 솔벤시 II 기준 자본적정성(SCR) 충족 여부.
+              </div>
+            </div>
+            <div class="qc-item">
+              <span class="qc-icon">📋</span>
+              <div class="qc-text">
+                <strong>④ 보험업 실질 (Insurance Substance)</strong>
+                캡티브에 보험 전문 인력, 언더라이팅 프로세스, 클레임 처리 절차가 갖춰져 있는가?
+              </div>
+            </div>
+            <div class="qc-item">
+              <span class="qc-icon">📄</span>
+              <div class="qc-text">
+                <strong>⑤ 보험계약 형식 요건</strong>
+                보험증권(policy)이 발행되고, 보험료가 사전에 결정되며, 계약 기간·보장 범위가 명확히 정의되어 있는가?
+              </div>
+            </div>
+            <div class="qc-item">
+              <span class="qc-icon">🚩</span>
+              <div class="qc-text">
+                <strong>⑥ 위장 보험 배제 (Non-Sham)</strong>
+                보험료가 그룹 내에서 순환(round-trip)되지 않고, 실제 클레임 지급이 이뤄지며, 계약이 경제적 실질을 반영하는가?
+              </div>
+            </div>
+          </div>
+          <div class="warn-point">⚠️ <strong>위장 보험(Sham Insurance) 리스크:</strong> 보험료를 지급한 관계사가 사실상 손실 발생 시 자체 자금으로 충당하거나, 보험료 = 지급 준비금 적립에 불과한 경우, 과세 당국은 이를 보험이 아닌 저축/준비금 적립으로 재분류(recharacterize)합니다.</div>
+          <h4>FAR 분석 — 캡티브 보험사</h4>
+          <div class="far-grid">
+            <div class="far-col">
+              <h5>기능 (Functions)</h5>
+              <ul>
+                <li>언더라이팅 및 리스크 선별</li>
+                <li>보험료 산정 (계리적 분석)</li>
+                <li>클레임 접수·조사·지급</li>
+                <li>재보험 협상·배분</li>
+                <li>지급준비금 적립·운용</li>
+                <li>규제 보고·감독 대응</li>
+              </ul>
+            </div>
+            <div class="far-col">
+              <h5>위험 (Risks)</h5>
+              <ul>
+                <li>보험 인수 위험(U/W Risk)</li>
+                <li>자연재해·거대 손실 위험</li>
+                <li>준비금 과소 계상 위험</li>
+                <li>투자 위험(자산 운용)</li>
+                <li>규제 미준수 위험</li>
+                <li>신용 위험(재보험사)</li>
+              </ul>
+            </div>
+            <div class="far-col">
+              <h5>자산 (Assets)</h5>
+              <ul>
+                <li>자기자본·지급준비금</li>
+                <li>출재 재보험 계약</li>
+                <li>보험업 인허가</li>
+                <li>계리 시스템·모델</li>
+                <li>언더라이팅 전문인력</li>
+                <li>클레임 처리 역량</li>
+              </ul>
+            </div>
+          </div>
+          <div class="key-point">💡 <strong>결론:</strong> 위 FAR 기능을 캡티브가 실질적으로 수행해야만 보험 이익의 귀속이 인정됩니다. 기능 없이 단순히 보험료를 수취하는 페이퍼 캡티브는 이전가격 조정 대상입니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 2 -->
+    <div class="card" id="sec2">
+      <h2>2. 정상가격 보험료 산정 방법론 <span class="tag tag-para">¶10.191–10.208</span></h2>
+      <p>캡티브 보험료가 ALP(정상가격 원칙)에 부합하는지 검증하는 주요 방법론을 소개합니다. OECD는 단일 방법에 의존하지 않고 복수 방법을 교차 검증(cross-check)할 것을 권고합니다.</p>
+
+      <!-- 아코디언 4 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>④ ALP 보험료 산정 방법론 개요<span class="para">¶10.191–10.197</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <div class="method-grid">
+            <div class="method-card">
+              <h5>① CUP방법 (Comparable Uncontrolled Price)</h5>
+              <div class="formula">ALP 보험료 = 유사 상업 보험 시장 요율</div>
+              <p><strong>적용:</strong> 동일하거나 유사한 위험에 대한 시장 요율이 있는 경우 가장 신뢰성 높음. 상업 재보험 시장의 재보험요율(reinsurance premium rates) 활용 가능.</p>
+              <p><strong>한계:</strong> 캡티브가 인수하는 위험은 종종 시장에서 부보 불가능하거나, 비교 가능한 정보가 없는 경우 많음.</p>
+              <p><strong>데이터 출처:</strong> Lloyd's of London 시장요율, Swiss Re Sigma, Munich Re 손해율 통계</p>
+            </div>
+            <div class="method-card">
+              <h5>② 계리적 방법 (Actuarial Pricing)</h5>
+              <div class="formula">ALP 보험료 = 예상손실 + 비용 + 위험마진</div>
+              <p><strong>적용:</strong> CUP이 없을 때 주로 사용. 과거 손실 데이터, 예상 손실 분포, 변동성, 자본 비용을 계리적으로 산출.</p>
+              <p><strong>구성 요소:</strong> Pure Premium(순보험료) + Loss Adjustment Expense + U/W Expense + Profit Margin</p>
+              <p><strong>주의:</strong> 공인계리사(FCAS/FIA 자격) 검토가 필요하며, 계리 보고서가 문서화 증거가 됨.</p>
+            </div>
+            <div class="method-card">
+              <h5>③ 결합비율 접근법 (Combined Ratio)</h5>
+              <div class="formula">ALP 보험료 = 손실 ÷ (1 - 비용비율 - 이익마진)</div>
+              <p><strong>적용:</strong> 업종 표준 결합비율(손해율 + 사업비율)을 기준으로 역산. 동종 상업 보험사의 결합비율을 벤치마크로 사용.</p>
+              <p><strong>예시:</strong> 업종 결합비율 95%(손해율 70% + 사업비율 25%)이면, ALP 보험료 = 예상손실 ÷ 70% × 95%</p>
+            </div>
+            <div class="method-card">
+              <h5>④ 캐피털 지원 접근법 (Capital Support)</h5>
+              <div class="formula">보험료 ≥ 위험 자본 × (ROE 요구 수익률)</div>
+              <p><strong>적용:</strong> 캡티브가 위험 인수를 위해 묶어두는 자본(risk capital)에 대한 적정 수익을 보험료로 커버해야 한다는 논리.</p>
+              <p><strong>유용성:</strong> 다른 방법과 교차 검증에 활용. 보험료가 자본 비용 대비 합리적인지 floor 검증 역할.</p>
+            </div>
+          </div>
+          <div class="key-point">💡 <strong>OECD 권고:</strong> ¶10.197은 CUP → 계리적 방법 → 결합비율의 순서로 시도하고, 가용한 방법을 교차 검증하라고 권고합니다. 단일 방법만 사용하면 방어력이 약해집니다.</div>
+        </div>
+      </div>
+
+      <!-- 아코디언 5 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>⑤ 계리적 방법 상세 — 보험료 구성 분해<span class="para">¶10.198–10.202</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <h4>ALP 보험료 구성 요소 (재산·배상책임보험 예시)</h4>
+          <table class="actuarial-table">
+            <thead>
+              <tr><th>구성 요소</th><th>내용</th><th>예시 금액 (USD)</th><th>비율</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>① 순보험료 (Pure Premium)</td><td>과거 5년 평균 손실 + 인플레이션 조정 + 트렌드 조정</td><td>700,000</td><td>70.0%</td></tr>
+              <tr class="sub-row"><td style="padding-left:1.5rem">— 빈도 × 심도 (F×S)</td><td>손실 빈도 × 사건당 평균 손실</td><td colspan="2">5건/년 × USD 140,000 = USD 700,000</td></tr>
+              <tr><td>② 손해조사비 (LAE)</td><td>클레임 조사·처리 비용 (Allocated + Unallocated)</td><td>70,000</td><td>7.0%</td></tr>
+              <tr><td>③ 사업비 (U/W Expense)</td><td>캡티브 운영비, 보험업 인가비, 계리비용</td><td>100,000</td><td>10.0%</td></tr>
+              <tr><td>④ 위험마진 (Risk Margin)</td><td>손실 변동성 반영 → 예상손실의 15~25%</td><td>105,000</td><td>10.5%</td></tr>
+              <tr><td>⑤ 재보험 비용 (Reinsurance Cost)</td><td>출재 재보험 프리미엄 — excess-of-loss layer</td><td>25,000</td><td>2.5%</td></tr>
+              <tr class="total-row"><td>✅ ALP 총 보험료</td><td>①+②+③+④+⑤</td><td>USD 1,000,000</td><td>100%</td></tr>
+            </tbody>
+          </table>
+          <h4>손실 빈도·심도 분석 (Frequency-Severity Analysis)</h4>
+          <p>계리적 방법의 핵심은 과거 5~10년 손실 데이터를 기반으로 <strong>빈도(Frequency)</strong>와 <strong>심도(Severity)</strong>를 별도로 모델링하는 것입니다.</p>
+          <ul>
+            <li><strong>빈도 모델:</strong> 포아송(Poisson) 분포 주로 사용 → λ = 연간 평균 사건 수</li>
+            <li><strong>심도 모델:</strong> 로그정규(Lognormal) 또는 파레토(Pareto) 분포 → 사건당 손실 크기</li>
+            <li><strong>몬테카를로 시뮬레이션:</strong> 빈도×심도 결합 분포에서 반복 추출 → 99th percentile VaR 계산</li>
+            <li><strong>트렌드 조정:</strong> 의료비 인플레이션, 법적 환경 변화 등 반영</li>
+          </ul>
+          <div class="note-point">📌 <strong>계리 보고서 요건:</strong> OECD ¶10.201은 계리사 의견서에 (a)사용된 데이터, (b)통계적 방법, (c)주요 가정, (d)불확실성 범위가 포함되어야 한다고 언급합니다. 단순 결과 수치만으로는 불충분합니다.</div>
+        </div>
+      </div>
+
+      <!-- 아코디언 6 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>⑥ 다각화 이익과 프론팅 거래<span class="para">¶10.203–10.208</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <h4>다각화 이익 (Diversification Benefit)</h4>
+          <p>캡티브가 여러 관계사의 위험을 통합 인수하면, 개별 위험의 단순 합산보다 총 위험이 작아지는 <strong>포트폴리오 효과</strong>가 발생합니다. 이것이 다각화 이익입니다.</p>
+          <div class="divers-box">
+            <h5>📊 다각화 이익 산출 예시</h5>
+            <div class="divers-row"><div class="divers-num">관계사 A</div>개별 필요 보험료 USD 600,000 (VaR 기반)</div>
+            <div class="divers-row"><div class="divers-num">관계사 B</div>개별 필요 보험료 USD 400,000</div>
+            <div class="divers-row"><div class="divers-num">합산</div>개별 합산 USD 1,000,000</div>
+            <div class="divers-row"><div class="divers-num">캡티브 통합</div>포트폴리오 VaR 후 필요 보험료 USD 850,000</div>
+            <div class="divers-row" style="font-weight:700;color:var(--purple)"><div class="divers-num">다각화 이익</div>USD 150,000 → A사 90,000 / B사 60,000 배분 (위험 기여도 비례)</div>
+          </div>
+          <p>다각화 이익은 캡티브 이용의 핵심 경제적 근거입니다. 각 관계사가 개별 보험료보다 낮은 보험료를 납부하는 것이 정당화되는 이유입니다. OECD ¶10.203은 이 이익이 <strong>위험 기여도에 비례하여</strong> 각 피보험자에게 환원되어야 한다고 합니다.</p>
+          <h4>프론팅 거래 (Fronting Arrangement)</h4>
+          <p>많은 국가에서 감독 당국의 인가를 받은 보험사와만 보험 계약이 가능합니다. 이 경우 캡티브는 현지 인가 보험사(프론터)를 통해 보험을 제공합니다.</p>
+          <div class="fronting-flow">
+            <div class="ff-box">관계사<br><small>피보험자 (한국)</small></div>
+            <div class="ff-arrow"><div>← 보험금</div><div>보험료 →</div></div>
+            <div class="ff-box">프론터<br><small>현지 인가보험사</small></div>
+            <div class="ff-arrow"><div>← 재보험금</div><div>재보험료 →</div><div style="font-size:.65rem">(보험료의 90~95%)</div></div>
+            <div class="ff-box cap">캡티브<br><small>Bermuda</small></div>
+            <div class="ff-arrow"><div>← 초과손실보상</div><div>재보험료 →</div></div>
+            <div class="ff-box" style="border-color:var(--green);color:var(--green)">외부재보험사<br><small>XOL Layer</small></div>
+          </div>
+          <ul>
+            <li><strong>프론터 수수료:</strong> 보험료의 5~15% — 행정·클레임 처리·자본 위험에 대한 보상</li>
+            <li><strong>이전가격 처리:</strong> 프론터→캡티브 재보험료가 ALP인지 검증 (CUP: 유사 재보험 계약)</li>
+            <li><strong>중요성:</strong> 프론터 수수료가 과도하면 관계사의 보험료 손금 중 일부가 캡티브에 귀속되지 않음 → ALP 조정 위험</li>
+          </ul>
+          <div class="key-point">💡 <strong>재보험(Reinsurance) 활용:</strong> 캡티브는 자신이 인수한 위험의 일부를 외부 재보험 시장에 출재합니다. 재보험 비용이 실제로 발생하므로 이를 관계사 보험료에 포함시키는 것은 정당합니다. 단, 재보험 거래 자체도 ALP 기준을 충족해야 합니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 3 -->
+    <div class="card" id="sec3">
+      <h2>3. 실무 적용 이슈 <span class="tag tag-para">¶10.209–10.220</span></h2>
+      <p>캡티브 이전가격 실무에서 자주 등장하는 자본적정성, 위장 보험, 실체 요건, 사례 연구를 다룹니다.</p>
+
+      <!-- 아코디언 7 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>⑦ 자본적정성·실체 요건 및 위장 보험 리스크<span class="para">¶10.209–10.215</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <h4>자본적정성 (Capital Adequacy)</h4>
+          <p>캡티브가 진정한 보험사로 인정받으려면 인수 위험을 흡수할 충분한 자본을 보유해야 합니다.</p>
+          <table class="actuarial-table">
+            <thead>
+              <tr><th>자본 기준</th><th>적용 관할</th><th>산출 방법</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>솔벤시 II SCR</td><td>EU (Luxembourg, Ireland)</td><td>VaR 99.5%(1년) 기반 리스크별 자본 산출 후 합산</td></tr>
+              <tr><td>BSCR</td><td>Bermuda</td><td>버뮤다 감독청(BMA) 기준 Bermuda Solvency Capital Requirement</td></tr>
+              <tr><td>최소법정자본</td><td>Cayman, Guernsey 등</td><td>관할별 최소자본 (예: Cayman Islands USD 120,000)</td></tr>
+              <tr><td>IAIS ICP 17</td><td>국제 기준</td><td>국제보험감독자협의회 자본적정성 원칙</td></tr>
+            </tbody>
+          </table>
+          <div class="warn-point">⚠️ 자본이 부족하면 캡티브가 손실 지급 능력이 없다는 의미 → 위험 이전이 실질적으로 없다고 판단될 수 있습니다. 보험료 수취액 전부가 모기업의 은밀한 적립금에 불과하다는 주장이 제기될 수 있습니다.</div>
+
+          <h4>실체 요건 (Substance Requirements)</h4>
+          <div class="substance-grid">
+            <div class="sub-item">
+              <div class="icon">👥</div>
+              <div class="label">전문 인력</div>
+              <div class="desc">캡티브 소재지에 실제 상근 언더라이터, 계리사 또는 관리자 존재</div>
+            </div>
+            <div class="sub-item">
+              <div class="icon">🏢</div>
+              <div class="label">사무소</div>
+              <div class="desc">실제 사무 공간 임차, 이사회 회의 현지 개최 기록 보유</div>
+            </div>
+            <div class="sub-item">
+              <div class="icon">📋</div>
+              <div class="label">언더라이팅 문서</div>
+              <div class="desc">위험 평가서, 보험증권, U/W 가이드라인이 캡티브 레벨에서 작성·보관</div>
+            </div>
+            <div class="sub-item">
+              <div class="icon">💰</div>
+              <div class="label">자산 관리</div>
+              <div class="desc">지급준비금·잉여금이 캡티브 명의 별도 계좌에 실제 예치</div>
+            </div>
+            <div class="sub-item">
+              <div class="icon">📊</div>
+              <div class="label">독립 감사</div>
+              <div class="desc">외부 감사인의 캡티브 재무제표 감사 수행 (IFRS 또는 현지 GAAP)</div>
+            </div>
+            <div class="sub-item">
+              <div class="icon">🔍</div>
+              <div class="label">클레임 처리</div>
+              <div class="desc">클레임 접수→조사→지급 전 과정을 캡티브가 직접 처리하거나 TPA 계약 체결</div>
+            </div>
+          </div>
+
+          <h4>위장 보험 (Sham Insurance) 판단 징후</h4>
+          <ul>
+            <li>❌ 손실 발생 시 보험금을 지급하지 않거나 모기업이 사실상 보전해주는 경우</li>
+            <li>❌ 보험료가 외부 재보험 비용·운영비 없이 100% 모기업에게 배당·반환되는 경우</li>
+            <li>❌ 캡티브가 모기업의 자금 관리 도구에 불과하여 독립적 언더라이팅 결정을 하지 않는 경우</li>
+            <li>❌ 보험계약서가 사후에 소급 작성되거나 실질이 없는 경우</li>
+            <li>❌ 시장 요율의 수배에 달하는 과도한 보험료를 관계사가 납부하는 경우</li>
+          </ul>
+          <div class="note-point">📌 <strong>OECD ¶10.213 주의:</strong> 과세 당국은 캡티브 보험을 보험이 아닌 그룹 내부 비용 배분이나 저축으로 재분류할 권한이 있습니다. 특히 "보험료 = 손실 적립금"인 closed-fund 캡티브는 높은 위험에 노출됩니다.</div>
+        </div>
+      </div>
+
+      <!-- 아코디언 8 -->
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>⑧ 종합 사례 연구 — ALP 보험료 산정 실무<span class="para">¶10.216–10.220</span></span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <div class="case-study">
+            <h5>사례: 한국 제조업체 그룹의 캡티브 보험료 이전가격 분쟁</h5>
+
+            <div class="cs-fact">
+              <strong>📌 거래 구조</strong><br>
+              • K그룹 제조 한국(주)(이하 "K사"): 생산 설비·재고에 대한 재산보험 필요<br>
+              • K-Captive Ltd. (Bermuda): 모기업 K Holdings가 설립한 순수 캡티브<br>
+              • 보험 대상: K사의 공장(대체원가 USD 5,000만), 재고(USD 1,000만)<br>
+              • K사→K-Captive 연간 보험료: USD 1,200,000 (자산가액의 2.0%)<br>
+              • 프론팅: DB손해보험(한국) → 재보험 95%를 K-Captive에 출재
+            </div>
+
+            <div class="cs-calc">
+              <strong>🔢 계리적 ALP 산정 결과</strong><br><br>
+              <strong>Step 1. CUP 검증</strong><br>
+              동종 산업(전자제조) 시장 재산보험요율: 자산가액의 0.35~0.55% → USD 210,000~330,000/년<br><br>
+              <strong>Step 2. 계리적 방법</strong><br>
+              • 과거 5년 평균 손실: USD 280,000/년 (빈도 2건×심도 140,000)<br>
+              • LAE (10%): USD 28,000<br>
+              • 운영비 (8%): USD 22,400<br>
+              • 위험마진 (20%): USD 56,000<br>
+              • 재보험비용 (XOL, USD 3M xs USD 500K layer): USD 18,000<br>
+              ✅ 계리적 ALP 보험료 = USD 404,400 ≈ USD 400,000~420,000/년<br><br>
+              <strong>Step 3. ALP 밴드 결정</strong><br>
+              하한: 계리적 방법 USD 400,000 / 상한: CUP + 25% 프리미엄 USD 412,500<br>
+              → ALP 범위: USD 400,000~420,000/년
+            </div>
+
+            <div class="alp-band">
+              <div class="alp-zone floor">
+                <div class="label">하한 (Floor)</div>
+                <div class="range" style="color:#065f46">USD 400,000</div>
+                <div class="desc">계리적 방법<br>(Pure Premium 기반)</div>
+              </div>
+              <div class="alp-zone alp">
+                <div class="label">ALP 적정 범위</div>
+                <div class="range">USD 400K~420K</div>
+                <div class="desc">자산가액의 0.67~0.70%<br>교차 검증 통과</div>
+              </div>
+              <div class="alp-zone ceiling">
+                <div class="label">실제 지급</div>
+                <div class="range" style="color:#991b1b">USD 1,200,000</div>
+                <div class="desc">자산가액의 2.0%<br>⚠️ ALP 초과 USD 780,000</div>
+              </div>
+            </div>
+
+            <div class="key-point">
+              ⚖️ 이전가격 조정 결론: K사→K-Captive 과다 보험료 연 USD 780,000 → K사 소득 증가 조정<br>
+              추가 이슈: K-Captive가 실체 요건을 갖추지 못한 경우, 보험 거래 자체 재분류 위험<br>
+              권고: 계리사 보고서 기반 ALP 보험료(약 USD 410,000) 재산정 후 적용
+            </div>
+          </div>
+
+          <h4>Chapter X 금융거래 — 전체 구조 정리</h4>
+          <table class="actuarial-table">
+            <thead>
+              <tr><th>모듈</th><th>주제</th><th>핵심 ALP 방법론</th><th>핵심 개념</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>M10-1</td><td>서론·범위·재분류</td><td>정확한 거래 획정</td><td>6단계 재분류, FAR 분석</td></tr>
+              <tr><td>M10-2</td><td>그룹 내 대출</td><td>CUP방법·수익률 접근법</td><td>신용등급, SOFR, 묵시적 지원</td></tr>
+              <tr><td>M10-3</td><td>현금풀링</td><td>ALP 밴드 (예금/차입)</td><td>명목/실물 풀링, Pool Leader FAR</td></tr>
+              <tr><td>M10-4</td><td>헷징</td><td>CUP (시장가격)</td><td>백투백 vs. 매크로, 이익 배분</td></tr>
+              <tr><td>M10-5</td><td>그룹 내 보증</td><td>CUP·기대손실·수익률</td><td>보증료 ALP 밴드, 묵시적 지원 차감</td></tr>
+              <tr><td><strong>M10-6</strong></td><td><strong>캡티브보험</strong></td><td><strong>계리적 방법·CUP</strong></td><td><strong>위험 이전·분산, 실체 요건</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 확인 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>📝 확인 퀴즈</h2>
+      <div id="quizArea">
+
+        <!-- Q1 -->
+        <div class="quiz-wrap">
+          <div class="quiz-q">Q1. OECD 이전가격 지침이 캡티브 보험을 진정한 보험으로 인정하기 위해 요구하는 세 가지 핵심 요건은?</div>
+          <ul class="quiz-opts">
+            <li><label><input type="radio" name="q1" value="a"> a) 자본 출자, 배당 지급, 감독기관 인가</label></li>
+            <li><label><input type="radio" name="q1" value="b"> b) 위험 이전(Risk Transfer), 위험 분산(Risk Distribution), 보험 인수 역량(Underwriting Capacity)</label></li>
+            <li><label><input type="radio" name="q1" value="c"> c) 프론팅 계약, 재보험 출재, 계리 보고서</label></li>
+            <li><label><input type="radio" name="q1" value="d"> d) 세무 절감 효과, 보험료 손금 처리, 캐피털 지원</label></li>
+          </ul>
+          <div class="quiz-feedback" id="fb1"></div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="quiz-wrap">
+          <div class="quiz-q">Q2. 캡티브 보험료 ALP 산정 시 가장 먼저 시도해야 하는 방법론은?</div>
+          <ul class="quiz-opts">
+            <li><label><input type="radio" name="q2" value="a"> a) 계리적 방법 (Actuarial Pricing)</label></li>
+            <li><label><input type="radio" name="q2" value="b"> b) CUP방법 (Comparable Uncontrolled Price) — 시장 보험요율 비교</label></li>
+            <li><label><input type="radio" name="q2" value="c"> c) 결합비율 접근법 (Combined Ratio Approach)</label></li>
+            <li><label><input type="radio" name="q2" value="d"> d) 캐피털 지원 접근법 (Capital Support Method)</label></li>
+          </ul>
+          <div class="quiz-feedback" id="fb2"></div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="quiz-wrap">
+          <div class="quiz-q">Q3. 캡티브 보험의 다각화 이익(Diversification Benefit)이란?</div>
+          <ul class="quiz-opts">
+            <li><label><input type="radio" name="q3" value="a"> a) 캡티브 설립 비용이 외부 보험료보다 저렴한 차이</label></li>
+            <li><label><input type="radio" name="q3" value="b"> b) 복수 관계사 위험을 통합 인수할 때 포트폴리오 효과로 개별 합산 위험보다 총 위험이 감소하는 효과</label></li>
+            <li><label><input type="radio" name="q3" value="c"> c) 캡티브 소재 관할의 세율이 낮아 얻는 세무 이익</label></li>
+            <li><label><input type="radio" name="q3" value="d"> d) 재보험을 통해 외부로 위험을 이전하는 경우의 비용 절감</label></li>
+          </ul>
+          <div class="quiz-feedback" id="fb3"></div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="quiz-wrap">
+          <div class="quiz-q">Q4. 프론팅 거래(Fronting Arrangement)에서 캡티브에 출재되는 재보험료 비율은 일반적으로 얼마인가?</div>
+          <ul class="quiz-opts">
+            <li><label><input type="radio" name="q4" value="a"> a) 보험료의 50%</label></li>
+            <li><label><input type="radio" name="q4" value="b"> b) 보험료의 90~95%</label></li>
+            <li><label><input type="radio" name="q4" value="c"> c) 보험료의 100%</label></li>
+            <li><label><input type="radio" name="q4" value="d"> d) 보험료의 30~40%</label></li>
+          </ul>
+          <div class="quiz-feedback" id="fb4"></div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="quiz-wrap">
+          <div class="quiz-q">Q5. 다음 중 위장 보험(Sham Insurance)으로 판단될 가능성이 가장 높은 상황은?</div>
+          <ul class="quiz-opts">
+            <li><label><input type="radio" name="q5" value="a"> a) 캡티브가 공인계리사의 보고서를 바탕으로 보험료를 산정한 경우</label></li>
+            <li><label><input type="radio" name="q5" value="b"> b) 보험금 지급 사건 발생 시 실제로 보험금을 지급하지 않고 모기업이 손실을 직접 흡수하는 경우</label></li>
+            <li><label><input type="radio" name="q5" value="c"> c) 캡티브가 솔벤시 II 기준 자본적정성 요건을 충족하고 있는 경우</label></li>
+            <li><label><input type="radio" name="q5" value="d"> d) 다수의 관계사 위험을 통합 인수하여 위험 분산이 이루어지는 경우</label></li>
+          </ul>
+          <div class="quiz-feedback" id="fb5"></div>
+        </div>
+
+        <button class="btn-quiz" onclick="gradeQuiz()">채점하기</button>
+        <div class="score-box" id="scoreBox">
+          <div class="big" id="scoreNum"></div>
+          <p id="scoreMsg"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 실무 체크리스트 -->
+    <div class="card" id="chk">
+      <h2>☑ 실무 체크리스트</h2>
+      <ul class="checklist" id="chkList">
+        <li><input type="checkbox" onchange="updateChk()"> <span>캡티브 보험이 위험 이전·위험 분산·보험 인수 역량 세 가지 요건을 모두 충족하는지 확인했다.</span></li>
+        <li><input type="checkbox" onchange="updateChk()"> <span>캡티브가 사업 목적(세무 절감 외의 경제적 이유) 으로 설립되었음을 문서화했다.</span></li>
+        <li><input type="checkbox" onchange="updateChk()"> <span>ALP 보험료를 CUP방법, 계리적 방법, 결합비율 접근법 중 복수 방법으로 교차 검증했다.</span></li>
+        <li><input type="checkbox" onchange="updateChk()"> <span>공인계리사(FCAS/FIA) 의견서에 데이터, 방법론, 가정, 불확실성 범위가 포함되어 있음을 확인했다.</span></li>
+        <li><input type="checkbox" onchange="updateChk()"> <span>다각화 이익이 각 관계사의 위험 기여도에 비례하여 환원되는 구조로 설계되었는지 검토했다.</span></li>
+        <li><input type="checkbox" onchange="updateChk()"> <span>프론팅 거래의 재보험료 및 프론터 수수료가 ALP 범위 내에 있는지 검증했다.</span></li>
+        <li><input type="checkbox" onchange="updateChk()"> <span>캡티브의 실체 요건(인력, 사무소, 언더라이팅 문서, 독립 감사)이 충족되었는지 확인했다.</span></li>
+        <li><input type="checkbox" onchange="updateChk()"> <span>캡티브 자본이 감독 관할의 자본적정성 기준(솔벤시 II SCR 또는 BSCR)을 충족하는지 확인했다.</span></li>
+      </ul>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="nav-bottom">
+      <a href="M10-5_그룹내보증.html">← M10-5 그룹 내 보증</a>
+      <a href="../index.html" class="btn-nav secondary">📋목차</a>
+      <button onclick="alert('Chapter X 학습 완료! 수고하셨습니다.')">Chapter X 완료 🎉</button>
+    </div>
+
+    <!-- Chapter X 완료 배너 -->
+    <div class="completion-banner">
+      <h3>🎉 Chapter X: 금융거래 — 학습 완료!</h3>
+      <p>OECD 이전가격 지침서 Chapter X (¶10.1–¶10.220) 전 과정을 완료했습니다.</p>
+      <div class="module-list-banner">
+        <span class="mod-chip done">✅ M10-1 서론·재분류원칙</span>
+        <span class="mod-chip done">✅ M10-2 그룹내대출·이자율산정</span>
+        <span class="mod-chip done">✅ M10-3 현금풀링</span>
+        <span class="mod-chip done">✅ M10-4 헷징</span>
+        <span class="mod-chip done">✅ M10-5 그룹내보증</span>
+        <span class="mod-chip done">✅ M10-6 캡티브보험</span>
+      </div>
+      <p style="font-size:.85rem;opacity:.8;margin-top:.8rem">
+        총 6개 모듈 · ¶10.1–¶10.220 · 금융거래 이전가격 전문가 과정 수료
+      </p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ===== 아코디언 ===== */
+const accs = document.querySelectorAll('.acc-header');
+const accTotal = accs.length;
+document.getElementById('accTotal').textContent = accTotal;
+let viewedAcc = new Set();
+
+function toggleAcc(btn){
+  const body = btn.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  if(!isOpen){
+    body.classList.add('open');
+    btn.classList.add('open');
+    btn.classList.add('viewed');
+    viewedAcc.add(btn);
+    document.getElementById('accDone').textContent = viewedAcc.size;
+    updateProgress();
+  } else {
+    body.classList.remove('open');
+    btn.classList.remove('open');
+  }
+}
+
+/* ===== 퀴즈 채점 ===== */
+const answers = {q1:'b',q2:'b',q3:'b',q4:'b',q5:'b'};
+const explanations = {
+  q1:'위험 이전(피보험자 위험이 캡티브로 실질 이전), 위험 분산(대수의 법칙이 작동할 만큼 다수의 위험 단위), 보험 인수 역량(충분한 자본·준비금)이 3대 요건입니다. (¶10.186–10.188)',
+  q2:'OECD는 CUP → 계리적 방법 → 결합비율 순서로 시도할 것을 권고합니다. 시장 요율 비교가 가장 신뢰성 높은 CUP가 우선입니다. (¶10.197)',
+  q3:'여러 관계사 위험을 통합 인수하면 상관관계가 낮은 위험들이 서로 상쇄되어 개별 합산보다 총 위험이 줄어드는 포트폴리오 효과가 다각화 이익입니다. (¶10.203)',
+  q4:'프론팅에서 프론터는 보험료의 5~15%를 수수료로 유지하고 나머지 85~95%(통상 90~95%)를 캡티브에 재보험으로 이전합니다.',
+  q5:'보험금 지급 사건 발생 시 실제 보험금을 지급하지 않는 것은 위험 이전이 없다는 결정적 증거로, 위장 보험의 가장 전형적 징후입니다. (¶10.213)'
+};
+
+let quizCorrect = 0;
+function gradeQuiz(){
+  quizCorrect = 0;
+  for(let i=1;i<=5;i++){
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    const fb = document.getElementById(`fb${i}`);
+    if(!sel){fb.style.display='block';fb.className='quiz-feedback wrong';fb.textContent='⚠ 답을 선택하세요.';continue;}
+    if(sel.value===answers[`q${i}`]){
+      fb.className='quiz-feedback correct';
+      fb.innerHTML=`✅ 정답! ${explanations[`q${i}`]}`;
+      quizCorrect++;
+    } else {
+      fb.className='quiz-feedback wrong';
+      fb.innerHTML=`❌ 오답. 정답: <strong>${answers[`q${i}`].toUpperCase()}</strong>. ${explanations[`q${i}`]}`;
+    }
+    fb.style.display='block';
+  }
+  document.getElementById('quizDone').textContent = quizCorrect;
+  updateProgress();
+  const sb = document.getElementById('scoreBox');
+  const score = quizCorrect*20;
+  document.getElementById('scoreNum').textContent = score+'점';
+  document.getElementById('scoreMsg').textContent = score>=80
+    ?`🎉 통과! ${quizCorrect}문항 정답. 다음 모듈로 진행하세요.`
+    :`${quizCorrect}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display = 'block';
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.querySelector('.btn-quiz').disabled = true;
+}
+
+/* ===== 체크리스트 ===== */
+function updateChk(){updateProgress();}
+
+/* ===== 진도 계산 ===== */
+function updateProgress(){
+  const accPct = viewedAcc.size / accTotal * 60;
+  const quizPct = quizCorrect / 5 * 40;
+  const total = Math.round(accPct + quizPct);
+  document.getElementById('pctDisp').textContent = total + '%';
+  document.getElementById('progStrip').style.width = total + '%';
+}
+
+/* ===== 스크롤 네비게이션 ===== */
+function goTo(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ===== 활성 사이드바 아이템 ===== */
+const sections=['obj','sec1','sec2','sec3','quiz','chk'];
+const navItems=document.querySelectorAll('.nav-item');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && el.getBoundingClientRect().top < 160) cur=id;
+  });
+  navItems.forEach(b=>{
+    const fn=b.getAttribute('onclick')||'';
+    b.classList.toggle('active', fn.includes(`'${cur}'`));
+  });
+});
+</script>
+</body>
+</html>

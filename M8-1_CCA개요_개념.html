@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M8-1: CCA 개요 및 개념</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#065f46;--purple-light:#ecfdf5;--purple-mid:#059669;--purple-dark:#022c22;
+  --green:#1a7a4a;--green-light:#e6f5ee;
+  --orange:#c06000;--orange-light:#fff3e0;
+  --red:#b02020;--red-light:#fdecea;
+  --gray:#555;--gray-light:#f5f5f5;--gray-border:#ddd;
+  --text:#222;--text2:#555;--white:#fff;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.10);
+}
+body{font-family:'Noto Sans KR',Arial,sans-serif;background:#f0f4f8;color:var(--text);line-height:1.75;font-size:16px}
+a{color:var(--purple);text-decoration:none}
+.mod-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,var(--purple-mid) 100%);color:#fff;padding:1.5rem 2rem}
+.mod-header .breadcrumb{font-size:.8rem;opacity:.7;margin-bottom:.4rem}
+.mod-header h1{font-size:1.4rem;font-weight:700}
+.mod-header .sub{font-size:.9rem;opacity:.85;margin-top:.3rem}
+.prog-strip{background:rgba(255,255,255,.2);height:6px;margin-top:1rem;border-radius:99px;overflow:hidden}
+.prog-strip-inner{height:100%;background:#fff;border-radius:99px;transition:width .4s}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;gap:1.5rem}
+.sidebar{width:230px;flex-shrink:0;position:sticky;top:1rem;align-self:flex-start;max-height:calc(100vh - 2rem);overflow-y:auto}
+.content{flex:1;min-width:0}
+.nav-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.2rem;margin-bottom:1rem}
+.nav-card h4{font-size:.85rem;color:var(--gray);margin-bottom:.8rem;letter-spacing:.04em}
+.nav-item{display:block;padding:.45rem .75rem;border-radius:6px;font-size:.84rem;color:var(--text2);margin-bottom:3px;cursor:pointer;border:none;width:100%;text-align:left;background:none;transition:background .12s;font-family:inherit}
+.nav-item:hover{background:var(--purple-light);color:var(--purple)}
+.nav-item.active{background:var(--purple);color:#fff;font-weight:600}
+.prog-detail{font-size:.72rem;color:var(--gray);margin-top:.4rem;line-height:1.5}
+.prog-detail span{font-weight:700;color:var(--purple)}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem 2rem;margin-bottom:1.5rem}
+.card h2{font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--purple-light)}
+.card p{font-size:.95rem;color:var(--text2);margin-bottom:.7rem}
+.card ul,.card ol{padding-left:1.4rem;font-size:.93rem;color:var(--text2);margin-bottom:.7rem}
+.card li{margin-bottom:.35rem;line-height:1.75}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:.4rem}
+.tag-para{background:var(--purple-light);color:var(--purple)}
+.obj-list{list-style:none;padding:0}
+.obj-list li{display:flex;gap:.7rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid var(--gray-border);font-size:.93rem}
+.obj-list li:last-child{border:none}
+.obj-num{background:var(--purple);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.key-point{background:var(--purple-light);border-left:4px solid var(--purple);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#022c22;line-height:1.75}
+.warn-point{background:var(--orange-light);border-left:4px solid var(--orange);padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#6b3a00;line-height:1.75}
+.note-point{background:#f0fdf4;border-left:4px solid #22c55e;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.8rem 0;font-size:.9rem;color:#14532d;line-height:1.75}
+.practice-note{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:.9rem 1.1rem;margin:.8rem 0}
+.practice-note .pn-label{font-weight:700;font-size:.78rem;color:#92400e;margin-bottom:.35rem}
+.practice-note p{font-size:.88rem;color:#78350f;margin-bottom:.35rem}
+.practice-note p:last-child{margin-bottom:0}
+.accordion{border:1px solid var(--gray-border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.2rem;cursor:pointer;background:var(--gray-light);font-weight:600;font-size:.95rem;border:none;width:100%;text-align:left;transition:background .12s;font-family:inherit}
+.acc-header:hover{background:#ebebeb}
+.acc-header.viewed{background:#d1fae5}
+.acc-header .para{font-size:.75rem;color:var(--purple);background:var(--purple-light);padding:2px 8px;border-radius:20px;margin-left:.5rem;font-weight:500;white-space:nowrap}
+.acc-header .arrow{font-size:1rem;color:var(--gray);transition:transform .2s;margin-left:.5rem;flex-shrink:0}
+.acc-header.open .arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding:1.1rem 1.3rem;background:#fff;font-size:.93rem;color:var(--text2);line-height:1.85;border-top:1px solid var(--gray-border)}
+.acc-body.open{display:block}
+.acc-body ul,.acc-body ol{padding-left:1.3rem;margin:.5rem 0 .7rem}
+.acc-body li{margin-bottom:.35rem;line-height:1.75}
+.compare-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.8rem 0}
+.compare-table th{background:var(--purple);color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+.compare-table td{padding:.55rem .9rem;border-bottom:1px solid var(--gray-border);color:var(--text2);vertical-align:top}
+.compare-table tr:last-child td{border:none}
+.compare-table tr:nth-child(even) td{background:var(--gray-light)}
+.compare-table td strong{color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.col-box{border-radius:8px;padding:1rem 1.1rem;border:1.5px solid #6ee7b7;background:var(--purple-light)}
+.col-box h4{font-size:.88rem;font-weight:700;color:var(--purple);margin-bottom:.4rem}
+.col-box p{font-size:.85rem;margin:0;color:var(--text2);line-height:1.65}
+.col-box ul{font-size:.84rem;color:var(--text2);padding-left:1.2rem;margin:.3rem 0 0}
+.col-box li{margin-bottom:.2rem}
+.col-box.orange{border-color:#fdba74;background:#fff7ed}
+.col-box.orange h4{color:var(--orange)}
+.col-box.red{border-color:#fca5a5;background:#fef2f2}
+.col-box.red h4{color:var(--red)}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+.pillar-card{border-radius:10px;padding:1rem 1.1rem;border:1.5px solid var(--purple);background:var(--purple-light)}
+.pillar-card .pl-num{display:inline-block;background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;text-align:center;line-height:26px;font-size:.78rem;font-weight:800;margin-bottom:.4rem}
+.pillar-card h4{font-size:.92rem;font-weight:700;color:var(--purple-dark);margin-bottom:.35rem}
+.pillar-card p{font-size:.82rem;color:var(--text2);margin:0;line-height:1.6}
+.q-block{background:var(--gray-light);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem}
+.q-block .q-text{font-weight:600;font-size:.93rem;margin-bottom:.7rem;color:var(--text);line-height:1.65}
+.q-options label{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:6px;cursor:pointer;font-size:.91rem;color:var(--text2);transition:background .1s;margin-bottom:3px;line-height:1.55}
+.q-options label:hover{background:#e8e8e8}
+.q-options input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--purple)}
+.q-feedback{display:none;margin-top:.7rem;padding:.6rem .9rem;border-radius:6px;font-size:.88rem;font-weight:500;line-height:1.6}
+.q-feedback.correct{background:#f0fdf4;color:var(--green);border-left:3px solid var(--green)}
+.q-feedback.wrong{background:var(--red-light);color:var(--red);border-left:3px solid var(--red)}
+.quiz-btn{background:var(--purple);color:#fff;border:none;padding:.7rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .15s;font-family:inherit}
+.quiz-btn:hover{background:var(--purple-mid)}
+.quiz-btn:disabled{background:#aaa;cursor:default}
+.score-box{display:none;background:var(--purple-light);border:2px solid var(--purple);border-radius:10px;padding:1.2rem;text-align:center;margin-top:1rem}
+.score-box .big{font-size:2rem;font-weight:800;color:var(--purple)}
+.score-box p{font-size:.92rem;color:var(--text2);margin-top:.3rem}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:.8rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--gray-border);font-size:.92rem}
+.checklist li:last-child{border:none}
+.checklist input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;accent-color:var(--purple)}
+.checklist label{cursor:pointer;color:var(--text2);line-height:1.65}
+.checklist input:checked+label{color:var(--purple);text-decoration:line-through;opacity:.7}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;gap:.5rem}
+.btn-nav{background:var(--purple);color:#fff;padding:.65rem 1.4rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;border:none;transition:background .15s;text-decoration:none;display:inline-block;font-family:inherit}
+.btn-nav:hover{background:var(--purple-mid)}
+.btn-nav.secondary{background:#fff;color:var(--purple);border:2px solid var(--purple)}
+.btn-nav.secondary:hover{background:var(--purple-light)}
+.def-box{background:#f8fffe;border:2px solid var(--purple-mid);border-radius:10px;padding:1.1rem 1.3rem;margin:.8rem 0}
+.def-box .def-label{font-size:.78rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.def-box p{font-size:.93rem;color:var(--text2);margin:0;line-height:1.8}
+.flow-box{display:flex;flex-direction:column;gap:.4rem;margin:.8rem 0}
+.flow-step{display:flex;align-items:center;gap:.8rem;background:var(--purple-light);border-radius:8px;padding:.6rem 1rem;font-size:.9rem}
+.flow-step .step-icon{background:var(--purple);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0}
+.flow-arrow-v{text-align:center;font-size:1.1rem;color:var(--purple-mid)}
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static}
+  .two-col,.three-col{grid-template-columns:1fr}
+}
+</style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="tp-firebase.js"></script>
+</head>
+<body>
+
+<header class="mod-header">
+  <div class="breadcrumb">고급과정 › Chapter VIII 원가분담약정(CCA) › M8-1 (1/4)</div>
+  <h1>M8-1. CCA 개요 및 개념 (Introduction & Concept of a CCA)</h1>
+  <div class="sub">A. Introduction & B. Concept of a CCA — CCA 정의, 유형, 참여자 이익, 타 Chapter와의 관계, 무형자산 권리&nbsp;|&nbsp;¶8.1 – ¶8.11&nbsp;|&nbsp;예상 학습시간: 40분</div>
+  <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="nav-card">
+      <h4>📑 목차</h4>
+      <button class="nav-item" onclick="goTo('obj')">🎯 학습목표</button>
+      <button class="nav-item" onclick="goTo('s1')">1. Chapter VIII 개관 </button>
+      <button class="nav-item" onclick="goTo('s2')">2. CCA 정의 및 실제 거래분석 </button>
+      <button class="nav-item" onclick="goTo('s3')">3. CCA 특성·참여자 이익 </button>
+      <button class="nav-item" onclick="goTo('s4')">4. 다른 Chapter와의 관계 </button>
+      <button class="nav-item" onclick="goTo('s5')">5. CCA 유형 및 무형자산 </button>
+      <button class="nav-item" onclick="goTo('quiz')">📝 확인 퀴즈</button>
+      <button class="nav-item" onclick="goTo('check')">☑ 실무 체크리스트</button>
+    </div>
+    <div class="nav-card">
+      <h4>📊 모듈 진도</h4>
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--purple)" id="pctDisp">0%</div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:.2rem">학습 완료율</div>
+        <div class="prog-detail">
+          📂 아코디언 <span id="accDone">0</span> / <span id="accTotal">0</span><br>
+          📝 퀴즈 정답 <span id="quizDone">0</span> / 5
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 학습목표 -->
+    <div class="card" id="obj">
+      <h2>🎯 학습목표</h2>
+      <ul class="obj-list">
+        <li><span class="obj-num">1</span><span>원가분담약정(CCA)의 OECD 정의와 핵심 구성 요소를 설명할 수 있다</span></li>
+        <li><span class="obj-num">2</span><span>개발 CCA와 서비스 CCA의 차이를 구분하고 각각의 적용 맥락을 파악한다</span></li>
+        <li><span class="obj-num">3</span><span>CCA 참여자의 요건과 이익 배분 방식의 기본 원칙을 이해한다</span></li>
+        <li><span class="obj-num">4</span><span>CCA가 OECD 지침 다른 Chapter와 어떻게 연계되는지 파악한다</span></li>
+        <li><span class="obj-num">5</span><span>개발 CCA에서 무형자산 권리의 귀속 방식을 설명할 수 있다</span></li>
+      </ul>
+    </div>
+
+    <!-- 섹션 1 -->
+    <div class="card" id="s1">
+      <h2>1. Chapter VIII 개관 <span class="tag tag-para">¶8.1–8.2</span></h2>
+      <p>Chapter VIII는 다국적기업 그룹 내에서 빈번히 활용되는 <strong>원가분담약정(Cost Contribution Arrangements, CCA)</strong>에 대한 이전가격 지침을 제공합니다. 복수의 관계회사들이 공동의 이익을 위해 비용과 위험을 분담하는 CCA는 전통적인 개별 거래 분석과는 다른 접근을 요구합니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          Chapter VIII의 목적과 배경 <span class="para">¶8.1</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA는 다국적기업 그룹에서 <strong>공동 프로젝트, 서비스, 자산 개발</strong>에 대한 비용과 위험을 복수의 관계회사가 분담하고 그 결과물로부터 이익을 공유하는 계약 형태입니다. Chapter VIII는 이러한 약정이 정상가격원칙에 부합하는지 평가하기 위한 지침을 제공합니다.</p>
+          <div class="key-point">
+            <strong>핵심:</strong> CCA는 단순한 비용 분담 계약이 아닙니다. 참여자들이 <em>기대이익에 비례한 기여</em>를 하고 결과물에 대한 직접적 권리를 취득하는 구조가 핵심입니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          CCA와 이전가격 이슈 <span class="para">¶8.2</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA에서 발생하는 주요 이전가격 이슈는 크게 세 가지입니다.</p>
+          <ul>
+            <li><strong>기여도 측정</strong>: 각 참여자의 기여(현금, 자산, 서비스)가 적정하게 평가되었는가?</li>
+            <li><strong>기대이익 배분</strong>: 비용 분담 비율이 미래 기대이익 비율에 부합하는가?</li>
+            <li><strong>Buy-in/Buy-out</strong>: 참여 또는 탈퇴 시 지급하는 대가가 정상가격에 해당하는가?</li>
+          </ul>
+          <div class="warn-point">
+            <strong>주의:</strong> CCA가 정상가격이 아닌 단순 비용 이전 수단으로 남용되는 경우, 과세관청은 이전가격 조정할 수 있습니다.
+          </div>
+	  <div class="note-point">
+            <strong>실무 시사점:</strong> CCA가 해외 MNE에게는 빈번하게 일어나는 계약 (또는 거래) 이지만 아직 한국 MNE는 적극적으로 활용한 사례가 없습니다.
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 2 -->
+    <div class="card" id="s2">
+      <h2>2. CCA 정의 및 실제 거래분석 <span class="tag tag-para">¶8.3–8.4</span></h2>
+
+      <div class="def-box">
+        <div class="def-label">OECD 정의 (¶8.3)</div>
+        <p>원가분담약정(CCA)이란 <strong>둘 이상의 사업체가 자산, 서비스, 권리의 개발·생산 또는 취득에 따른 비용과 위험을 분담하고, 그 결과물로부터 기대되는 이익의 성격과 범위를 결정하는 구조(framework)을 규정하는 약정</strong>을 의미합니다.</p>
+      </div>
+
+      <p>이 정의에서 핵심 요소는 다음과 같습니다.</p>
+
+      <div class="three-col">
+        <div class="pillar-card">
+          <div class="pl-num">①</div>
+          <h4>비용·위험 분담</h4>
+          <p>복수의 참여자가 공동으로 비용과 사업 위험을 부담</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pl-num">②</div>
+          <h4>기대이익 비례</h4>
+          <p>분담 비율은 각 참여자가 기대하는 이익에 비례해야 함</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pl-num">③</div>
+          <h4>직접적 권리 취득</h4>
+          <p>각 참여자는 결과물(자산·서비스 등)에 대한 직접 권리를 취득</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          실제 거래분석의 중요성 <span class="para">¶8.4</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA가 정상가격원칙에 부합하는지 판단할 때 가장 중요한 것은 <strong>계약서의 형식이 아닌 실제 거래의 실질(substance)</strong>입니다.</p>
+          <ul>
+            <li>계약서에 CCA로 명명되어 있더라도 실제 운영이 다르다면 CCA로 인정되지 않을 수 있음</li>
+            <li>반대로 명칭이 다르더라도 CCA의 실질적 요건을 충족하면 CCA로 분석해야 함</li>
+            <li>Chapter I D.1에서 설명하는 <em>실제 거래의 정확한 분석(accurate delineation)</em> 원칙을 CCA에도 적용</li>
+          </ul>
+          <div class="note-point">
+            <strong>실무 시사점:</strong> 해외 관세관청이 사례에서 CCA 감사 시 과세관청은 계약서 검토에 머물지 않고, 실제 기여 활동, 의사결정 과정, 기대이익 분석, 비용 흐름을 종합적으로 검토합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 3 -->
+    <div class="card" id="s3">
+      <h2>3. CCA 특성·참여자 이익·사례 <span class="tag tag-para">¶8.5–8.8</span></h2>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          원가분담약정의 2가지 종류 개관 <span class="para">¶8.5</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>OECD 지침은 CCA를 크게 두 가지 유형으로 구분합니다(상세 분류는 ¶8.10에서 다룸).</p>
+          <div class="two-col">
+            <div class="col-box">
+              <h4>① 개발 CCA (Development CCA)</h4>
+              <p>무형자산이나 유형자산의 <strong>개발·개선·유지·보호</strong>를 위한 원가분담약정. 각 참여자는 결과물에 대한 소유권 또는 사용권을 취득.</p>
+            </div>
+            <div class="col-box orange">
+              <h4>② 서비스 CCA (Services CCA)</h4>
+              <p>참여자들이 공동으로 서비스를 <strong>취득하거나 생산</strong>하기 위한 약정. 각 참여자는 서비스로부터 이익을 취득하되 추가 대가를 지급하지 않음.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          참여자의 이익 (Expected Benefits) <span class="para">¶8.6</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>CCA에서 각 참여자는 <strong>결과물로부터 직접적인 이익(direct benefit)</strong>을 취득해야 합니다. 단순히 다른 참여자가 이익을 얻도록 돕는 역할만 하는 주체는 CCA 참여자가 아닙니다.</p>
+          <ul>
+            <li>이익은 <strong>금전적 이익</strong>(비용 절감, 수익 증가)뿐 아니라 간접적 이익도 포함될 수 있음</li>
+            <li>참여자의 기대이익은 반드시 <strong>미래 이익에 대한 합리적 예상</strong>에 기반해야 함</li>
+            <li>실제 이익이 기대이익과 다를 수 있으나, 이는 사후적으로만 판단하지 않음</li>
+          </ul>
+          <div class="key-point">
+            <strong>정상가격 원칙 적용:</strong> 독립된 제3자라면 합리적인 기대이익 없이 CCA에 참여하여 비용을 분담하지 않을 것입니다. 기대이익이 없거나 극히 미미한 관계회사의 CCA 참여는 정상가격 원칙에 위반될 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          그룹 내 다양한 서비스 제공 <span class="para">¶8.7</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>단일 CCA 내에서 복수의 활동 유형이 포함될 수 있습니다.</p>
+          <ul>
+            <li>R&D + 마케팅 + 관리 서비스가 하나의 CCA 내에 혼재 가능</li>
+            <li>각 활동 유형마다 별도의 기대이익 측정이 필요할 수 있음</li>
+            <li>하나의 CCA에서 일부 참여자는 일부 활동에서만 이익을 기대할 수 있으므로, 기여도 배분이 활동별로 차별화될 수 있음</li>
+          </ul>
+          <div class="warn-point">
+            <strong>실무 주의:</strong> 서로 성격이 다른 활동이 혼재된 CCA는 분석이 복잡해집니다. 각 활동별로 이익 배분 비율이 다를 수 있어 단일 배부율 적용 시 왜곡이 발생할 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          사례: 그룹 내 제조회사 (¶8.8)
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p><strong>상황:</strong> A국 모회사(P)와 B국, C국 자회사(S1, S2)가 공동으로 신제품 연구개발을 위한 CCA를 체결합니다.</p>
+          <table class="compare-table">
+            <tr><th>구분</th><th>P (A국)</th><th>S1 (B국)</th><th>S2 (C국)</th></tr>
+            <tr><td>기여 방식</td><td>기존 IP 제공 + 현금</td><td>R&D 인력·시설</td><td>현금 기여</td></tr>
+            <tr><td>기대이익 비율</td><td>50%</td><td>30%</td><td>20%</td></tr>
+            <tr><td>결과물 권리</td><td>A국 시장</td><td>B국 시장</td><td>C국 시장</td></tr>
+          </table>
+          <div class="note-point">
+            각 참여자는 자신이 기대하는 이익 비율에 비례하여 비용을 분담하고, 개발된 IP에 대한 직접적 권리를 자국 시장 범위 내에서 취득합니다. 이것이 CCA의 핵심 구조입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 4 -->
+    <div class="card" id="s4">
+      <h2>4. 다른 Chapter와의 관계 <span class="tag tag-para">¶8.9</span></h2>
+      <p>CCA는 OECD 이전가격 지침의 독립된 Chapter이지만, 분석 시 다른 Chapter들과 유기적으로 연계됩니다.</p>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          CCA와 다른 Chapter의 관계 <span class="para">¶8.9</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <table class="compare-table">
+            <tr><th>관련 Chapter</th><th>CCA 분석에서의 역할</th></tr>
+            <tr>
+              <td><strong>Chapter I</strong><br>정상가격원칙</td>
+              <td>CCA의 기본 틀. 실제 거래 분석, 비교가능성 5대 요소, 위험 분석 원칙 적용</td>
+            </tr>
+            <tr>
+              <td><strong>Chapter II</strong><br>정상가격 산출방법</td>
+              <td>CCA 기여도 가치 평가 시 CUP, TNMM 등 방법론 활용 가능</td>
+            </tr>
+            <tr>
+              <td><strong>Chapter VI</strong><br>무형자산</td>
+              <td>개발 CCA에서 무형자산 가치 측정, DEMPE 기능 분석, HTVI 처리</td>
+            </tr>
+            <tr>
+              <td><strong>Chapter VII</strong><br>그룹 내 서비스</td>
+              <td>서비스 CCA의 경우 LVA(저부가가치 서비스) 등 Chapter VII 원칙 참조</td>
+            </tr>
+          </table>
+          <div class="key-point">
+            <strong>핵심 원칙:</strong> CCA에 고유한 별도의 정상가격 산출방법은 없습니다. Chapter I–III에서 제시하는 방법론이 CCA 기여도 평가에도 동일하게 적용됩니다(¶8.9).
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-box">
+        <div class="flow-step"><div class="step-icon">1</div><strong>실제 거래 분석 (Ch.I D.1)</strong>: CCA의 실질 내용, 참여자의 기능·자산·위험 파악</div>
+        <div class="flow-arrow-v">↓</div>
+        <div class="flow-step"><div class="step-icon">2</div><strong>기여도 가치 측정 (Ch.II 방법론)</strong>: CUP, TNMM 등으로 각 참여자 기여의 공정가치 산정</div>
+        <div class="flow-arrow-v">↓</div>
+        <div class="flow-step"><div class="step-icon">3</div><strong>기대이익 배분 비율 검토 (Ch.III)</strong>: 비교가능성 분석으로 이익 배분 비율의 정상가격 여부 검증</div>
+        <div class="flow-arrow-v">↓</div>
+        <div class="flow-step"><div class="step-icon">4</div><strong>무형자산 특수 분석 (Ch.VI, VIII)</strong>: 개발 CCA는 무형자산 DEMPE 원칙 적용</div>
+      </div>
+    </div>
+
+    <!-- 섹션 5 -->
+    <div class="card" id="s5">
+      <h2>5. CCA 유형 및 무형자산 권리 <span class="tag tag-para">¶8.10–8.11</span></h2>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          원가분담약정의 2가지 분류 (상세) <span class="para">¶8.10</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <div class="two-col">
+            <div class="col-box">
+              <h4>개발 CCA (Development CCA)</h4>
+              <ul>
+                <li>목적: 무형자산/유형자산의 개발·개선·유지·보호</li>
+                <li>결과물: 특허, 브랜드, 노하우 등 IP</li>
+                <li>이익: 지속적·장기적 (IP 활용 수익)</li>
+                <li>핵심 이슈: 무형자산 소유권 배분, 기여가치 측정</li>
+                <li>예: 복수 법인이 공동으로 신약을 개발하는 R&D CCA</li>
+              </ul>
+            </div>
+            <div class="col-box orange">
+              <h4>서비스 CCA (Services CCA)</h4>
+              <ul>
+                <li>목적: 공동으로 서비스 취득 또는 생산</li>
+                <li>결과물: IT 시스템, 경영 컨설팅, 재무 서비스 등</li>
+                <li>이익: 당기적·단기적 (서비스 이용 가치)</li>
+                <li>핵심 이슈: 적정 비용 배분, 이익 측정 기준</li>
+                <li>예: 그룹사가 공동으로 ERP 시스템 도입 비용을 분담</li>
+              </ul>
+            </div>
+          </div>
+          <div class="key-point">
+            <strong>분류의 실무적 의미:</strong> 개발 CCA는 Buy-in/Buy-out 지급, 무형자산 권리 배분 등 복잡한 이슈가 수반되는 반면, 서비스 CCA는 상대적으로 Chapter VII 서비스 분석 방식과 유사하게 접근할 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          개발 CCA에서의 무형자산 권리 <span class="para">¶8.11</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="acc-body">
+          <p>개발 CCA에서 가장 중요한 특성은 각 참여자가 <strong>개발된 무형자산에 대한 직접적 권리(direct interest)</strong>를 취득한다는 점입니다.</p>
+          <ul>
+            <li>각 참여자는 자신의 기여 비율에 따라 무형자산의 법적 소유권 또는 사용권을 직접 취득</li>
+            <li>결과물인 IP를 다른 관계회사로부터 <em>라이선스 받는 것이 아님</em> — 이것이 일반적인 라이선스 거래와의 근본적 차이</li>
+            <li>따라서 CCA 참여자는 개발된 IP를 활용하기 위해 별도의 로열티를 지급하지 않음</li>
+          </ul>
+          <div class="two-col">
+            <div class="col-box red">
+              <h4>❌ CCA가 아닌 경우 (일반 라이선스)</h4>
+              <p>P가 IP를 개발 → S1이 P에 로열티를 지급하고 IP 사용</p>
+              <p>→ S1은 권리자가 아닌 사용자</p>
+            </div>
+            <div class="col-box">
+              <h4>✅ CCA인 경우</h4>
+              <p>P와 S1이 공동 개발 비용 분담 → S1이 개발 결과물에 대한 권리를 직접 취득</p>
+              <p>→ S1은 공동 권리자</p>
+            </div>
+          </div>
+          <div class="warn-point">
+            <strong>과세 리스크:</strong> 일부 다국적기업은 형식적으로 CCA를 구성하여 저세율 국가 법인에게 IP 권리를 이전시키는 시도를 합니다. 과세관청은 ¶8.4의 실질 분석 원칙에 따라 CCA 형식이 경제적 실질과 일치하는지 검토합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="practice-note">
+        <div class="pn-label">💡 개발 CCA vs 서비스 CCA 요약 비교</div>
+        <p><strong>개발 CCA:</strong> 장기적·반복적 이익 기대 / IP 권리 직접 취득 / Buy-in·Buy-out 발생 / 무형자산 Chapter(VI) 연계 필수</p>
+        <p><strong>서비스 CCA:</strong> 당기적·단발적 이익 기대 / 서비스 이용권 / 참가·탈퇴 대가 구조 단순 / 서비스 Chapter(VII) 참조 가능</p>
+      </div>
+    </div>
+
+    <!-- 퀴즈 -->
+    <div class="card" id="quiz">
+      <h2>📝 확인 퀴즈</h2>
+      <p style="font-size:.9rem;color:var(--gray);margin-bottom:1rem">5문항 | 80점(4문항) 이상 통과</p>
+
+      <!-- Q1 -->
+      <div class="q-block">
+        <div class="q-text">Q1. OECD 이전가격 지침상 원가분담약정(CCA)의 핵심 요건이 <u>아닌</u> 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q1" value="a"> ① 복수의 사업체가 비용과 위험을 분담한다</label>
+          <label><input type="radio" name="q1" value="b"> ② 각 참여자는 결과물로부터 직접적인 이익을 취득한다</label>
+          <label><input type="radio" name="q1" value="c"> ③ 비용 분담 비율은 기대이익에 비례해야 한다</label>
+          <label><input type="radio" name="q1" value="d"> ④ 참여자는 반드시 모회사와 자회사 관계여야 한다</label>
+        </div>
+        <div class="q-feedback" id="f1"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="q-block">
+        <div class="q-text">Q2. 개발 CCA와 일반 라이선스 거래의 근본적 차이점은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q2" value="a"> ① 개발 CCA는 무형자산 개발에만 사용된다</label>
+          <label><input type="radio" name="q2" value="b"> ② 개발 CCA 참여자는 결과 IP에 대한 직접 권리를 취득하므로 로열티를 지급하지 않는다</label>
+          <label><input type="radio" name="q2" value="c"> ③ 일반 라이선스는 정상가격원칙 적용을 받지 않는다</label>
+          <label><input type="radio" name="q2" value="d"> ④ 개발 CCA는 반드시 서면 계약이 있어야 한다</label>
+        </div>
+        <div class="q-feedback" id="f2"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="q-block">
+        <div class="q-text">Q3. CCA 분석 시 ¶8.4에서 강조하는 원칙은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q3" value="a"> ① 계약서의 명칭이 'CCA'라면 자동으로 CCA로 인정된다</label>
+          <label><input type="radio" name="q3" value="b"> ② 참여자 수가 3개 이상이어야 CCA로 인정된다</label>
+          <label><input type="radio" name="q3" value="c"> ③ 계약의 형식보다 실제 거래의 실질(substance)을 기준으로 분석해야 한다</label>
+          <label><input type="radio" name="q3" value="d"> ④ 서비스 CCA는 Chapter VIII 적용 대상이 아니다</label>
+        </div>
+        <div class="q-feedback" id="f3"></div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="q-block">
+        <div class="q-text">Q4. 다음 중 CCA에 고유한 정상가격 산출방법에 대한 설명으로 옳은 것은?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q4" value="a"> ① CCA 전용의 특별 정상가격 산출방법이 별도로 존재한다</label>
+          <label><input type="radio" name="q4" value="b"> ② CCA에는 Chapter I–III의 정상가격 방법론이 동일하게 적용된다</label>
+          <label><input type="radio" name="q4" value="c"> ③ CCA는 항상 이익분할법(PSM)만 사용해야 한다</label>
+          <label><input type="radio" name="q4" value="d"> ④ CCA에는 정상가격원칙이 적용되지 않는다</label>
+        </div>
+        <div class="q-feedback" id="f4"></div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="q-block">
+        <div class="q-text">Q5. A, B, C 세 관계회사가 공동 ERP 시스템 도입 비용을 분담하는 약정이 있다. 각 법인은 도입된 ERP를 직접 사용하고 추가 사용료는 지급하지 않는다. 이 약정은 어떤 유형의 CCA인가?</div>
+        <div class="q-options">
+          <label><input type="radio" name="q5" value="a"> ① 개발 CCA (Development CCA)</label>
+          <label><input type="radio" name="q5" value="b"> ② 서비스 CCA (Services CCA)</label>
+          <label><input type="radio" name="q5" value="c"> ③ CCA가 아닌 단순 비용 배분 거래</label>
+          <label><input type="radio" name="q5" value="d"> ④ 무형자산 라이선스 거래</label>
+        </div>
+        <div class="q-feedback" id="f5"></div>
+      </div>
+
+      <button class="quiz-btn" onclick="gradeQuiz()">채점하기</button>
+      <div class="score-box" id="scoreBox">
+        <div class="big" id="scoreNum"></div>
+        <p id="scoreMsg"></p>
+      </div>
+    </div>
+
+    <!-- 체크리스트 -->
+    <div class="card" id="check">
+      <h2>☑ 실무 체크리스트</h2>
+      <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">CCA 검토 시 기본 확인 사항 (¶8.1–8.11 기준)</p>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c1">
+          <label for="c1">CCA 계약서(또는 이에 준하는 문서)가 존재하며, 약정의 목적·참여자·비용 범위·이익 배분 방식이 명확히 기술되어 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c2">
+          <label for="c2">각 참여자가 CCA 결과물로부터 <strong>직접적인 이익</strong>을 기대하고 있음을 입증할 수 있습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c3">
+          <label for="c3">CCA의 유형(개발 CCA vs. 서비스 CCA)을 명확히 구분하고 그에 맞는 분석 방식을 적용하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c4">
+          <label for="c4">비용 분담 비율이 각 참여자의 <strong>기대이익 비율</strong>에 비례함을 확인하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c5">
+          <label for="c5">CCA의 실질이 계약 형식과 일치하는지(실제 기여 활동, 의사결정 권한, 자금 흐름 등) 검토하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c6">
+          <label for="c6">개발 CCA의 경우, 각 참여자가 개발된 무형자산에 대해 <strong>직접적 권리</strong>를 취득하는 구조임을 확인하였습니까?</label>
+        </li>
+        <li>
+          <input type="checkbox" id="c7">
+          <label for="c7">관련 OECD 지침 Chapter(특히 Ch.I, VI, VII)를 참조하여 분석에 적용하였습니까?</label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="nav-bottom">
+      <span class="btn-nav secondary" style="opacity:.4;cursor:default">← 이전 모듈</span>
+      <span class="btn-nav secondary" onclick="alert('목차 페이지로 이동합니다.')">📋 목차로</span>
+      <a class="btn-nav" href="M8-2_참여자_기대이익_기여도.html">다음 모듈 →</a>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── 아코디언 ──
+const allAcc = document.querySelectorAll('.acc-header');
+document.getElementById('accTotal').textContent = allAcc.length;
+
+function toggleAcc(btn){
+  const body = btn.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  if(!btn.classList.contains('viewed')){
+    btn.classList.add('viewed');
+    updatePct();
+  }
+}
+
+// ── 진도 계산 ──
+let quizCorrect = 0;
+function updatePct(){
+  const viewed = document.querySelectorAll('.acc-header.viewed').length;
+  const total = allAcc.length;
+  const accPct = total > 0 ? (viewed / total) : 0;
+  const quizPct = quizCorrect / 5;
+  const pct = Math.round((accPct * 0.6 + quizPct * 0.4) * 100);
+  document.getElementById('pctDisp').textContent = pct + '%';
+  document.getElementById('topBar').style.width = pct + '%';
+  document.getElementById('accDone').textContent = viewed;
+  document.getElementById('quizDone').textContent = quizCorrect;
+}
+
+// ── 퀴즈 ──
+const answers = {q1:'d', q2:'b', q3:'c', q4:'b', q5:'b'};
+const feedbacks = {
+  q1:{
+    a:'오답: 비용·위험 분담은 CCA의 핵심 요건입니다.',
+    b:'오답: 직접적 이익 취득은 CCA를 일반 서비스 거래와 구분하는 핵심 요건입니다.',
+    c:'오답: 기대이익 비례 원칙은 CCA 정상가격 분석의 기반입니다.',
+    d:'정답! CCA는 모-자 관계에 국한되지 않습니다. 형제 회사(sister companies) 간에도 CCA가 체결될 수 있습니다.'
+  },
+  q2:{
+    a:'오답: 개발 CCA는 무형자산뿐 아니라 유형자산 개발에도 사용될 수 있습니다.',
+    b:'정답! CCA 참여자는 개발된 IP에 대해 직접 권리를 취득하므로 별도의 로열티(사용료) 지급 없이 IP를 활용할 수 있습니다. 이것이 라이선스 거래와의 근본적 차이입니다.',
+    c:'오답: 일반 라이선스 거래도 당연히 정상가격원칙 적용을 받습니다.',
+    d:'오답: 서면 계약은 중요하지만 ¶8.4에 따라 실질 분석이 우선입니다.'
+  },
+  q3:{
+    a:'오답: ¶8.4는 명칭보다 실질을 강조합니다. CCA로 명명해도 실질이 없으면 CCA로 인정되지 않습니다.',
+    b:'오답: 참여자 수에 대한 최소 요건은 없습니다(2개 이상이면 됩니다).',
+    c:'정답! ¶8.4는 Chapter I D.1의 실제 거래 분석 원칙을 CCA에도 적용해야 함을 강조합니다. 계약 형식보다 실제 기여·의사결정·자금 흐름 등 실질을 기준으로 분석해야 합니다.',
+    d:'오답: 서비스 CCA도 Chapter VIII의 적용 대상입니다(¶8.10).'
+  },
+  q4:{
+    a:'오답: CCA 전용의 독립적인 정상가격 산출방법은 존재하지 않습니다.',
+    b:'정답! ¶8.9는 CCA에 적용되는 정상가격 방법이 Chapter I–III에서 정의한 방법과 동일함을 명시합니다. CUP, TNMM, PSM 등이 상황에 따라 활용됩니다.',
+    c:'오답: 특정 방법이 강제되지 않으며, 각 상황에 가장 적합한 방법을 선택해야 합니다.',
+    d:'오답: CCA도 당연히 정상가격원칙의 적용을 받습니다.'
+  },
+  q5:{
+    a:'오답: 개발 CCA는 무형자산·유형자산의 개발·개선·유지·보호를 위한 약정입니다. ERP 도입은 서비스(시스템 이용) 취득에 해당합니다.',
+    b:'정답! 공동으로 서비스(ERP 시스템)를 취득하고 각자 직접 이용하며 추가 사용료를 지급하지 않는 구조는 서비스 CCA의 전형적 사례입니다.',
+    c:'오답: 각 법인이 직접 이익을 취득하고 기대이익 비례 비용 분담이 이루어지므로 CCA의 요건을 충족합니다.',
+    d:'오답: 라이선스 거래에서는 IP 사용에 대해 별도 사용료를 지급하지만, 이 사례에서는 추가 비용이 없습니다.'
+  }
+};
+
+function gradeQuiz(){
+  let correct = 0;
+  ['q1','q2','q3','q4','q5'].forEach(q=>{
+    const sel = document.querySelector(`input[name=${q}]:checked`);
+    const fb = document.getElementById('f'+q.slice(1));
+    if(!sel){fb.style.display='none'; return;}
+    const val = sel.value;
+    const isCorrect = val === answers[q];
+    if(isCorrect) correct++;
+    fb.textContent = (isCorrect ? '✅ ' : '❌ ') + feedbacks[q][val];
+    fb.className = 'q-feedback ' + (isCorrect ? 'correct' : 'wrong');
+    fb.style.display = 'block';
+  });
+  quizCorrect = correct;
+  updatePct();
+  const sb = document.getElementById('scoreBox');
+  const score = correct * 20;
+  document.getElementById('scoreNum').textContent = score + '점';
+  document.getElementById('scoreMsg').textContent = score >= 80
+    ? `🎉 통과! ${correct}문항 정답. 다음 모듈로 진행하세요.`
+    : `${correct}문항 정답. 오답 해설을 확인 후 다시 도전해 보세요.`;
+  sb.style.display = 'block';
+  sb.scrollIntoView({behavior:'smooth', block:'nearest'});
+  document.querySelector('.quiz-btn').disabled = true;
+}
+
+// ── 스크롤 이동 ──
+function goTo(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── 사이드바 활성 표시 ──
+const sections = ['obj','s1','s2','s3','s4','s5','quiz','check'];
+const navBtns = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', ()=>{
+  let current = sections[0];
+  sections.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el && window.scrollY + 150 >= el.offsetTop) current = id;
+  });
+  navBtns.forEach(btn=>{
+    const fn = btn.getAttribute('onclick');
+    if(fn && fn.includes(`'${current}'`)) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+});
+
+updatePct();
+</script>
+</body>
+</html>
