@@ -921,7 +921,7 @@ window.addEventListener('scroll',()=>{
 });
 updatePct();
 
-/* ─── Firebase 진도 자동 저장/복원 ─────────────────────────────── */
+
 var MODKEY = 'ch10_m3';
 
 var _origRefreshProgressUI = typeof refreshProgressUI !== 'undefined' ? refreshProgressUI : null;
@@ -950,6 +950,69 @@ tpOnReady(function(user){
   var pct = parseInt(typeof tpGet==='function' ? (tpGet(MODKEY+'_pct')||'0') : '0');
   if(pct > 0){
     var bar = document.getElementById('topBar');
+    var disp = document.getElementById('pctDisp');
+    if(bar) bar.style.width = pct + '%';
+    if(disp) disp.textContent = pct + '%';
+  }
+});
+
+
+var MODKEY = 'ch10_m3';
+
+(function(){
+  // updatePct 또는 updateProgress 후킹
+  var _fn = typeof updatePct !== 'undefined' ? 'updatePct' :
+            typeof updateProgress !== 'undefined' ? 'updateProgress' : null;
+  if(_fn && window[_fn]){
+    var _orig = window[_fn];
+    window[_fn] = function(){
+      _orig.apply(this, arguments);
+      var dispEl = document.getElementById('pctDisp');
+      var pct = dispEl ? parseInt(dispEl.textContent) || 0 : 0;
+      if(typeof tpSet === 'function'){
+        tpSet(MODKEY + '_pct', pct);
+        if(pct >= 100) tpSet(MODKEY + '_completed', true);
+      }
+    };
+  }
+})();
+
+tpOnReady(function(user){
+  var nameEl = document.getElementById('topUserName');
+  if(nameEl && user) nameEl.textContent = user.displayName || user.email;
+  var pct = parseInt(typeof tpGet==='function' ? (tpGet(MODKEY+'_pct')||'0') : '0');
+  if(pct > 0){
+    var bar = document.getElementById('topBar') || document.getElementById('progStrip');
+    var disp = document.getElementById('pctDisp');
+    if(bar) bar.style.width = pct + '%';
+    if(disp) disp.textContent = pct + '%';
+  }
+});
+
+/* ─── Firebase 진도 자동 저장/복원 ─────────────────────────────── */
+var MODKEY = 'ch10_m3';
+(function(){
+  var _fn = typeof updatePct !== 'undefined' ? 'updatePct' :
+            typeof updateProgress !== 'undefined' ? 'updateProgress' : null;
+  if(_fn && window[_fn]){
+    var _orig = window[_fn];
+    window[_fn] = function(){
+      _orig.apply(this, arguments);
+      var dispEl = document.getElementById('pctDisp');
+      var pct = dispEl ? parseInt(dispEl.textContent) || 0 : 0;
+      if(typeof tpSet === 'function'){
+        tpSet(MODKEY + '_pct', pct);
+        if(pct >= 100) tpSet(MODKEY + '_completed', true);
+      }
+    };
+  }
+})();
+tpOnReady(function(user){
+  var nameEl = document.getElementById('topUserName');
+  if(nameEl && user) nameEl.textContent = user.displayName || user.email;
+  var pct = parseInt(typeof tpGet==='function' ? (tpGet(MODKEY+'_pct')||'0') : '0');
+  if(pct > 0){
+    var bar = document.getElementById('topBar') || document.getElementById('progStrip');
     var disp = document.getElementById('pctDisp');
     if(bar) bar.style.width = pct + '%';
     if(disp) disp.textContent = pct + '%';
