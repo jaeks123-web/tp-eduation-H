@@ -107,6 +107,16 @@ a{color:var(--emerald);text-decoration:none}
 .s-num.ch8{color:var(--emerald)}
 .s-num.ch9{color:var(--sky)}
 .s-num.ch10{color:var(--rose)}
+/* 모듈 진도바 */
+.status-bar{height:4px;background:#eee;border-radius:99px;overflow:hidden;margin:.6rem 0 .7rem}
+.status-fill{height:100%;border-radius:99px;transition:width .4s}
+.status-fill.ch8{background:var(--emerald)}
+.status-fill.ch9{background:var(--sky)}
+.status-fill.ch10{background:var(--rose)}
+/* 학습중 태그 */
+.tag-inprog-ch8{background:var(--emerald-light);color:var(--emerald)}
+.tag-inprog-ch9{background:var(--sky-light);color:var(--sky)}
+.tag-inprog-ch10{background:var(--rose-light);color:var(--rose)}
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
@@ -203,36 +213,40 @@ a{color:var(--emerald);text-decoration:none}
 
     <div class="module-grid">
       <div class="module-card ch8" id="card-M8-1">
-        <span class="status-tag tag-pending" id="tag-M8-1">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M8-1">미시작</span>
         <div class="num">MODULE 8-1</div>
         <h3>CCA 개요 및 개념</h3>
         <p>원가분담약정(CCA)의 정의, 유형, 정상가격원칙 적용 근거 및 서비스 CCA와 개발 CCA 비교</p>
         <span class="para-range">§8.1~§8.16</span>
-        <a href="M8-1_CCA개요_개념.html" class="btn-mod" id="btn-M8-1">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch8" id="fill-M8-1" style="width:0%"></div></div>
+        <a href="M8-1_CCA개요_개념.html" class="btn-mod" id="btn-M8-1">학습 시작 →</a>
       </div>
       <div class="module-card ch8" id="card-M8-2">
-        <span class="status-tag tag-pending" id="tag-M8-2">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M8-2">미시작</span>
         <div class="num">MODULE 8-2</div>
         <h3>정상가격원칙 적용 — 참여자·기대이익·기여도</h3>
         <p>CCA 참여자 결정 기준, 기대이익의 측정 방법, 기여도 산정 원칙 및 진입 시 가치 평가</p>
         <span class="para-range">§8.17~§8.38</span>
-        <a href="M8-2_참여자_기대이익_기여도.html" class="btn-mod" id="btn-M8-2">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch8" id="fill-M8-2" style="width:0%"></div></div>
+        <a href="M8-2_참여자_기대이익_기여도.html" class="btn-mod" id="btn-M8-2">학습 시작 →</a>
       </div>
       <div class="module-card ch8" id="card-M8-3">
-        <span class="status-tag tag-pending" id="tag-M8-3">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M8-3">미시작</span>
         <div class="num">MODULE 8-3</div>
         <h3>대차지급액·실제거래분석·세무처리</h3>
         <p>Buy-in/Buy-out 대가의 산정, CCA 실제 거래 분석 기준, 각국 세무처리 및 원천세 이슈</p>
         <span class="para-range">§8.25~§8.47</span>
-        <a href="M8-3_대차지급액_세무처리.html" class="btn-mod" id="btn-M8-3">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch8" id="fill-M8-3" style="width:0%"></div></div>
+        <a href="M8-3_대차지급액_세무처리.html" class="btn-mod" id="btn-M8-3">학습 시작 →</a>
       </div>
       <div class="module-card ch8" id="card-M8-4">
-        <span class="status-tag tag-pending" id="tag-M8-4">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M8-4">미시작</span>
         <div class="num">MODULE 8-4</div>
         <h3>CCA 참가·탈퇴·종료 및 문서화</h3>
         <p>CCA 신규 참가·중도 탈퇴·약정 종료 시 처리 기준과 문서화 요건 및 실무 체크리스트</p>
         <span class="para-range">§8.39~§8.65</span>
-        <a href="M8-4_참가탈퇴종료_문서화.html" class="btn-mod" id="btn-M8-4">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch8" id="fill-M8-4" style="width:0%"></div></div>
+        <a href="M8-4_참가탈퇴종료_문서화.html" class="btn-mod" id="btn-M8-4">학습 시작 →</a>
       </div>
     </div>
   </div>
@@ -249,52 +263,58 @@ a{color:var(--emerald);text-decoration:none}
 
     <div class="module-grid">
       <div class="module-card ch9" id="card-M9-1">
-        <span class="status-tag tag-pending" id="tag-M9-1">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M9-1">미시작</span>
         <div class="num">MODULE 9-1</div>
         <h3>서론·범위·이론적 틀</h3>
         <p>사업구조재편의 정의, OECD 지침 적용 범위, 이전가격 처리를 위한 이론적 프레임워크</p>
         <span class="para-range">§9.1~§9.30</span>
-        <a href="M9-1_서론_범위_이론적틀.html" class="btn-mod" id="btn-M9-1">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch9" id="fill-M9-1" style="width:0%"></div></div>
+        <a href="M9-1_서론_범위_이론적틀.html" class="btn-mod" id="btn-M9-1">학습 시작 →</a>
       </div>
       <div class="module-card ch9" id="card-M9-2">
-        <span class="status-tag tag-pending" id="tag-M9-2">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M9-2">미시작</span>
         <div class="num">MODULE 9-2</div>
         <h3>FAR 분석·시너지·문서화</h3>
         <p>재편 전후 FAR 분석 비교, 그룹 시너지 효과 귀속, 재편 관련 문서화 실무 요건</p>
         <span class="para-range">§9.20~§9.55</span>
-        <a href="M9-2_FAR분석_시너지_문서화.html" class="btn-mod" id="btn-M9-2">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch9" id="fill-M9-2" style="width:0%"></div></div>
+        <a href="M9-2_FAR분석_시너지_문서화.html" class="btn-mod" id="btn-M9-2">학습 시작 →</a>
       </div>
       <div class="module-card ch9" id="card-M9-3">
-        <span class="status-tag tag-pending" id="tag-M9-3">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M9-3">미시작</span>
         <div class="num">MODULE 9-3</div>
         <h3>거래인식·이익잠재력 재배분</h3>
         <p>재편 거래의 이전가격 목적 인식 기준, 이익잠재력(profit potential)의 이전 및 재배분 원칙</p>
         <span class="para-range">§9.56~§9.100</span>
-        <a href="M9-3_거래인식_이익잠재력_재배분.html" class="btn-mod" id="btn-M9-3">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch9" id="fill-M9-3" style="width:0%"></div></div>
+        <a href="M9-3_거래인식_이익잠재력_재배분.html" class="btn-mod" id="btn-M9-3">학습 시작 →</a>
       </div>
       <div class="module-card ch9" id="card-M9-4">
-        <span class="status-tag tag-pending" id="tag-M9-4">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M9-4">미시작</span>
         <div class="num">MODULE 9-4</div>
         <h3>가치이전 — 유형·무형자산·계속기업</h3>
         <p>재편 시 이전되는 유형자산·무형자산·계속기업 가치의 이전가격 평가 방법론 및 사례</p>
         <span class="para-range">§9.75~§9.130</span>
-        <a href="M9-4_가치이전_유형무형_계속기업.html" class="btn-mod" id="btn-M9-4">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch9" id="fill-M9-4" style="width:0%"></div></div>
+        <a href="M9-4_가치이전_유형무형_계속기업.html" class="btn-mod" id="btn-M9-4">학습 시작 →</a>
       </div>
       <div class="module-card ch9" id="card-M9-5">
-        <span class="status-tag tag-pending" id="tag-M9-5">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M9-5">미시작</span>
         <div class="num">MODULE 9-5</div>
         <h3>기존약정 종료·보상·비용부담</h3>
         <p>기존 계약 및 약정 종료 시 보상 필요성 판단 기준, 해지 손실 보전 및 비용부담 원칙</p>
         <span class="para-range">§9.100~§9.150</span>
-        <a href="M9-5_기존약정_종료_보상_비용부담.html" class="btn-mod" id="btn-M9-5">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch9" id="fill-M9-5" style="width:0%"></div></div>
+        <a href="M9-5_기존약정_종료_보상_비용부담.html" class="btn-mod" id="btn-M9-5">학습 시작 →</a>
       </div>
       <div class="module-card ch9" id="card-M9-6">
-        <span class="status-tag tag-pending" id="tag-M9-6">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M9-6">미시작</span>
         <div class="num">MODULE 9-6</div>
         <h3>구조조정 후 거래보상·비교가능성·지역절감</h3>
         <p>재편 이후 관계사 간 거래의 정상가격 결정, 비교가능성 분석, 지역절감효과(LSA) 귀속</p>
         <span class="para-range">§9.150~§9.190</span>
-        <a href="M9-6_구조조정후거래보상_비교분석_지역절감.html" class="btn-mod" id="btn-M9-6">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch9" id="fill-M9-6" style="width:0%"></div></div>
+        <a href="M9-6_구조조정후거래보상_비교분석_지역절감.html" class="btn-mod" id="btn-M9-6">학습 시작 →</a>
       </div>
     </div>
   </div>
@@ -311,52 +331,58 @@ a{color:var(--emerald);text-decoration:none}
 
     <div class="module-grid">
       <div class="module-card ch10" id="card-M10-1">
-        <span class="status-tag tag-pending" id="tag-M10-1">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M10-1">미시작</span>
         <div class="num">MODULE 10-1</div>
         <h3>서론·금융거래 범위·재획정 원칙</h3>
         <p>금융거래 이전가격 지침의 적용 범위, 부채·자본 재획정 원칙 및 독립기업 간 비교 기준</p>
         <span class="para-range">§10.1~§10.35</span>
-        <a href="M10-1_서론_금융거래범위_재획정원칙.html" class="btn-mod" id="btn-M10-1">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch10" id="fill-M10-1" style="width:0%"></div></div>
+        <a href="M10-1_서론_금융거래범위_재획정원칙.html" class="btn-mod" id="btn-M10-1">학습 시작 →</a>
       </div>
       <div class="module-card ch10" id="card-M10-2">
-        <span class="status-tag tag-pending" id="tag-M10-2">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M10-2">미시작</span>
         <div class="num">MODULE 10-2</div>
         <h3>그룹 내 대출·이자율 산정</h3>
         <p>그룹 내 대출의 정상가격 이자율 결정 방법: CUP 적용, 신용등급 분석, 경제적 대안 비교</p>
         <span class="para-range">§10.36~§10.95</span>
-        <a href="M10-2_그룹내대출_이자율산정.html" class="btn-mod" id="btn-M10-2">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch10" id="fill-M10-2" style="width:0%"></div></div>
+        <a href="M10-2_그룹내대출_이자율산정.html" class="btn-mod" id="btn-M10-2">학습 시작 →</a>
       </div>
       <div class="module-card ch10" id="card-M10-3">
-        <span class="status-tag tag-pending" id="tag-M10-3">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M10-3">미시작</span>
         <div class="num">MODULE 10-3</div>
         <h3>현금풀링 (Cash Pooling)</h3>
         <p>물리적·명목상 현금풀링의 구조와 정상가격 처리, 참여자별 이익 배분 및 담보 가치 평가</p>
         <span class="para-range">§10.96~§10.130</span>
-        <a href="M10-3_현금풀링.html" class="btn-mod" id="btn-M10-3">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch10" id="fill-M10-3" style="width:0%"></div></div>
+        <a href="M10-3_현금풀링.html" class="btn-mod" id="btn-M10-3">학습 시작 →</a>
       </div>
       <div class="module-card ch10" id="card-M10-4">
-        <span class="status-tag tag-pending" id="tag-M10-4">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M10-4">미시작</span>
         <div class="num">MODULE 10-4</div>
         <h3>헷징 (Hedging)</h3>
         <p>그룹 내 헷징 거래의 이전가격 처리, 헷징 비용 배분, 집중화 헷징 구조의 정상가격 검토</p>
         <span class="para-range">§10.131~§10.160</span>
-        <a href="M10-4_헷징.html" class="btn-mod" id="btn-M10-4">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch10" id="fill-M10-4" style="width:0%"></div></div>
+        <a href="M10-4_헷징.html" class="btn-mod" id="btn-M10-4">학습 시작 →</a>
       </div>
       <div class="module-card ch10" id="card-M10-5">
-        <span class="status-tag tag-pending" id="tag-M10-5">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M10-5">미시작</span>
         <div class="num">MODULE 10-5</div>
         <h3>그룹 내 보증 (Financial Guarantees)</h3>
         <p>명시적·암묵적 지원의 구분, 보증 수수료 산정 방법, 수동적 연계(passive association) 효과</p>
         <span class="para-range">§10.161~§10.193</span>
-        <a href="M10-5_그룹내보증.html" class="btn-mod" id="btn-M10-5">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch10" id="fill-M10-5" style="width:0%"></div></div>
+        <a href="M10-5_그룹내보증.html" class="btn-mod" id="btn-M10-5">학습 시작 →</a>
       </div>
       <div class="module-card ch10" id="card-M10-6">
-        <span class="status-tag tag-pending" id="tag-M10-6">미완료</span>
+        <span class="status-tag tag-pending" id="tag-M10-6">미시작</span>
         <div class="num">MODULE 10-6</div>
         <h3>자기보험·캡티브보험 (Captive Insurance)</h3>
         <p>캡티브보험의 이전가격 처리, 보험료 정상가격 산정, 위험 인수 실질 분석 및 사례 검토</p>
         <span class="para-range">§10.194~§10.220</span>
-        <a href="M10-6_캡티브보험.html" class="btn-mod" id="btn-M10-6">학습 시작</a>
+        <div class="status-bar"><div class="status-fill ch10" id="fill-M10-6" style="width:0%"></div></div>
+        <a href="M10-6_캡티브보험.html" class="btn-mod" id="btn-M10-6">학습 시작 →</a>
       </div>
     </div>
   </div>
@@ -364,53 +390,106 @@ a{color:var(--emerald);text-decoration:none}
 </div><!-- /main -->
 
 <script>
-const CH_MODS = {
-  ch8:  ['M8-1','M8-2','M8-3','M8-4'],
-  ch9:  ['M9-1','M9-2','M9-3','M9-4','M9-5','M9-6'],
-  ch10: ['M10-1','M10-2','M10-3','M10-4','M10-5','M10-6']
-};
-
-function updateUI(data) {
-  let totalDone = 0;
-  Object.entries(CH_MODS).forEach(([ch, mods]) => {
-    let done = 0;
-    mods.forEach(mod => {
-      const completed = data && data[mod] && data[mod].completed;
-      const tag  = document.getElementById('tag-'  + mod);
-      const card = document.getElementById('card-' + mod);
-      const btn  = document.getElementById('btn-'  + mod);
-      if (completed) {
-        done++;
-        if (tag)  { tag.textContent = '완료'; tag.className = 'status-tag tag-done'; }
-        if (card) card.classList.add('done');
-        if (btn)  { btn.className = 'btn-mod btn-mod-done'; btn.textContent = '다시 보기'; }
-      }
-    });
-    const total = mods.length;
-    const pct   = total ? Math.round(done / total * 100) : 0;
-    const bar   = document.getElementById(ch + '-bar');
-    const txt   = document.getElementById(ch + '-text');
-    const pctEl = document.getElementById(ch + '-pct');
-    const numEl = document.getElementById(ch + '-done-num');
-    if (bar)   bar.style.width    = pct + '%';
-    if (txt)   txt.textContent    = done + ' / ' + total + ' 모듈 완료';
-    if (pctEl) pctEl.textContent  = pct + '%';
-    if (numEl) numEl.textContent  = done + '/' + total;
-    totalDone += done;
+/* ── Chapter VIII ─────────────────────────────── */
+var ch8mods=['m1','m2','m3','m4'];
+function loadCh8Progress(){
+  var done=0;
+  ch8mods.forEach(function(m,i){
+    var mod='M8-'+(i+1);
+    var pct=parseInt(tpGet('ch8_'+m+'_pct')||'0');
+    var fill=document.getElementById('fill-'+mod);
+    var tag=document.getElementById('tag-'+mod);
+    var btn=document.getElementById('btn-'+mod);
+    var card=document.getElementById('card-'+mod);
+    if(fill)fill.style.width=pct+'%';
+    if(pct===100){
+      done++;
+      if(tag){tag.textContent='완료 ✓';tag.className='status-tag tag-done';}
+      if(card)card.classList.add('done');
+      if(btn){btn.textContent='복습하기';btn.className='btn-mod btn-mod-done';}
+    } else if(pct>0){
+      if(tag){tag.textContent='학습중';tag.className='status-tag tag-inprog-ch8';}
+      if(card)card.classList.add('inprog');
+      if(btn)btn.textContent='이어서 학습 →';
+    }
   });
-  const totalEl = document.getElementById('total-done-num');
-  if (totalEl) totalEl.textContent = totalDone;
+  var pct=Math.round(done/4*100);
+  document.getElementById('ch8-bar').style.width=pct+'%';
+  document.getElementById('ch8-text').textContent=done+' / 4 모듈 완료';
+  document.getElementById('ch8-pct').textContent=pct+'%';
+  document.getElementById('ch8-done-num').textContent=done+'/4';
+  return done;
 }
 
-tpOnReady(function(uid, data) {
-  const loading = document.getElementById('tpLoading');
-  if (loading) loading.style.display = 'none';
+/* ── Chapter IX ─────────────────────────────── */
+var ch9mods=['m1','m2','m3','m4','m5','m6'];
+function loadCh9Progress(){
+  var done=0;
+  ch9mods.forEach(function(m,i){
+    var mod='M9-'+(i+1);
+    var pct=parseInt(tpGet('ch9_'+m+'_pct')||'0');
+    var fill=document.getElementById('fill-'+mod);
+    var tag=document.getElementById('tag-'+mod);
+    var btn=document.getElementById('btn-'+mod);
+    var card=document.getElementById('card-'+mod);
+    if(fill)fill.style.width=pct+'%';
+    if(pct===100){
+      done++;
+      if(tag){tag.textContent='완료 ✓';tag.className='status-tag tag-done';}
+      if(card)card.classList.add('done');
+      if(btn){btn.textContent='복습하기';btn.className='btn-mod btn-mod-done';}
+    } else if(pct>0){
+      if(tag){tag.textContent='학습중';tag.className='status-tag tag-inprog-ch9';}
+      if(card)card.classList.add('inprog');
+      if(btn)btn.textContent='이어서 학습 →';
+    }
+  });
+  var pct=Math.round(done/6*100);
+  document.getElementById('ch9-bar').style.width=pct+'%';
+  document.getElementById('ch9-text').textContent=done+' / 6 모듈 완료';
+  document.getElementById('ch9-pct').textContent=pct+'%';
+  document.getElementById('ch9-done-num').textContent=done+'/6';
+  return done;
+}
 
-  const user = firebase.auth().currentUser;
-  const nameEl = document.getElementById('topUserName');
-  if (nameEl && user) nameEl.textContent = (user.displayName || user.email || '');
+/* ── Chapter X ─────────────────────────────── */
+var ch10mods=['m1','m2','m3','m4','m5','m6'];
+function loadCh10Progress(){
+  var done=0;
+  ch10mods.forEach(function(m,i){
+    var mod='M10-'+(i+1);
+    var pct=parseInt(tpGet('ch10_'+m+'_pct')||'0');
+    var fill=document.getElementById('fill-'+mod);
+    var tag=document.getElementById('tag-'+mod);
+    var btn=document.getElementById('btn-'+mod);
+    var card=document.getElementById('card-'+mod);
+    if(fill)fill.style.width=pct+'%';
+    if(pct===100){
+      done++;
+      if(tag){tag.textContent='완료 ✓';tag.className='status-tag tag-done';}
+      if(card)card.classList.add('done');
+      if(btn){btn.textContent='복습하기';btn.className='btn-mod btn-mod-done';}
+    } else if(pct>0){
+      if(tag){tag.textContent='학습중';tag.className='status-tag tag-inprog-ch10';}
+      if(card)card.classList.add('inprog');
+      if(btn)btn.textContent='이어서 학습 →';
+    }
+  });
+  var pct=Math.round(done/6*100);
+  document.getElementById('ch10-bar').style.width=pct+'%';
+  document.getElementById('ch10-text').textContent=done+' / 6 모듈 완료';
+  document.getElementById('ch10-pct').textContent=pct+'%';
+  document.getElementById('ch10-done-num').textContent=done+'/6';
+  return done;
+}
 
-  updateUI(data);
+tpOnReady(function(user){
+  document.getElementById('tpLoading').style.display='none';
+  document.getElementById('topUserName').textContent=user.displayName||user.email;
+  var d8=loadCh8Progress();
+  var d9=loadCh9Progress();
+  var d10=loadCh10Progress();
+  document.getElementById('total-done-num').textContent=d8+d9+d10;
 });
 </script>
 </body>

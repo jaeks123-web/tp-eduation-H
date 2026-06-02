@@ -161,6 +161,13 @@ a{color:var(--purple);text-decoration:none}
   .sidebar{width:100%;position:static}
   .two-col,.three-col,.type-grid,.cond-grid,.cost-grid{grid-template-columns:1fr}
 }
+
+#retryBtn, #retry-btn {
+  transition: filter .15s;
+}
+#retryBtn:hover, #retry-btn:hover {
+  filter: brightness(1.2);
+}
 </style>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
@@ -174,6 +181,10 @@ a{color:var(--purple);text-decoration:none}
   <h1>M9-5. 기존약정 종료 · 보상 · 비용부담</h1>
   <div class="sub">기존약정 종료의 ALP 기준 &amp; 종료 보상 산정 &amp; 손해배상 &amp; 구조조정 후 비용부담&nbsp;|&nbsp;¶9.75 – ¶9.97&nbsp;|&nbsp;예상 학습시간: 45분</div>
   <div class="prog-strip"><div class="prog-strip-inner" id="topBar" style="width:0%"></div></div>
+  <div style="display:flex;justify-content:flex-end;align-items:center;gap:.7rem;margin-top:.5rem;font-size:.82rem">
+    <span id="topUserName" style="color:rgba(255,255,255,.85)"></span>
+    <button onclick="tpSignOut()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;padding:3px 14px;border-radius:20px;cursor:pointer;font-size:.78rem;font-family:inherit">로그아웃</button>
+  </div>
 </header>
 
 <div class="layout">
@@ -611,7 +622,8 @@ a{color:var(--purple);text-decoration:none}
       <div class="score-box" id="scoreBox">
         <div class="big" id="scoreNum"></div>
         <p id="scoreMsg"></p>
-      </div>
+        <button class="quiz-btn" id="retryBtn" onclick="resetQuiz()" style="margin-top:1rem;background:#0f6b78;color:#fff;">🔄 다시 응시하기</button>
+            </div>
     </div>
 
     <!-- 체크리스트 -->
@@ -656,7 +668,7 @@ a{color:var(--purple);text-decoration:none}
 
     <div class="nav-bottom">
       <a class="btn-nav secondary" href="M9-4_가치이전_유형무형_계속기업.html">← 이전 모듈</a>
-      <span class="btn-nav secondary" onclick="alert('목차 페이지로 이동합니다.')">📋 목차로</span>
+      <a class="btn-nav secondary" href="index.html">📋 목차로</a>
       <a class="btn-nav" href="M9-6_구조조정후거래보상_비교분석_지역절감.html">다음 모듈 →</a>
     </div>
   </main>
@@ -716,6 +728,18 @@ const feedbacks={
   }
 };
 let graded=false;
+function resetQuiz(){
+  document.querySelectorAll('input[type="radio"]').forEach(function(r){ r.checked=false; });
+  document.querySelectorAll('.q-feedback').forEach(function(el){
+    el.style.display='none'; el.textContent=''; el.className='q-feedback';
+  });
+  var sb=document.getElementById('scoreBox');
+  if(sb) sb.style.display='none';
+  var btn=document.querySelector('.quiz-btn:not(#retryBtn)');
+  if(btn){ btn.disabled=false; btn.style.opacity='1'; }
+  _saveAdvPct();
+}
+
 function gradeQuiz(){
   if(graded)return;
   let correct=0;
@@ -760,6 +784,41 @@ window.addEventListener('scroll',()=>{
   });
 });
 updatePct();
+
+/* ─── Firebase 진도 자동 저장/복원 ─────────────────────────────── */
+var MODKEY = 'ch9_m5';
+
+var _origRefreshProgressUI = typeof refreshProgressUI !== 'undefined' ? refreshProgressUI : null;
+if(_origRefreshProgressUI){
+  refreshProgressUI = function(){
+    _origRefreshProgressUI.apply(this, arguments);
+    var pct = typeof calcProgress === 'function' ? calcProgress() : 0;
+    if(typeof tpSet === 'function'){
+      tpSet(MODKEY + '_pct', pct);
+      if(pct >= 100) tpSet(MODKEY + '_completed', true);
+    }
+  };
+}
+
+function _saveAdvPct(){
+  var pct = typeof calcProgress === 'function' ? calcProgress() : 0;
+  if(typeof tpSet === 'function'){
+    tpSet(MODKEY + '_pct', pct);
+    if(pct >= 100) tpSet(MODKEY + '_completed', true);
+  }
+}
+
+tpOnReady(function(user){
+  var nameEl = document.getElementById('topUserName');
+  if(nameEl && user) nameEl.textContent = user.displayName || user.email;
+  var pct = parseInt(typeof tpGet==='function' ? (tpGet(MODKEY+'_pct')||'0') : '0');
+  if(pct > 0){
+    var bar = document.getElementById('topBar');
+    var disp = document.getElementById('pctDisp');
+    if(bar) bar.style.width = pct + '%';
+    if(disp) disp.textContent = pct + '%';
+  }
+});
 </script>
 </body>
 </html>
